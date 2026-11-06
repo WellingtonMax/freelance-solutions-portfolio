@@ -21,6 +21,8 @@ python -m unittest test_clean.py -v
 
 **Security controls:** source input is limited to 5 MB / 20,000 rows and 2,048 characters per cell. Output files will not overwrite existing paths or follow pre-existing symlink targets. Use optional `--expected-sha256 HASH` supplied from a **trusted independent channel** to detect source modification. Input authenticity is **not** guaranteed by checksums supplied by the same untrusted party.
 
+**Failure recovery:** if an output write fails, the cleaner attempts to delete files created during that invocation, leaving existing files untouched. This is **best-effort rollback, not atomic multi-file publication**: concurrent readers may see a partial result before cleanup, and untrusted directories or filesystem races are out of scope. Only run with operator-controlled output paths.
+
 **Scope limitation:** This is a standalone CSV transformation, not an authenticated CRM integration. It has not been tested against proprietary Excel workbook features, hostile filesystem races, concurrent writers or customer data.
 
 **Demonstration only.** Synthetic contacts; no personal customer data.
