@@ -57,21 +57,22 @@ def compare(before, after):
     second = blocks(after)
     matcher = difflib.SequenceMatcher(None, first, second, autojunk=True)
     changes = []
+    total_changes = 0
     for tag, a0, a1, b0, b1 in matcher.get_opcodes():
         if tag == "equal":
             continue
-        changes.append({"type": tag, "before_blocks": a1 - a0, "after_blocks": b1 - b0,
-                        "before_excerpt": " | ".join(first[a0:a1])[:160],
-                        "after_excerpt": " | ".join(second[b0:b1])[:160]})
-        if len(changes) == 10:
-            break
+        total_changes += 1
+        if len(changes) < 10:
+            changes.append({"type": tag, "before_blocks": a1 - a0, "after_blocks": b1 - b0,
+                            "before_excerpt": " | ".join(first[a0:a1])[:160],
+                            "after_excerpt": " | ".join(second[b0:b1])[:160]})
     return {"status": "offline_comparison", "changed": first != second,
             "before_sha256": hashlib.sha256(before).hexdigest(),
             "after_sha256": hashlib.sha256(after).hexdigest(),
             "visible_blocks_before": len(first),
             "visible_blocks_after": len(second),
             "first_10_changes": changes,
-            "truncated_change_list": len(matcher.get_opcodes()) > 11}
+            "truncated_change_list": total_changes > 10}
 
 
 def main():

@@ -30,6 +30,18 @@ class OfflineMonitorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "complexity"):
             blocks(b"<p>x</p>" * 501)
 
+    def test_change_list_truncation_counts_changes_not_equal_blocks(self):
+        a = "".join(f"<p>old{i}</p><p>stable{i}</p>" for i in range(12)).encode()
+        b = "".join(f"<p>new{i}</p><p>stable{i}</p>" for i in range(12)).encode()
+        result = compare(a, b)
+        self.assertEqual(len(result["first_10_changes"]), 10)
+        self.assertTrue(result["truncated_change_list"])
+
+    def test_fewer_changes_not_reported_truncated(self):
+        a = "".join(f"<p>old{i}</p><p>stable{i}</p>" for i in range(8)).encode()
+        b = "".join(f"<p>new{i}</p><p>stable{i}</p>" for i in range(8)).encode()
+        self.assertFalse(compare(a, b)["truncated_change_list"])
+
     def test_no_network_or_html_execution(self):
         result = compare(b"<a href='https://example.com'>Read more</a>", b"<a href='https://evil.example'>Read more</a>")
         self.assertFalse(result["changed"])  # Only the rendered text is compared.

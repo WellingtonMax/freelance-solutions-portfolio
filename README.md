@@ -25,11 +25,6 @@
 
 ## Remaining portfolio roadmap (not implemented yet)
 
-4. **CRM Workflow:** lead normalization, rules engine, follow-up queues.
-5. **Landing Page Studio:** accessible, responsive site with validated contact form.
-6. **Document Factory:** batch generation of reports and PDF documents.
-7. **Data Quality Auditor:** schema checks, anomaly reports, data lineage.
-8. **Web Monitor:** permitted website status/change alerts without bypassing access restrictions.
 9. **Bug Fix Laboratory:** documented regression cases, patches and automated tests.
 10. **Business Operations API:** documented CRUD API, permissions and integration tests.
 
