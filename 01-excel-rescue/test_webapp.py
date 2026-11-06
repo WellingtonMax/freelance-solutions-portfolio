@@ -142,13 +142,25 @@ class WebAppTests(unittest.TestCase):
         cookie, csrf = self.login()
         status, _, _ = self.upload(cookie, csrf, b"not,a,valid,schema\nvalue\n")
         self.assertEqual(status, 422)
-        status, _, _ = self.upload(cookie, csrf, b"x" * 5_000_001)
-        self.assertEqual(status, 413)
+        # Send only headers: a well-behaved server rejects oversized requests
+        # immediately without reading a 5 MB body or waiting for a full upload.
+        connection = HTTPConnection("127.0.0.1", self.port, timeout=8)
+        connection.putrequest("POST", "/api/jobs")
+        connection.putheader("Origin", "http://127.0.0.1:" + str(self.port))
+        connection.putheader("Cookie", cookie)
+        connection.putheader("X-CSRF-Token", csrf)
+        connection.putheader("Content-Type", "text/csv")
+        connection.putheader("Content-Length", "5000001")
+        connection.endheaders()
+        response = connection.getresponse()
+        self.assertEqual(response.status, 413)
+        response.read()
+        connection.close()
         self.assertEqual(self.store.list_jobs(1), [])
 
     def test_logout_revokes_session(self):
         cookie, csrf = self.login()
-        status, _, _ = self.call("POST", "/api/logout", b"{}", cookie, csrf)
+        status, _, _ = self.call("POST", "/api/logout", None, cookie, csrf)
         self.assertEqual(status, 200)
         status, _, _ = self.call("GET", "/api/me", cookie=cookie)
         self.assertEqual(status, 401)
