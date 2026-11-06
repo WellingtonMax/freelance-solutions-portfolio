@@ -1,4 +1,4 @@
-name: Freelance Portfolio - Python security regression checks
+name: Freelance Portfolio - regression and security checks
 on:
   push:
     branches: [main]
@@ -6,6 +6,11 @@ on:
       - '01-excel-rescue/**'
       - '02-sales-intelligence/**'
       - '03-api-bridge/**'
+      - '04-crm-lead-intelligence/**'
+      - '05-landing-page-studio/**'
+      - '06-document-factory/**'
+      - '07-data-quality-auditor/**'
+      - '08-site-change-monitor/**'
       - '.github/workflows/portfolio-ci.yml'
   pull_request:
     branches: [main]
@@ -17,7 +22,7 @@ permissions:
 jobs:
   tests:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -35,3 +40,20 @@ jobs:
       - name: API Bridge
         working-directory: 03-api-bridge
         run: python -m unittest discover -v
+      - name: CRM Lead Intelligence
+        working-directory: 04-crm-lead-intelligence
+        run: python -m unittest discover -v
+      - name: Landing Page Studio
+        working-directory: 05-landing-page-studio
+        run: node --test test_site.cjs
+      - name: Document Factory
+        working-directory: 06-document-factory
+        run: python -m unittest discover -v
+      - name: Data Quality Auditor
+        working-directory: 07-data-quality-auditor
+        run: python -m unittest discover -v
+      - name: Site Change Monitor
+        working-directory: 08-site-change-monitor
+        run: python -m unittest discover -v
+      - name: Compile Python demos
+        run: python -m compileall -q 01-excel-rescue 02-sales-intelligence 03-api-bridge 04-crm-lead-intelligence 06-document-factory 07-data-quality-auditor 08-site-change-monitor
