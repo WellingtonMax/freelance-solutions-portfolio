@@ -86,7 +86,7 @@ python -m unittest discover -s tests -v
 python -S -m unittest discover -s tests -v
 ```
 
-The second command exercises the standard-library path and skips ML-dependent tests. `npm ci --ignore-scripts && npm test` runs six test-only DOM interaction/security checks. See [the verification record](docs/VERIFICATION.md) for exact observed results and environment limitations. The dedicated workflow runs rule, ML and report interaction checks independently of the existing portfolio demos.
+The second command exercises the standard-library path and skips ML-dependent tests. `npm ci --ignore-scripts && npm test` runs eight test-only DOM interaction/security checks. See [the verification record](docs/VERIFICATION.md) for exact observed results and environment limitations. The dedicated workflow runs rule, ML and report interaction checks independently of the existing portfolio demos.
 
 ## Commercial boundary
 

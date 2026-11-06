@@ -63,6 +63,31 @@ test("material selector changes the country allocation bars", () => {
   dom.window.close();
 });
 
+function scenarioReport(options) {
+  const code = [
+    "from stratasignal.demo import demo_bundle",
+    "from stratasignal.analytics import analyze",
+    "from stratasignal.report import render_html",
+    "print(render_html(analyze(demo_bundle(),'a'*64,enable_ml=False," + options + ")))"
+  ].join("\n");
+  return execFileSync(process.env.PYTHON || "python",["-c",code],{encoding:"utf8"});
+}
+
+test("requested shock country outside the portfolio remains selected with zero exposure", () => {
+  const {dom,doc} = open(scenarioReport("shock_country='US'"));
+  assert.equal(doc.getElementById("shock-country").value,"US");
+  assert.deepEqual([...doc.querySelectorAll("#scenario-results strong")].map(e=>e.textContent),["0 kg","0 kg","0 kg"]);
+  dom.window.close();
+});
+
+test("fractional CLI reduction is preserved when the report initializes", () => {
+  const {dom,doc} = open(scenarioReport("reduction=0.333,duration_days=180"));
+  assert.ok(Math.abs(Number(doc.getElementById("shock-reduction").value)/100 - .333) < 1e-12);
+  assert.equal(doc.getElementById("reduction-value").textContent,"33,3%");
+  assert.equal(doc.querySelectorAll("#scenario-results strong")[1].textContent,"15.894,1 kg");
+  dom.window.close();
+});
+
 test("malicious material label stays text and creates no executable elements", () => {
   const code = [
     "from stratasignal.demo import demo_bundle",

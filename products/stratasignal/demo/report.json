@@ -267,7 +267,7 @@
   "scenario": {
     "country": "CN",
     "duration_days": 45,
-    "reduction": 1.0,
+    "reduction": 1,
     "assumption": "Fluxo normal = demanda constante; redução começa no dia 0; estoque integralmente utilizável. Sem reposição extraordinária.",
     "outcomes": [
       {

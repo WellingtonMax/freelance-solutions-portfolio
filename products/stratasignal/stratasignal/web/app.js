@@ -44,11 +44,11 @@
   const flagNames = {missing_evidence:"Evidência não fornecida",unknown_origin:"Origem desconhecida",origin_mismatch:"Origem declarada divergente",missing_issue_date:"Emissão não informada",issue_after_observation:"Emissão posterior à observação",expired_evidence:"Validade expirada",invalid_validity_window:"Janela de validade inconsistente",shared_fingerprint:"Mesmo hash em fornecedores distintos"};
   report.metadata_flags.forEach(f => { const tr = node("tr"); [flagNames[f.code] || f.code, names[f.material], f.supplier, f.evidence_id || "—"].forEach(v => tr.append(node("td", v))); $("evidence-table").append(tr); });
   if (!report.metadata_flags.length) { const tr = node("tr"); const td = node("td", "Nenhum sinal nas verificações implementadas."); td.colSpan = 4; tr.append(td); $("evidence-table").append(tr); }
-  const countries = [...new Set(report.materials.flatMap(m => m.suppliers.map(s => s.origin_country)))].sort();
+  const countries = [...new Set(report.materials.flatMap(m => m.suppliers.map(s => s.origin_country)).concat(report.scenario.country))].sort();
   countries.forEach(code => { const option = node("option", countryName(code) + " (" + code + ")"); option.value = code; $("shock-country").append(option); });
   $("shock-country").value = countries.includes(report.scenario.country) ? report.scenario.country : countries[0];
   $("shock-days").value = report.scenario.duration_days;
-  $("shock-reduction").value = Math.round(report.scenario.reduction * 100);
+  $("shock-reduction").value = report.scenario.reduction * 100;
   $("scenario-assumption").textContent = report.scenario.assumption;
   function simulate() {
     const country = $("shock-country").value; const duration = Number($("shock-days").value); const reduction = Number($("shock-reduction").value) / 100;
