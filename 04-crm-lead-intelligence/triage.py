@@ -42,6 +42,7 @@ def analyze_bytes(data):
         if reader.fieldnames != list(FIELDS):
             raise ValueError("CSV headers must exactly match documented schema")
         selected = {}
+        suppressed = set()
         rejected = []
         for number, row in enumerate(reader, start=2):
             if number > MAX_ROWS + 1:
@@ -57,16 +58,22 @@ def analyze_bytes(data):
                 openings = int(row["openings"])
                 if not 0 <= openings <= 1000:
                     raise ValueError("openings out of range")
-                if yes_no(row["agency"]):
-                    rejected.append({"row": number, "reason": "agency excluded"})
+                agency = yes_no(row["agency"])
+                opted_out = yes_no(row["opt_out"])
+                key = company.casefold()
+                # Conservative company-level suppression: a later opted-out or agency
+                # record must invalidate earlier candidates, regardless of CSV order.
+                if agency or opted_out:
+                    suppressed.add(key)
+                    selected.pop(key, None)
+                    rejected.append({"row": number, "reason": "opted out" if opted_out else "agency excluded"})
                     continue
-                if yes_no(row["opt_out"]):
-                    rejected.append({"row": number, "reason": "opted out"})
+                if key in suppressed:
+                    rejected.append({"row": number, "reason": "company suppressed by another row"})
                     continue
                 score = min(openings * 10, 60) + (15 if any(
                     word in role.casefold() for word in ("engineer", "developer", "security")
                 ) else 0)
-                key = company.casefold()
                 lead = {"company": company, "role": role, "openings": openings,
                         "email": email, "score": score, "status": "requires_human_review"}
                 if key in selected:
