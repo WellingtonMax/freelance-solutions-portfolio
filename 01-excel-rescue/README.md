@@ -1,5 +1,8 @@
 # Excel Rescue — CRM CSV Cleanup
 
+[Explore the offline sample audit](demo.html) — a static, accessible walkthrough of the exact synthetic sample, with interactive accepted/rejected filters. It does **not** process uploaded files or claim to be the Python application. CI verifies its rows and counts against the actual Python cleaner.
+
+
 **Client problem:** exported contact files often contain inconsistent dates, duplicate emails and invalid rows.
 
 **Deliverables:** normalized CSV, rejected-record audit CSV, command-line script, unit tests and fictional sample data.
