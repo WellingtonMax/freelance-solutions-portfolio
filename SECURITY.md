@@ -43,7 +43,7 @@ No agent is implemented in these demos, so the OWASP Top 10 for Agentic Applicat
 
 The CSV cleaner creates both output files with exclusive-create semantics and attempts rollback of its newly created files if either write fails. Fault-injection tests simulate a denied second output and verify removal of the first output; pre-existing outputs are preserved. This does **not** make multi-file publication atomic. Other processes may observe an intermediate output, and malicious concurrent changes to output directories remain outside the trusted local-operator model. The email validation also rejects formula-like prefixes hidden behind Unicode format characters and whitespace.
 
-## Project acceptance criteria
+### CRM company-level suppression (November 2026)\n\nThe CRM demo fails closed on company-level opt-out and agency conflicts across rows, irrespective of ordering. This avoids silently prioritizing a lead for the same company after a contradictory suppression signal. Suppression is based on user-supplied flags, not verified consent or organizational identity. Homonymous companies and false flags remain residual risks; no outreach is automated.\n\n## Project acceptance criteria
 
 For **every** new project or material change:
 
