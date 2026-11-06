@@ -1,0 +1,35 @@
+name: CodeQL security scanning
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '01-excel-rescue/**'
+      - '02-sales-intelligence/**'
+      - '03-api-bridge/**'
+      - '.github/workflows/codeql.yml'
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '27 6 * * 1'
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  python-security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: python
+          build-mode: none
+          queries: security-extended
+      - name: Analyze
+        uses: github/codeql-action/analyze@v4
