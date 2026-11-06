@@ -90,6 +90,13 @@ class DifferentialCsvTests(unittest.TestCase):
                 except (ValueError, csv.Error, UnicodeError):
                     self.assertFalse(browser["ok"], f"{label}: browser accepted malformed CSV")
                     continue
+                # Intentional policy difference: Python rejects a malformed *row*,
+                # while the browser rejects the whole upload. Python's csv module
+                # also tolerates an unterminated quote by default.
+                if label in ("extra_columns", "unclosed_quote"):
+                    self.assertFalse(browser["ok"], f"{label}: browser must fail closed")
+                    self.assertEqual(len(list(csv.DictReader((base / "clean.csv").open(encoding="utf-8")))), 0)
+                    continue
                 self.assertTrue(browser["ok"], f"{label}: {browser.get('message')}")
                 python_clean = list(csv.DictReader((base / "clean.csv").open(encoding="utf-8", newline="")))
                 python_reject = list(csv.DictReader((base / "rejected.csv").open(encoding="utf-8", newline="")))
