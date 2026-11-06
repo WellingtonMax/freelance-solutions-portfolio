@@ -129,14 +129,24 @@ def process(source: Path, destination: Path, rejects_file: Path,
     cleaned, rejected = clean_rows(reader)
     for path in (destination, rejects_file):
         path.parent.mkdir(parents=True, exist_ok=True)
-    with destination.open("x", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=FIELDS)
-        writer.writeheader()
-        writer.writerows(cleaned)
-    with rejects_file.open("x", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=("line", "reason"))
-        writer.writeheader()
-        writer.writerows(rejected)
+    # Both outputs are created exclusively. If either write fails, remove
+    # only files this invocation created. This is best-effort rollback, not
+    # a transaction: concurrent readers may briefly observe one output.
+    created = []
+    try:
+        for path, fields, records in (
+            (destination, FIELDS, cleaned),
+            (rejects_file, ("line", "reason"), rejected),
+        ):
+            with path.open("x", encoding="utf-8", newline="") as stream:
+                created.append(path)
+                writer = csv.DictWriter(stream, fieldnames=fields)
+                writer.writeheader()
+                writer.writerows(records)
+    except Exception:
+        for path in reversed(created):
+            path.unlink(missing_ok=True)
+        raise
     return len(cleaned), len(rejected)
 
 
