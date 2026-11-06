@@ -6,6 +6,7 @@ import io
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from report import analyze, render_html, process
 
@@ -93,6 +94,73 @@ class ReportTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 process(root / "source.csv", root / "out.json", root / "out.html")
             self.assertEqual((root / "out.json").read_text(), "previous")
+
+    def test_second_export_failure_rolls_back_first(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "source.csv"
+            output_json = root / "out.json"
+            output_html = root / "out.html"
+            source.write_text(SAMPLE, encoding="utf-8")
+            original_open = Path.open
+
+            def fail_second(path, *args, **kwargs):
+                if path == output_html and args and args[0] == "x":
+                    raise PermissionError("simulated denied HTML export")
+                return original_open(path, *args, **kwargs)
+
+            with patch.object(Path, "open", autospec=True, side_effect=fail_second):
+                with self.assertRaisesRegex(PermissionError, "simulated"):
+                    process(source, output_json, output_html)
+            self.assertFalse(output_json.exists())
+            self.assertFalse(output_html.exists())
+
+    def test_failed_export_preserves_unrelated_files(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "source.csv"
+            source.write_text(SAMPLE, encoding="utf-8")
+            keep = root / "keep.txt"
+            keep.write_text("do not delete", encoding="utf-8")
+            output_html = root / "out.html"
+            original_open = Path.open
+
+            def fail_second(path, *args, **kwargs):
+                if path == output_html and args and args[0] == "x":
+                    raise PermissionError("simulated")
+                return original_open(path, *args, **kwargs)
+
+            with patch.object(Path, "open", autospec=True, side_effect=fail_second):
+                with self.assertRaises(PermissionError):
+                    process(source, root / "out.json", output_html)
+            self.assertEqual(keep.read_text(encoding="utf-8"), "do not delete")
+
+    def test_cleanup_failure_preserves_original_error(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "source.csv"
+            output_json = root / "out.json"
+            output_html = root / "out.html"
+            source.write_text(SAMPLE, encoding="utf-8")
+            original_open = Path.open
+            original_unlink = Path.unlink
+
+            def fail_second(path, *args, **kwargs):
+                if path == output_html and args and args[0] == "x":
+                    raise PermissionError("original HTML failure")
+                return original_open(path, *args, **kwargs)
+
+            def fail_cleanup(path, *args, **kwargs):
+                if path == output_json:
+                    raise PermissionError("cleanup denied")
+                return original_unlink(path, *args, **kwargs)
+
+            with (patch.object(Path, "open", autospec=True, side_effect=fail_second),
+                  patch.object(Path, "unlink", autospec=True, side_effect=fail_cleanup)):
+                with self.assertRaisesRegex(PermissionError, "original HTML failure"):
+                    process(source, output_json, output_html)
+            # Best-effort rollback cannot guarantee removal if the filesystem denies it.
+            self.assertTrue(output_json.exists())
 
     def test_pipeline(self):
         with tempfile.TemporaryDirectory() as folder:

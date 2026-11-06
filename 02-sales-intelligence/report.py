@@ -163,10 +163,27 @@ def process(source: Path, report_path: Path, html_path: Path,
     report_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
     # Exclusive creation prevents clobbering prior reports or following symlinks.
-    with report_path.open("x", encoding="utf-8") as stream:
-        stream.write(json.dumps(result, indent=2, ensure_ascii=False))
-    with html_path.open("x", encoding="utf-8") as stream:
-        stream.write(render_html(result))
+    # Prepare both payloads before creating either output. A failed second
+    # write must not leave a misleading half-published report pair.
+    json_payload = json.dumps(result, indent=2, ensure_ascii=False)
+    html_payload = render_html(result)
+    created = []
+    try:
+        with report_path.open("x", encoding="utf-8") as stream:
+            created.append(report_path)
+            stream.write(json_payload)
+        with html_path.open("x", encoding="utf-8") as stream:
+            created.append(html_path)
+            stream.write(html_payload)
+    except OSError:
+        # Preserve the original I/O failure if cleanup itself fails.
+        # Never remove files that were not created by this invocation.
+        for path in reversed(created):
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                pass  # Best-effort cleanup; residual files require manual review.
+        raise
     return result
 
 
