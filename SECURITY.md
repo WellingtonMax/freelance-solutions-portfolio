@@ -14,6 +14,20 @@ The optional `01-excel-rescue/try.html` offers **local-only** CSV processing (no
 
 The optional `01-excel-rescue/demo.html` presents fixed synthetic rows from the repository sample and uses only local DOM visibility toggles. No file uploads, cookies, analytics, external requests, third-party dependencies, credentials, or client data are used. A restrictive Content Security Policy permits only same-origin JavaScript and CSS, blocks inline execution, outbound connections and external resources. The demo uses local `demo.js` and `demo.css` files. The HTML meta CSP is defense-in-depth, not a substitute for a reviewed HTTP response header when hosted; embedding environments and browser differences remain unverified. This is a **static educational demo**, not the Python cleaner running in the browser. Automated tests compare the displayed sample outcomes against actual Python output; visual/accessibility review across browsers remains outstanding. A hosted deployment still requires explicit approval and environment review.
 
+## New offline demonstrations (04–08, November 2026)
+
+All use **fictional inputs** and intentionally avoid third-party services, credentials, scheduled jobs, production deployments and autonomous AI agents. The following controls reflect selected trust-boundary and input-validation themes from **OWASP ASVS 5.0**, but no ASVS certification or penetration test is claimed.
+
+| Demo | Threats / trust boundary | Controls | Residual risks |
+|---|---|---|---|
+| 04 Lead Intelligence | Untrusted B2B CSV, contact privacy, formula injection, mistaken outreach eligibility | 1 MB / 5k rows, exact headers, syntax and enum checks, agency and suppression filters, formula-like name rejection, no sending or scraping, review-only output | Agency/consent/source authenticity not externally verified; synthetic scoring is not a quality probability; outputs still contain contact fields |
+| 05 Landing Page Studio | Untrusted form text and client-side script execution | Local-only validation, no outbound network, CSP, no raw HTML interpolation, no form submissions, semantic labels and keyboard affordances | Client-side validation is bypassable; real intake requires backend validation, anti-abuse, consent and privacy reviews; manual WCAG testing pending |
+| 06 Document Factory | Untrusted JSON rendered to HTML, output overwrite, excessive numeric values | 150 KB / 100 items, exact JSON schema, decimal-string prices, HTML escaping, exclusive-create output, CSP | Local operator controls paths; symlinked parent directories, filesystem races and financial workflows require review |
+| 07 Data Quality Auditor | Malformed or poisoned CSV, privacy leaks, false anomaly decisions | Exact schema, 1 MB / 10k records, strict UTF-8/CSV, output issue codes without raw field values, source SHA-256 | Hash alone does not establish authenticity; thresholds are heuristics; local access controls not provided |
+| 08 Site Change Monitor | Hostile HTML, SSRF, prohibited scraping, sensitive diff disclosure, resource exhaustion | **Local snapshots only** (no URLs/network), max 256 KB / 500 blocks, ignores script/style/template text, bounded excerpts | Not a browser renderer; excerpts may disclose private content; dynamic/attribute-only changes not detected |
+
+No agent is implemented in these demos, so the OWASP Top 10 for Agentic Applications 2026 applies as a **future design constraint**, not as a completed agent assessment. Do not place client or confidential data into these examples. CI and CodeQL results must be independently checked per commit; the existence of workflows is not evidence of passing.
+
 ## Threat model (initial, non-exhaustive)
 
 | Area | Relevant attack or failure | Current mitigation | Residual risk |
@@ -61,7 +75,7 @@ These requirements follow risk themes from [OWASP ASVS 5.0](https://owasp.org/ww
 - [Unit tests](.github/workflows/portfolio-ci.yml) run on changed demo files, with a limited read-only GitHub token.
 - [CodeQL scanning](.github/workflows/codeql.yml) is configured for Python using extended security queries. The workflow file being present is **not evidence that the scan has passed**; consult the actual GitHub Actions and Security results.
 - Public GitHub repositories may offer secret scanning and push protection; check the repository settings before relying on them.
-- No third-party runtime Python dependencies are used in demos 01–03; that reduces, but does not remove, supply-chain exposure.
+- No third-party runtime Python dependencies are used in Python demos 01–04 and 06–08; that reduces, but does not remove, supply-chain exposure.
 
 ## Scope and responsible claims
 

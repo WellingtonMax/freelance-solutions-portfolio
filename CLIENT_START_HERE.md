@@ -19,6 +19,11 @@ Yes. Every completed demonstration aims to include:
 | Messy spreadsheets, duplicate contacts, inconsistent dates | [Excel Rescue](01-excel-rescue/CASE_STUDY.md) | Cleaned CSV, error log, reusable script and tests |
 | You have sales exports but no clear monthly metrics | [Sales Intelligence](02-sales-intelligence/CASE_STUDY.md) | Reproducible summary, browser-viewable report, source code |
 | You copy data from a JSON API into spreadsheets manually | [API Bridge](03-api-bridge/CASE_STUDY.md) | Configurable API export, tests, security notes and instructions |
+| You need to triage company leads without sending messages | [CRM Lead Intelligence](04-crm-lead-intelligence/README.md) | Bounded synthetic CSV review queue and suppression rules |
+| Your business needs a clear sample website | [Landing Page Studio](05-landing-page-studio/README.md) | Responsive page and no-send validation |
+| You retype quotes by hand | [Document Factory](06-document-factory/README.md) | Offline HTML quotations and decimal-safe totals |
+| Your exports contain unreliable records | [Data Quality Auditor](07-data-quality-auditor/README.md) | Schema, duplicates, anomaly reports |
+| You need to compare approved page captures | [Site Change Monitor](08-site-change-monitor/README.md) | Offline snapshot change report without scraping |
 
 ## A predictable project workflow
 
@@ -39,6 +44,6 @@ This portfolio was developed with AI assistance and human review. AI tools can h
 ## Current limits
 
 - This repository is a **portfolio-in-progress**.
-- Three projects have source, sample data and automated test files; passing CI/test results must be verified independently before claiming success.
+- Eight projects have source, synthetic sample data and tests configured; passing CI/test results must be verified independently before claiming success.
 - Planned projects are not represented as finished.
 - No paid-client references, fabricated testimonials or invented performance metrics are used.
