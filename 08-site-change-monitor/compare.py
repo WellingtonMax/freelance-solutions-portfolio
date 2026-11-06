@@ -19,11 +19,11 @@ class VisibleText(HTMLParser):
         self.blocks = []
 
     def handle_starttag(self, tag, attrs):
-        if tag in {"script", "style", "template"}:
+        if tag in {"script", "style", "template", "head", "svg"}:
             self.blocked += 1
 
     def handle_endtag(self, tag):
-        if tag in {"script", "style", "template"} and self.blocked:
+        if tag in {"script", "style", "template", "head", "svg"} and self.blocked:
             self.blocked -= 1
 
     def handle_data(self, data):

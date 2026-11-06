@@ -39,6 +39,7 @@ def audit(data):
             if None in row or any(v is None for v in row.values()):
                 issues.append({"row": line, "code": "SCHEMA_COLUMNS"})
                 continue
+            issue_count_before_row = len(issues)
             rid = row["record_id"].strip()
             if not IDENT.fullmatch(rid):
                 issues.append({"row": line, "code": "INVALID_ID"})
@@ -50,11 +51,12 @@ def audit(data):
             if not 1 <= len(category) <= 80 or any(ord(c) < 32 for c in category):
                 issues.append({"row": line, "code": "INVALID_CATEGORY"})
             value = row["amount"].strip()
+            amount = None
             if not MONEY.fullmatch(value):
                 issues.append({"row": line, "code": "INVALID_AMOUNT"})
             else:
                 try:
-                    amounts.append((line, Decimal(value)))
+                    amount = Decimal(value)
                 except InvalidOperation:
                     issues.append({"row": line, "code": "INVALID_AMOUNT"})
             raw_date = row["updated_at"].strip()
@@ -63,6 +65,9 @@ def audit(data):
                     raise ValueError
             except ValueError:
                 issues.append({"row": line, "code": "INVALID_DATE"})
+            # Invalid records must not poison the anomaly baseline.
+            if len(issues) == issue_count_before_row and amount is not None:
+                amounts.append((line, amount))
     except csv.Error as exc:
         raise ValueError("malformed CSV") from exc
     # Heuristic, not an audited fraud detector. Only flag high outliers with enough sample records.

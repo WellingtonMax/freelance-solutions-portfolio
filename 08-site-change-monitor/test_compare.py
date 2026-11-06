@@ -10,6 +10,11 @@ class OfflineMonitorTests(unittest.TestCase):
         self.assertTrue(result["changed"])
         self.assertEqual(result["first_10_changes"][0]["type"], "replace")
 
+    def test_title_and_svg_metadata_not_counted_as_visible_body(self):
+        before = b"<html><head><title>Old</title></head><body><p>Same</p><svg><text>old</text></svg></body></html>"
+        after = b"<html><head><title>New</title></head><body><p>Same</p><svg><text>new</text></svg></body></html>"
+        self.assertFalse(compare(before, after)["changed"])
+
     def test_script_changes_are_not_visible(self):
         a = b"<p>Hi</p><script>alert(1)</script>"
         b = b"<p>Hi</p><script>malicious()</script>"

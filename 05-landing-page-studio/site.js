@@ -1,10 +1,14 @@
 "use strict";
 function validateEnquiry(fields) {
-  const name = String(fields.name || "").trim();
-  const email = String(fields.email || "").trim();
-  const message = String(fields.message || "").trim();
+  if (!fields || ["name", "email", "message"].some(
+    key => typeof fields[key] !== "string"
+  )) return "Form values must be text.";
+  const name = fields.name.trim();
+  const email = fields.email.trim();
+  const message = fields.message.trim();
   if (!name || name.length > 80) return "Provide a name (1–80 characters).";
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254)
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254
+      || /[\u200B-\u200F\u2060\uFEFF\u0000-\u001F\u007F]/u.test(email))
     return "Provide a valid email format.";
   if (message.length < 10 || message.length > 1000)
     return "Provide a project summary (10–1000 characters).";

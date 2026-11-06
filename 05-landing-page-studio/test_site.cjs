@@ -11,6 +11,10 @@ test('rejects missing, invalid and oversized fields', () => {
   assert.ok(validateEnquiry({name:'Test',email:'a@b.com',message:'x'}));
   assert.ok(validateEnquiry({name:'Test',email:'a@b.com',message:'x'.repeat(1001)}));
 });
+test('rejects non-text inputs and invisible email spoofing',()=>{
+  assert.ok(validateEnquiry({name:{toString(){throw Error('unexpected')}},email:'a@b.com',message:'Hello world'}));
+  assert.ok(validateEnquiry({name:'Test',email:'n\u200bame@example.com',message:'A sample project request'}));
+});
 test('no network submission, inline JS or unsafe HTML sinks', () => {
   const html=fs.readFileSync('index.html','utf8');
   const js=fs.readFileSync('site.js','utf8');

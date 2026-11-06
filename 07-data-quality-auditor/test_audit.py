@@ -27,6 +27,14 @@ class AuditTests(unittest.TestCase):
         result = audit((HEADER + "\n".join(rows) + "\n").encode())
         self.assertIn("HIGH_AMOUNT_OUTLIER", [i["code"] for i in result["issues"]])
 
+    def test_bad_date_amount_does_not_poison_median(self):
+        good = [f"R{i},Parts,10.00,2026-11-05" for i in range(5)]
+        bad = "INVALID,Parts,999999.00,2026-02-31"
+        result = audit((HEADER + "\n".join(good + [bad]) + "\n").encode())
+        codes = [issue["code"] for issue in result["issues"]]
+        self.assertIn("INVALID_DATE", codes)
+        self.assertNotIn("HIGH_AMOUNT_OUTLIER", codes)
+
     def test_formula_id_rejected_and_no_raw_value_echoed(self):
         data = HEADER + "=HYPERLINK,Parts,20.00,2026-11-05\n"
         result = audit(data.encode())
