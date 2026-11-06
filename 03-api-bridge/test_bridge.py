@@ -52,6 +52,34 @@ class BridgeTests(unittest.TestCase):
         self.assertEqual(safe_csv("=SUM(1)"), "'=SUM(1)")
         self.assertEqual(safe_csv("@admin"), "'@admin")
 
+    def test_reject_embedded_credentials_and_internal_redirect(self):
+        from bridge import RefuseRedirects
+        with self.assertRaises(ValueError):
+            validate_url("https://admin:secret@api.example.org/items", {"api.example.org"})
+        with self.assertRaisesRegex(ValueError, "Redirects"):
+            RefuseRedirects().redirect_request(
+                None, None, 302, "Found", {}, "http://127.0.0.1/private"
+            )
+
+    def test_reject_response_over_size_limit(self):
+        from bridge import MAX_BYTES
+        with self.assertRaisesRegex(ValueError, "exceeds"):
+            fetch_json(
+                "https://api.example.org/items",
+                {"api.example.org"},
+                transport=lambda request, timeout: FakeResponse(b"x" * (MAX_BYTES + 1)),
+            )
+
+    def test_validate_host_before_transport(self):
+        calls = []
+        def fake_transport(request, timeout):
+            calls.append(request)
+            return FakeResponse(b"[]")
+        with self.assertRaisesRegex(ValueError, "allowlist"):
+            fetch_json("https://outside.example.net/items", {"api.example.org"},
+                       transport=fake_transport)
+        self.assertEqual(calls, [])
+
     def test_export(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "out.csv"
