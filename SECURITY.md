@@ -28,6 +28,23 @@ All use **fictional inputs** and intentionally avoid third-party services, crede
 
 No agent is implemented in these demos, so the OWASP Top 10 for Agentic Applications 2026 applies as a **future design constraint**, not as a completed agent assessment. Do not place client or confidential data into these examples. CI and CodeQL results must be independently checked per commit; the existence of workflows is not evidence of passing.
 
+## Eight-project adversarial regression sprint (November 2026)
+
+This independent, **stacked PR** extends the eight-project prototype branch; neither changes to the current main branch nor a completed deployment are implied.
+
+| Demo | Failure addressed | Defensive check / residual risk |
+|---|---|---|
+| 01 Excel Rescue | Duplicate identities and oversized CSV values | Browser parser tests duplicate case/whitespace identities and 2,048-character cell bound; real-browser testing outstanding |
+| 02 Sales Intelligence | Untrusted HTML labels and duplicate CSV headers | Regression tests ensure HTML escapes and no publication for duplicate headers; two-file rollback remains a separate pending PR |
+| 03 API Bridge | Partial CSV exports on malformed records | In-memory bounded preflight, 8,192-character cell and 10 MB export ceilings; large datasets need streaming redesign |
+| 04 CRM Lead Intelligence | Opt-out bypass when email/role are invalid | Suppression evaluated before optional contact fields; agency/opt-out authenticity and consent are not independently verified |
+| 05 Landing Page Studio | Non-text input and Unicode email spoofing | Reject unexpected types and invisible email controls; this is not server-side validation |
+| 06 Document Factory | JSON key shadowing | Duplicate JSON keys rejected at any nesting depth; path and filesystem controls still operator-owned |
+| 07 Data Quality Auditor | Poisoned anomaly baseline | Invalid rows excluded from median/outlier calculation; anomaly thresholds are heuristics |
+| 08 Site Change Monitor | Non-visible metadata counted as visible changes | Ignore head/title and inline SVG text; no browser rendering or network collection |
+
+Security checks are inspired by selected OWASP ASVS 5.0 principles, not proof of compliance or a penetration test. No agent is present; OWASP Agentic Top 10 2026 remains a future design constraint. No credentials, customer records, paid services, live scraping, or outbound messaging are used.
+
 ## Threat model (initial, non-exhaustive)
 
 | Area | Relevant attack or failure | Current mitigation | Residual risk |
