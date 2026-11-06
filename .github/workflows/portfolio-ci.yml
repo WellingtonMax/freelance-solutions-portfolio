@@ -1,0 +1,30 @@
+name: Freelance Portfolio - Python checks
+on:
+  push:
+    branches: [main]
+    paths:
+      - '01-excel-rescue/**'\n      - '02-sales-intelligence/**'\n      - '03-api-bridge/**'
+      - '.github/workflows/portfolio-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Excel Rescue
+        working-directory: 01-excel-rescue
+        run: python -m unittest discover -v
+      - name: Sales Intelligence
+        working-directory: 02-sales-intelligence
+        run: python -m unittest discover -v
+      - name: API Bridge
+        working-directory: 03-api-bridge
+        run: python -m unittest discover -v
