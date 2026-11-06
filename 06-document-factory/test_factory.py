@@ -47,6 +47,14 @@ class DocumentFactoryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             parse_document(b"{invalid}")
 
+    def test_duplicate_keys_rejected_at_all_levels(self):
+        root = b'{"quote_id":"A","quote_id":"B","customer":"X","date":"2026-11-06","items":[]}'
+        item = b'{"quote_id":"A","customer":"X","date":"2026-11-06","items":[{"description":"Item","quantity":1,"quantity":999,"unit_price":"2.00"}]}'
+        for raw in (root, item):
+            with self.subTest(raw=raw):
+                with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
+                    parse_document(raw)
+
     def test_existing_file_never_overwritten(self):
         with tempfile.TemporaryDirectory() as td:
             output = Path(td) / "quote.html"

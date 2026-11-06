@@ -20,11 +20,21 @@ def field(value, limit):
     return value.strip()
 
 
+def unique_object_pairs(pairs):
+    """Reject duplicate JSON keys, including in nested item objects."""
+    result = {}
+    for key, value in pairs:
+        if key in result:
+            raise ValueError("duplicate JSON key")
+        result[key] = value
+    return result
+
+
 def parse_document(raw):
     if len(raw) > MAX_BYTES:
         raise ValueError("JSON exceeds 150 KB")
     try:
-        obj = json.loads(raw.decode("utf-8"))
+        obj = json.loads(raw.decode("utf-8"), object_pairs_hook=unique_object_pairs)
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise ValueError("invalid UTF-8 JSON") from exc
     if not isinstance(obj, dict) or set(obj) != {"quote_id", "customer", "date", "items"}:

@@ -28,6 +28,15 @@ class LeadTriageTests(unittest.TestCase):
             self.assertEqual(result["leads"], [])
             self.assertTrue(any(r["reason"] == "opted out" for r in result["rejected"]))
 
+    def test_malformed_opt_out_still_suppresses_company(self):
+        csv_data = HEADER + (
+            "Acme,Engineer,4,no,valid@acme.example,no\n"
+            "Acme,,bad,no,INVALID,yes\n"
+            "Acme,Engineer,8,no,other@acme.example,no\n")
+        result = analyze_bytes(csv_data.encode())
+        self.assertFalse(result["leads"])
+        self.assertIn("opted out", [entry["reason"] for entry in result["rejected"]])
+
     def test_agency_conflict_suppresses_company(self):
         csv_data = HEADER + (
             "Agency Co,Developer,3,no,one@agency.example,no\n"
