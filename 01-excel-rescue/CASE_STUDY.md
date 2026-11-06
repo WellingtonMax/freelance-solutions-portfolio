@@ -12,7 +12,7 @@ A Python command-line tool:
 
 - validates the input header;
 - normalizes emails, whitespace and dates;
-- keeps the first valid record for each case-insensitive email;
+- rejects every occurrence of a duplicate email for manual reconciliation;
 - writes a separate CSV listing rejected rows and reasons;
 - protects text columns against basic spreadsheet formula injection.
 
@@ -24,12 +24,12 @@ A Python command-line tool:
 
 | Outcome | Example |
 |---|---|
-| Accepted | Alice Silva; Bob Lima |
-| Rejected | Repeated email for Alice; invalid email |
+| Accepted | Bob Lima |
+| Rejected | Both occurrences of Alice's email; invalid email |
 | Date normalization | `05/11/2026` → `2026-11-05` |
 | Email normalization | ` ALICE@EXAMPLE.COM ` → `alice@example.com` |
 
-Expected count: **2 accepted, 2 rejected** for the provided fixture. This is the expected result from the fixture, not a measurement of a real customer's dataset.
+Expected count: **1 accepted, 3 rejected** for the provided fixture. This is the expected result from the fixture, not a measurement of a real customer's dataset.
 
 ## Verify it
 
@@ -48,6 +48,6 @@ Inspect `cleaned.csv` and `rejected.csv`. The test suite checks normalization, d
 - Unit tests: [test_clean.py](test_clean.py)
 - [Operational README](README.md)
 
-**Caveats:** Handles CSV, not native Excel macros or workbooks; supports stated date formats only; does not connect to a live CRM. Ambiguous dates, data schemas and duplicate rules must be agreed for a real engagement.
+**Caveats:** Handles CSV, not native Excel macros or workbooks; supports ISO and DD/MM/YYYY only; does not connect to a live CRM. To stop silent duplicate poisoning, all ambiguous duplicate records are rejected and require trusted external reconciliation. Input is bounded to 5 MB / 20,000 rows; SHA-256 comparison is optional and depends on an independently trusted value. Ambiguous dates, data schemas and duplicate rules must be agreed for a real engagement.
 
 **Status:** implemented. Independent runtime/CI verification still needs confirmation.
