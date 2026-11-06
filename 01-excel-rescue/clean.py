@@ -33,6 +33,10 @@ def normalize(row: dict[str, str]) -> dict[str, str]:
     email = str(row.get("email") or "").strip().lower()
     if not EMAIL_PATTERN.fullmatch(email):
         raise ValueError("invalid email")
+    # CSV viewers may interpret these initial characters as spreadsheet formulas.
+    # Reject rather than silently changing a contact's canonical email.
+    if email.startswith(("=", "+", "-", "@")):
+        raise ValueError("unsafe email prefix for spreadsheet export")
     name = safe_cell(row.get("name") or "")
     if not name:
         raise ValueError("missing name")
