@@ -3,6 +3,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
+import hmac
+import io
+import re
 from collections import defaultdict
 from datetime import date
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
@@ -12,6 +16,10 @@ from pathlib import Path
 
 REQUIRED = {"order_id", "date", "product", "category", "quantity", "unit_price"}
 CENTS = Decimal("0.01")
+MAX_BYTES = 5_000_000
+MAX_ROWS = 20_000
+MAX_QUANTITY = 100_000
+MAX_UNIT_PRICE = Decimal("100000000.00")
 
 
 def money(value: Decimal) -> str:
@@ -27,6 +35,8 @@ def analyze(rows):
     by_product = defaultdict(lambda: Decimal("0"))
     orders = 0
     for index, row in enumerate(rows, start=2):
+        if index > MAX_ROWS + 1:
+            raise ValueError("CSV row limit exceeded")
         try:
             identifier = (row.get("order_id") or "").strip()
             product = (row.get("product") or "").strip()
@@ -36,9 +46,15 @@ def analyze(rows):
             if identifier in seen:
                 raise ValueError("duplicate order ID")
             ordered = date.fromisoformat((row.get("date") or "").strip())
-            quantity = int((row.get("quantity") or "").strip())
-            price = Decimal((row.get("unit_price") or "").strip())
-            if quantity <= 0 or price < 0 or not price.is_finite():
+            quantity_text = (row.get("quantity") or "").strip()
+            price_text = (row.get("unit_price") or "").strip()
+            if len(quantity_text) > 8 or len(price_text) > 24:
+                raise ValueError("invalid quantity or price")
+            quantity = int(quantity_text)
+            price = Decimal(price_text)
+            if (not 1 <= quantity <= MAX_QUANTITY or not price.is_finite()
+                    or not 0 <= price <= MAX_UNIT_PRICE
+                    or price.as_tuple().exponent < -2):
                 raise ValueError("invalid quantity or price")
         except (ValueError, InvalidOperation) as exc:
             raise ValueError(f"CSV line {index}: {exc}") from exc
@@ -99,19 +115,52 @@ small{{color:#5d6b80}}@media(max-width:500px){{.bar-row{{grid-template-columns:1
 <tbody>{rows}</tbody></table></section></main></body></html>"""
 
 
-def process(source: Path, report_path: Path, html_path: Path):
+def process(source: Path, report_path: Path, html_path: Path,
+            expected_sha256: str | None = None,
+            expected_orders: int | None = None,
+            expected_revenue: str | None = None):
+    """Use trusted independent checksums/totals to detect upstream tampering.
+
+    None of these values authenticate a source if supplied by the same
+    untrusted party who supplies the CSV.
+    """
     paths = [source.resolve(), report_path.resolve(), html_path.resolve()]
     if len(set(paths)) != 3:
         raise ValueError("input and output paths must be different")
-    with source.open("r", newline="", encoding="utf-8-sig") as stream:
-        reader = csv.DictReader(stream)
-        if not reader.fieldnames or not REQUIRED.issubset(reader.fieldnames):
-            raise ValueError(f"Required columns: {', '.join(sorted(REQUIRED))}")
-        result = analyze(reader)
+    if (report_path.exists() or report_path.is_symlink()
+            or html_path.exists() or html_path.is_symlink()):
+        raise FileExistsError("report output already exists; choose new output paths")
+    with source.open("rb") as stream:
+        raw = stream.read(MAX_BYTES + 1)
+    if len(raw) > MAX_BYTES:
+        raise ValueError("CSV input exceeds 5 MB limit")
+    digest = hashlib.sha256(raw).hexdigest()
+    if expected_sha256 is not None:
+        if not re.fullmatch(r"[a-fA-F0-9]{64}", expected_sha256):
+            raise ValueError("expected SHA-256 must be 64 hex characters")
+        if not hmac.compare_digest(digest, expected_sha256.lower()):
+            raise ValueError("sales input SHA-256 mismatch")
+    reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig"), newline=""))
+    if not reader.fieldnames or not REQUIRED.issubset(reader.fieldnames):
+        raise ValueError(f"Required columns: {', '.join(sorted(REQUIRED))}")
+    result = analyze(reader)
+    if expected_orders is not None and result["orders"] != expected_orders:
+        raise ValueError("sales order count does not match trusted reconciliation")
+    if expected_revenue is not None:
+        try:
+            agreed = Decimal(expected_revenue)
+            if not agreed.is_finite() or agreed < 0 or money(agreed) != result["revenue"]:
+                raise ValueError("sales revenue does not match trusted reconciliation")
+        except InvalidOperation as exc:
+            raise ValueError("invalid trusted revenue amount") from exc
+    result["input_sha256"] = digest
     report_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
-    report_path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
-    html_path.write_text(render_html(result), encoding="utf-8")
+    # Exclusive creation prevents clobbering prior reports or following symlinks.
+    with report_path.open("x", encoding="utf-8") as stream:
+        stream.write(json.dumps(result, indent=2, ensure_ascii=False))
+    with html_path.open("x", encoding="utf-8") as stream:
+        stream.write(render_html(result))
     return result
 
 
@@ -120,8 +169,12 @@ def main():
     parser.add_argument("source", type=Path)
     parser.add_argument("--json", type=Path, default=Path("report.json"))
     parser.add_argument("--html", type=Path, default=Path("dashboard.html"))
+    parser.add_argument("--expected-sha256", help="Input hash from an independent trusted channel")
+    parser.add_argument("--expected-orders", type=int, help="Order count from an independent source")
+    parser.add_argument("--expected-revenue", help="Revenue from an independent source")
     args = parser.parse_args()
-    report = process(args.source, args.json, args.html)
+    report = process(args.source, args.json, args.html,
+                     args.expected_sha256, args.expected_orders, args.expected_revenue)
     print(f"Orders: {report['orders']} | Revenue: $ {report['revenue']}")
 
 
