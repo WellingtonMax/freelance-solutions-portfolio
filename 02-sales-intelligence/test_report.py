@@ -156,7 +156,7 @@ class ReportTests(unittest.TestCase):
                 return original_unlink(path, *args, **kwargs)
 
             with patch.object(Path, "open", autospec=True, side_effect=fail_second), \\
-                 patch.object(Path, "unlink", autospec=True, side_effect=fail_cleanup):
+                  patch.object(Path, "unlink", autospec=True, side_effect=fail_cleanup)):
                 with self.assertRaisesRegex(PermissionError, "original HTML failure"):
                     process(source, output_json, output_html)
             # Best-effort rollback cannot guarantee removal if the filesystem denies it.
