@@ -6,6 +6,10 @@
 
 Please **do not publish credentials, customer data, working exploits or sensitive vulnerability details in public GitHub issues**. If GitHub private vulnerability reporting is enabled for this repository, use its private report feature. Otherwise, open a public issue asking for a secure contact channel **without disclosing exploit details**. The maintainer will arrange an appropriate private channel; no response time is guaranteed.
 
+## Static sample-audit walkthrough (Excel Rescue)
+
+The optional `01-excel-rescue/demo.html` presents fixed synthetic rows from the repository sample and uses only local DOM visibility toggles. No file uploads, cookies, analytics, external requests, third-party dependencies, credentials, or client data are used. A restrictive inline Content Security Policy blocks outbound connections and external resources. This is a **static educational demo**, not the Python cleaner running in the browser. Automated tests compare the displayed sample outcomes against actual Python output; visual/accessibility review across browsers remains outstanding. A hosted deployment still requires explicit approval and environment review.
+
 ## Threat model (initial, non-exhaustive)
 
 | Area | Relevant attack or failure | Current mitigation | Residual risk |

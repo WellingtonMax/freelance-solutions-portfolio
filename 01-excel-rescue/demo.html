@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Excel Rescue: inspect the real sample's accepted and rejected rows in a privacy-preserving offline demonstration.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; connect-src 'none'; img-src 'none'; object-src 'none'">
+<title>Excel Rescue · Sample Audit</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1221;--panel:#17243b;--border:#344761;--text:#f3f6ff;--muted:#c0cce0;--accent:#80e0c3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.55 system-ui,sans-serif}
+main{max-width:960px;margin:auto;padding:30px 20px 70px}a{color:var(--accent)}h1{font-size:clamp(2rem,5vw,3.3rem);line-height:1.12}
+p{color:var(--muted)}.eyebrow{color:var(--accent);font-weight:750;letter-spacing:.1em;text-transform:uppercase;font-size:.8rem}
+.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:26px 0}.metric{border:1px solid var(--border);border-radius:14px;background:var(--panel);padding:18px}
+.metric strong{display:block;font-size:2rem}.metric span{color:var(--muted)}.panel{border:1px solid var(--border);border-radius:16px;background:var(--panel);padding:22px;margin:20px 0}
+button{border:1px solid var(--border);border-radius:9px;padding:10px 15px;background:transparent;color:var(--text);font:inherit;cursor:pointer}
+button[aria-pressed="true"]{background:var(--accent);color:#06291e;font-weight:750}button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.controls{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.scroll{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:600px;text-align:left}
+th,td{padding:12px;border-bottom:1px solid var(--border);vertical-align:top}th{color:var(--accent)}td{overflow-wrap:anywhere}.small{font-size:.88rem}
+@media(max-width:550px){.summary{grid-template-columns:1fr}.panel{padding:14px}}
+</style>
+</head>
+<body><main>
+<a href="../index.html">← Portfolio home</a>
+<p class="eyebrow">01 / Data operations · Fictional demonstration</p>
+<h1>Four messy contacts. One traceable cleanup.</h1>
+<p>This interactive audit explores the repository's <a href="sample.csv">synthetic sample CSV</a>. It shows the expected results of the Python cleaner, not a browser-based CSV processor. No file upload, analytics, external scripts, or network requests are needed to use this page.</p>
+<div class="summary" aria-label="Sample result totals">
+<div class="metric"><strong>4</strong><span>Source records</span></div>
+<div class="metric"><strong>1</strong><span>Accepted record</span></div>
+<div class="metric"><strong>3</strong><span>Rejected records</span></div>
+</div>
+<section class="panel" aria-labelledby="audit-title"><h2 id="audit-title">Inspect the audit trail</h2>
+<p>Duplicate identities are rejected together, rather than choosing a winner from untrusted input.</p>
+<div class="controls" role="group" aria-label="Filter audit rows">
+<button type="button" data-view="all" aria-pressed="true">All (4)</button>
+<button type="button" data-view="accepted" aria-pressed="false">Accepted (1)</button>
+<button type="button" data-view="rejected" aria-pressed="false">Rejected (3)</button>
+</div>
+<div class="scroll"><table><caption class="small">Expected audit of the versioned synthetic sample</caption><thead><tr><th scope="col">CSV line</th><th scope="col">Name</th><th scope="col">Normalized email</th><th scope="col">Outcome</th><th scope="col">Reason</th></tr></thead>
+<tbody id="audit">
+<tr data-status="rejected"><td>2</td><td>Alice Silva</td><td>alice@example.com</td><td>Rejected</td><td>Duplicate email</td></tr>
+<tr data-status="accepted"><td>3</td><td>Bob Lima</td><td>bob@example.com</td><td>Accepted</td><td>Valid; date 2026-11-02</td></tr>
+<tr data-status="rejected"><td>4</td><td>Alice duplicate</td><td>alice@example.com</td><td>Rejected</td><td>Duplicate email</td></tr>
+<tr data-status="rejected"><td>5</td><td>Invalid entry</td><td>no-at-sign</td><td>Rejected</td><td>Invalid email</td></tr>
+</tbody></table></div><p id="filter-status" role="status" aria-live="polite" class="small">Showing all 4 records.</p>
+</section>
+<section class="panel"><h2>What a client actually receives</h2>
+<p>The Python command produces a normalized CSV and a separate rejected-record audit. It validates the input schema, enforces row and file-size limits, detects formula-like values and refuses to overwrite existing output files.</p>
+<p><a href="README.md">Run the real Python cleaner</a> · <a href="test_redteam.py">Inspect adversarial tests</a> · <a href="../SECURITY.md">Security limitations</a></p>
+<p class="small">This page is a static explanation of a fixed sample, not a production CRM integration, security certification, or claim of completed client work. AI-assisted development; human review required before real-world deployment.</p>
+</section>
+</main>
+<script>
+"use strict";
+const buttons = [...document.querySelectorAll("button[data-view]")];
+const rows = [...document.querySelectorAll("#audit tr")];
+const status = document.getElementById("filter-status");
+for (const button of buttons) {
+  button.addEventListener("click", () => {
+    const view = button.dataset.view;
+    for (const item of buttons) item.setAttribute("aria-pressed", String(item === button));
+    let shown = 0;
+    for (const row of rows) {
+      row.hidden = view !== "all" && row.dataset.status !== view;
+      if (!row.hidden) shown++;
+    }
+    status.textContent = "Showing " + shown + " " + (view === "all" ? "sample" : view) + " record" + (shown === 1 ? "" : "s") + ".";
+  });
+}
+</script></body></html>
