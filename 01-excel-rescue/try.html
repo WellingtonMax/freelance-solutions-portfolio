@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Excel Rescue | Try a local CSV</title><link rel="stylesheet" href="demo.css"></head>
+<body><main><a href="demo.html">← Sample audit</a>
+<p class="eyebrow">01 / Offline CSV preview · Fictional demonstration</p>
+<h1>Try the cleaner in your browser.</h1>
+<p>Choose a CSV file with the headers <code>name,email,signup_date,city</code> (any order). Processing happens in this browser tab. No uploads or external connections. Maximum 1 MB, 2,000 rows. Preview logic is independently implemented and is not a substitute for the Python CLI or production data validation.</p>
+<section class="panel"><h2>Local file preview</h2>
+<label for="source">CSV file (UTF-8)</label><p><input id="source" type="file" accept=".csv,text/csv"></p>
+<button id="run" type="button">Process locally</button><p id="feedback" role="status" aria-live="polite">No file selected.</p>
+<div id="result" hidden><p id="totals"></p>
+<label for="clean">Accepted records — copyable CSV</label><textarea id="clean" readonly rows="7"></textarea>
+<label for="reject">Rejected records — copyable CSV</label><textarea id="reject" readonly rows="7"></textarea></div>
+</section>
+<section class="panel"><h2>Limits and trust</h2>
+<p>Invalid or ambiguous duplicates are rejected together. Formula-like text is escaped, and suspicious email prefixes are rejected. A local preview does not establish data authenticity or guarantee identical behavior across spreadsheet applications. Do not use real customer records in this demonstration.</p>
+<p class="small">Fictional demonstration · AI-assisted development · Human review required before deployment. <a href="../SECURITY.md">Security policy</a> · <a href="README.md">Python reference implementation</a></p></section>
+</main><script src="try.js" defer></script><script src="try-ui.js" defer></script></body></html>
