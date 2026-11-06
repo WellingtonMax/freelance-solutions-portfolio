@@ -3,7 +3,9 @@ on:
   push:
     branches: [main]
     paths:
-      - '01-excel-rescue/**'\n      - '02-sales-intelligence/**'\n      - '03-api-bridge/**'
+      - '01-excel-rescue/**'
+      - '02-sales-intelligence/**'
+      - '03-api-bridge/**'
       - '.github/workflows/portfolio-ci.yml'
   workflow_dispatch:
 
