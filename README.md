@@ -6,7 +6,7 @@
 
 **Approach:** security-aware scope and threat modeling → implementation → negative/security tests → documentation → human review. AI-assisted development is disclosed; outcomes are verified before delivery. All sample organizations and data are fictional.
 
-## Implemented demonstrations (automated test verification pending)
+## Implemented demonstrations (unit tests and adversarial checks configured in GitHub Actions; check current CI status)
 
 | Project | What a client receives | Tech | Status |
 |---|---|---|---|
