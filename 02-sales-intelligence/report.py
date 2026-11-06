@@ -176,8 +176,13 @@ def process(source: Path, report_path: Path, html_path: Path,
             created.append(html_path)
             stream.write(html_payload)
     except OSError:
+        # Preserve the original I/O failure if cleanup itself fails.
+        # Never remove files that were not created by this invocation.
         for path in reversed(created):
-            path.unlink(missing_ok=True)
+            try:
+                path.unlink(missing_ok=True)
+            except OSError:
+                pass  # Best-effort cleanup; residual files require manual review.
         raise
     return result
 
