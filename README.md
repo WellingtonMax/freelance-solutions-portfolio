@@ -10,7 +10,7 @@
 
 | Project | What a client receives | Tech | Status |
 |---|---|---|---|
-| [01 Excel Rescue](01-excel-rescue/) | CSV cleanup, duplicate removal and rejection log | Python standard library | Implemented; verify CI |
+| [01 Excel Rescue](01-excel-rescue/) · [Sample audit demo](01-excel-rescue/demo.html) | CSV cleanup, duplicate removal and rejection log | Python standard library | Implemented; verify CI |
 | [02 Sales Intelligence](02-sales-intelligence/) | Sales KPIs in JSON and a portable HTML report | Python standard library | Implemented; verify CI |
 | [03 API Bridge](03-api-bridge/) | Controlled JSON-to-CSV API export with retries | Python standard library | Implemented; verify CI |
 
