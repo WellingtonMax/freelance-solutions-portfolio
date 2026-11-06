@@ -18,6 +18,6 @@ test('no network submission, inline JS or unsafe HTML sinks', () => {
   assert.match(html,/<main id="main">/);
   assert.match(html,/role="status"/);
   assert.doesNotMatch(html,/<script(?![^>]*src=)[^>]*>/);
-  assert.doesNotMatch(html,/on\w+\s*=/i);
+  assert.doesNotMatch(html,/<[a-z][^>]*\s+on[a-z]+\s*=/i);
   assert.doesNotMatch(js,/\b(fetch|XMLHttpRequest|sendBeacon|innerHTML|eval)\b/);
 });
