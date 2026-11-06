@@ -1,4 +1,5 @@
 import csv
+import hashlib
 from decimal import Decimal
 from html import escape
 import io
@@ -43,6 +44,55 @@ class ReportTests(unittest.TestCase):
         page = render_html(result)
         self.assertIn("&lt;script&gt;", page)
         self.assertNotIn("<script>", page)
+
+    def test_reject_extreme_or_overprecise_values(self):
+        for field, value in (("quantity", "100001"), ("unit_price", "100000001"),
+                             ("unit_price", "1.001"), ("unit_price", "NaN")):
+            rows = self.rows()
+            rows[0][field] = value
+            with self.subTest(field=field, value=value):
+                with self.assertRaises(ValueError):
+                    analyze(rows)
+
+    def test_reject_oversized_input(self):
+        from report import MAX_BYTES
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "source.csv").write_bytes(b"x" * (MAX_BYTES + 1))
+            with self.assertRaisesRegex(ValueError, "5 MB"):
+                process(root / "source.csv", root / "out.json", root / "out.html")
+            self.assertFalse((root / "out.json").exists())
+
+    def test_trusted_checksum_and_reconciliation(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "source.csv"
+            raw = SAMPLE.encode("utf-8")
+            source.write_bytes(raw)
+            with self.assertRaisesRegex(ValueError, "SHA-256 mismatch"):
+                process(source, root / "out.json", root / "out.html",
+                        expected_sha256="0" * 64)
+            self.assertFalse((root / "out.json").exists())
+            with self.assertRaisesRegex(ValueError, "trusted reconciliation"):
+                process(source, root / "out.json", root / "out.html",
+                        expected_orders=999)
+            self.assertFalse((root / "out.json").exists())
+            with self.assertRaisesRegex(ValueError, "revenue does not match"):
+                process(source, root / "out.json", root / "out.html",
+                        expected_revenue="1.00")
+            result = process(source, root / "out.json", root / "out.html",
+                             expected_sha256=hashlib.sha256(raw).hexdigest(),
+                             expected_orders=3, expected_revenue="60.00")
+            self.assertEqual(result["input_sha256"], hashlib.sha256(raw).hexdigest())
+
+    def test_reject_existing_report(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "source.csv").write_text(SAMPLE, encoding="utf-8")
+            (root / "out.json").write_text("previous", encoding="utf-8")
+            with self.assertRaises(FileExistsError):
+                process(root / "source.csv", root / "out.json", root / "out.html")
+            self.assertEqual((root / "out.json").read_text(), "previous")
 
     def test_pipeline(self):
         with tempfile.TemporaryDirectory() as folder:
