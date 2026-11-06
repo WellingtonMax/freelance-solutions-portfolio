@@ -17,6 +17,7 @@ import re
 import socket
 import ssl
 import time
+import unicodedata
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
 from urllib.request import Request
@@ -26,6 +27,7 @@ MAX_RECORDS = 20_000
 RETRY_CODES = {429, 500, 502, 503, 504}
 SAFE_FIELD = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
 SAFE_HOST = re.compile(r"^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
+SAFE_DNS_LABEL = re.compile(r"^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$")
 
 
 def validate_url(url: str, allowed_hosts: set[str]) -> str:
@@ -38,6 +40,8 @@ def validate_url(url: str, allowed_hosts: set[str]) -> str:
             or parts.password is not None or parts.port not in (None, 443)
             or parts.fragment or host.endswith(".")
             or not SAFE_HOST.fullmatch(host)
+            or len(host) > 253
+            or any(not SAFE_DNS_LABEL.fullmatch(label) for label in host.split("."))
             or "." not in host
             or host.endswith((".local", ".localhost", ".internal", ".test", ".invalid"))):
         raise ValueError("Only valid public HTTPS DNS endpoints are accepted")
@@ -152,13 +156,22 @@ def fetch_json(url: str, allowed_hosts: set[str], transport=None,
     raise RuntimeError("API request exhausted retries")
 
 
+def resembles_spreadsheet_formula(value: str) -> bool:
+    """Consider leading Unicode format/control characters and whitespace."""
+    for char in value:
+        if char.isspace() or unicodedata.category(char) in ("Cf", "Cc"):
+            continue
+        return char in ("=", "+", "-", "@")
+    return False
+
+
 def safe_csv(value) -> str:
     if value is None:
         return ""
     if isinstance(value, (dict, list)):
         value = json.dumps(value, ensure_ascii=False)
     text = str(value).replace("\r", " ").replace("\n", " ").strip()
-    if text.lstrip("\ufeff\u200b\u200c\u200d").startswith(("=", "+", "-", "@")):
+    if resembles_spreadsheet_formula(text):
         return "'" + text
     return text
 
