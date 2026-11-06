@@ -37,6 +37,8 @@ def analyze(rows):
     for index, row in enumerate(rows, start=2):
         if index > MAX_ROWS + 1:
             raise ValueError("CSV row limit exceeded")
+        if None in row:
+            raise ValueError(f"CSV line {index}: unexpected extra columns or malformed row")
         try:
             identifier = (row.get("order_id") or "").strip()
             product = (row.get("product") or "").strip()
@@ -141,8 +143,12 @@ def process(source: Path, report_path: Path, html_path: Path,
         if not hmac.compare_digest(digest, expected_sha256.lower()):
             raise ValueError("sales input SHA-256 mismatch")
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig"), newline=""))
-    if not reader.fieldnames or not REQUIRED.issubset(reader.fieldnames):
-        raise ValueError(f"Required columns: {', '.join(sorted(REQUIRED))}")
+    if not reader.fieldnames:
+        raise ValueError("CSV header is required")
+    if len(reader.fieldnames) != len(set(reader.fieldnames)):
+        raise ValueError("duplicate CSV header fields are not allowed")
+    if set(reader.fieldnames) != REQUIRED:
+        raise ValueError(f"CSV header must contain exactly: {', '.join(sorted(REQUIRED))}")
     result = analyze(reader)
     if expected_orders is not None and result["orders"] != expected_orders:
         raise ValueError("sales order count does not match trusted reconciliation")

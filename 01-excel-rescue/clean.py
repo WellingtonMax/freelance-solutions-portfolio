@@ -14,6 +14,7 @@ import hmac
 import io
 from pathlib import Path
 import re
+import unicodedata
 
 FIELDS = ("name", "email", "signup_date", "city")
 EMAIL_PATTERN = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
@@ -22,12 +23,26 @@ MAX_ROWS = 20_000
 MAX_CELL = 2_048
 
 
+def resembles_spreadsheet_formula(value: str) -> bool:
+    """Treat Unicode format/control characters and whitespace as ignorable prefix.
+
+    Protects CSV spreadsheet consumers that normalize invisible prefixes before
+    interpreting a cell. It is intentionally conservative, not a guarantee
+    about the behavior of every spreadsheet application.
+    """
+    for char in value:
+        if char.isspace() or unicodedata.category(char) in ("Cf", "Cc"):
+            continue
+        return char in ("=", "+", "-", "@")
+    return False
+
+
 def safe_cell(value: str) -> str:
     """Conservatively escape CSV formula-leading free text."""
     value = " ".join(str(value or "").split())
     if len(value) > MAX_CELL:
         raise ValueError("field too long")
-    if value.lstrip("\ufeff\u200b\u200c\u200d").startswith(("=", "+", "-", "@")):
+    if resembles_spreadsheet_formula(value):
         return "'" + value
     return value
 
@@ -105,8 +120,12 @@ def process(source: Path, destination: Path, rejects_file: Path,
         if not hmac.compare_digest(digest, expected_sha256.lower()):
             raise ValueError("CSV input SHA-256 mismatch")
     reader = csv.DictReader(io.StringIO(raw.decode("utf-8-sig"), newline=""))
-    if not reader.fieldnames or any(key not in reader.fieldnames for key in FIELDS):
-        raise ValueError("required columns: " + ", ".join(FIELDS))
+    if not reader.fieldnames:
+        raise ValueError("CSV header is required")
+    if len(reader.fieldnames) != len(set(reader.fieldnames)):
+        raise ValueError("duplicate CSV header fields are not allowed")
+    if set(reader.fieldnames) != set(FIELDS):
+        raise ValueError("CSV header must contain exactly: " + ", ".join(FIELDS))
     cleaned, rejected = clean_rows(reader)
     for path in (destination, rejects_file):
         path.parent.mkdir(parents=True, exist_ok=True)
