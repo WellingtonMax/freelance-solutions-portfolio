@@ -1,5 +1,9 @@
 # Excel Rescue — CRM CSV Cleanup
 
+[Try a local CSV in your browser](try.html) — an optional browser-only preview, with no external requests, dependencies or backend. The browser preview supports up to **1 MB and 2,000 rows**, validates exact unique headers, parses quoted CSV, rejects ambiguous duplicates and exports accepted/rejected records as copyable text. The reference Python CLI is more comprehensive (5 MB and 20,000 rows); the JavaScript implementation is independently tested but **not certified behaviorally equivalent** to Python. Use only synthetic/non-sensitive data in the demo.
+
+**Fictional client brief:** A small business needs a transparent way to identify duplicate or malformed CRM contacts before import. **Acceptance criteria:** preserve valid unique contacts; reject every occurrence of ambiguous duplicate emails; report invalid rows without executing spreadsheet formulas; avoid uploading customer files. **Status:** offline prototype with automated tests; not a production CRM integration. AI-assisted development, human review required.
+
 [Explore the offline sample audit](demo.html) — a static, accessible walkthrough of the exact synthetic sample, with interactive accepted/rejected filters. It does **not** process uploaded files or claim to be the Python application. CI verifies its rows and counts against the actual Python cleaner. The walkthrough uses local `demo.js` and `demo.css` with a restrictive CSP that rejects inline script/style execution. It does not send data to a server or accept uploads.
 
 
