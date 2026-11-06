@@ -17,6 +17,25 @@ class LeadTriageTests(unittest.TestCase):
         self.assertEqual(result["leads"][0]["score"], 45)
         self.assertEqual(len(result["rejected"]), 3)
 
+    def test_company_opt_out_suppresses_earlier_and_later_rows(self):
+        rows = [
+            "Acme,Engineer,5,no,a@acme.example,no",
+            "Acme,Engineer,1,no,b@acme.example,yes",
+            "Acme,Engineer,9,no,c@acme.example,no",
+        ]
+        for ordering in (rows, list(reversed(rows))):
+            result = analyze_bytes((HEADER + "\n".join(ordering) + "\n").encode())
+            self.assertEqual(result["leads"], [])
+            self.assertTrue(any(r["reason"] == "opted out" for r in result["rejected"]))
+
+    def test_agency_conflict_suppresses_company(self):
+        csv_data = HEADER + (
+            "Agency Co,Developer,3,no,one@agency.example,no\n"
+            "Agency Co,Developer,1,yes,two@agency.example,no\n"
+        )
+        result = analyze_bytes(csv_data.encode())
+        self.assertEqual(result["leads"], [])
+
     def test_invalid_email_is_not_treated_as_verified(self):
         result = analyze_bytes((HEADER + "Acme,Engineer,1,no,invalid,no\n").encode())
         self.assertFalse(result["leads"])
