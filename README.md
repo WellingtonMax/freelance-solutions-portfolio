@@ -1,10 +1,10 @@
 # Freelance Solutions Portfolio — AI-Assisted, Human-Reviewed
 
-[View the client-facing showcase](index.html) · [Python checks workflow](.github/workflows/portfolio-ci.yml)
+[View the client-facing showcase](index.html) · [Python test workflow](.github/workflows/portfolio-ci.yml) · [CodeQL security scanning](.github/workflows/codeql.yml) · [Security policy and threat model](SECURITY.md)
 
 **Original demonstration projects**, developed to showcase practical deliverables for freelance clients. This is a portfolio-in-progress, not a record of paid client work.
 
-**Approach:** requirements → implementation → repeatable tests → documentation → human review. AI-assisted development is disclosed; outcomes are verified before delivery. All sample organizations and data are fictional.
+**Approach:** security-aware scope and threat modeling → implementation → negative/security tests → documentation → human review. AI-assisted development is disclosed; outcomes are verified before delivery. All sample organizations and data are fictional.
 
 ## Implemented demonstrations (automated test verification pending)
 
