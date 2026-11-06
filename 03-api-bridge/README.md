@@ -7,7 +7,7 @@
 ## Run tests (offline, without credentials)
 
 ```bash
-cd portfolio/03-api-bridge
+cd 03-api-bridge
 python -m unittest test_bridge.py -v
 ```
 
@@ -21,6 +21,6 @@ python bridge.py --url https://jsonplaceholder.typicode.com/users \
 
 The example contacts originate from a public test service, not real client data. Network access is needed for the example only; tests use a fake HTTP transport.
 
-If the authorized API uses a bearer token, set `API_TOKEN` in your shell/environment. Never commit tokens, .env files or exported client data to Git.
+**Credential policy:** this standalone demo **never reads or sends `API_TOKEN`**, even when it exists in the environment. Automatic forwarding to a caller-chosen hostname was removed. Authenticated enterprise integrations require a **separate** implementation with administrator-owned endpoint policy and credentials scoped to each approved service. Never commit tokens, .env files or exported client data to Git.
 
-**Security and scope:** exact host allowlist, HTTPS, refusal of redirects, limited response size and retries protect against common mistakes, but are **not** a complete SSRF defense or security audit. Use only endpoints and data you are authorized to access. Pagination, rate-limit contracts, schema mapping, production monitoring and OAuth require project-specific engineering.
+**Security and scope:** the operator supplies an exact allowlist (never take it from an untrusted end user); HTTPS and public-IP DNS validation are required, the connection is **pinned to a checked public IP** with TLS verification of the original hostname, and redirects/proxies are not followed. Responses are bounded to 2 MB / 20,000 records; exports cannot overwrite existing files; CSV column names are restricted. The tool deliberately supports only *public unauthenticated* endpoints. Do **not** expose the CLI as a service accepting arbitrary user-supplied URLs or allowlists; service-side authorization, egress firewalls, limits and project-specific threat modeling are required. Use only endpoints and data you are authorized to access. Pagination, rate-limit contracts, schema mapping, production monitoring and OAuth require project-specific engineering.

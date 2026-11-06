@@ -10,10 +10,10 @@ Please **do not publish credentials, customer data, working exploits or sensitiv
 
 | Area | Relevant attack or failure | Current mitigation | Residual risk |
 |---|---|---|---|
-| Untrusted CSV input | Spreadsheet formula injection and malformed records | Validation, CSV formula prefixing, error log, tests | Spreadsheet software varies; encoding and Excel-specific behaviors are not fully tested |
-| File handling | Accidental input overwrite, oversized datasets | Different input/output paths in Excel Rescue; bounded API response | CSV ingestion is not size-bounded; filenames/permissions are operator-controlled |
-| HTML reporting | Script injection from product/category labels | HTML encoding for text fields; offline generated report | Browser policy and multi-browser tests not complete |
-| Remote API | Credential exposure, SSRF, malicious redirects, unreliable network | HTTPS-only, exact host allowlist, no redirects, retry/timeout/size limits, environment token | Hostname list is operator-supplied; no DNS/IP pinning; proxies and endpoint changes require hardening |
+| Untrusted CSV input | Spreadsheet formula injection, duplicate poisoning and malformed records | Formula prefix/reject, bounded inputs, fail-closed duplicate reconciliation, SHA-256 verification when expected value is trusted | Spreadsheet behaviors vary; hash alone does not establish who supplied the source |
+| File handling | Accidental input overwrite, oversized datasets | CSV size/row bounds, exclusive output creation, API response/record limits | Filesystem races, untrusted directories and concurrent writers require environment-specific controls |
+| HTML reporting | Script injection or fraudulent financial decisions from corrupted source | HTML encoding for labels, source hash in JSON, optional independent total reconciliation | Data source authentication and ERP-grade cross-checking require actual enterprise integration |
+| Remote API | Credential exposure, SSRF, malicious redirects, unreliable network | No API_TOKEN forwarding, HTTPS, exact operator-controlled host allowlist, public DNS IP checks, pinned-IP TLS, no proxies/redirects, request/response limits | Not a multi-user network API; operators control allowlists and URLs; firewall egress policies and enterprise authentication are outside demo scope |
 | Repositories and CI | Exposed secrets, malicious dependencies, compromised automation | No committed credentials; minimal runtime libraries; read-only token for tests; CodeQL workflow | Dependency and workflow supply-chain risk; GitHub security features/configuration must be verified |
 | AI-agent features (future) | Prompt injection, excessive agency, unauthorized tools, data exfiltration | **Policy only**: tool allowlists, trust-boundaries, least privilege, approvals, costs/time limits, logging required before implementation | No autonomous agent has been implemented or verified in this repository |
 
