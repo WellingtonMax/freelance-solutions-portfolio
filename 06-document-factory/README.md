@@ -24,3 +24,6 @@ Open `quotation.html` locally in a browser and use *Print → Save as PDF* manua
 The trust boundary is local untrusted JSON to a local HTML document. Limits are 150 KB, 100 lines, 1,000 units each. Existing file overwrite is rejected. A malicious operator-selected output directory, filesystem races, symlinks in parent directories, invoicing rules, local printer permissions, and customer data handling are not addressed. Not a hosted multi-tenant service. No authentication, credentials or network requests.
 
 **Status:** prototype, synthetic tests included; human review and environment checks required. **Fictional demonstration / AI-assisted development / human review required.**
+
+### Hardening update (review branch)
+The parser now rejects duplicate JSON keys at the root and within nested line items. This avoids key-shadowing ambiguity in prices and quantities. Output remains offline HTML (not an automatically generated PDF) and a human must confirm financial accuracy.

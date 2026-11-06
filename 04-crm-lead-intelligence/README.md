@@ -25,3 +25,6 @@ Synthetic sample uses reserved `.example` email domains. Output is JSON with ran
 Trust boundary: untrusted local CSV to review-only JSON. Size limited to 1 MB / 5,000 rows; no multitenancy or authentication because this is not a service. Malicious Unicode, ownership misidentification, invalid consent or stale leads remain risks. Score is a simple heuristic, **not ML** or a verified lead quality probability. Output may contain contact fields; avoid using customer data or recording sensitive output in logs.
 
 **Status:** prototype; local synthetic tests provided. **Fictional demonstration / AI-assisted development / human review required.** Not production-ready.
+
+### Hardening update (review branch)
+An opt-out or agency indicator takes precedence over the role, openings and contact format. Thus even a malformed contact cannot bypass company-level suppression. These flags are data supplied by an operator, not verified consent or authoritative business classifications; never send messages without human and legal review.

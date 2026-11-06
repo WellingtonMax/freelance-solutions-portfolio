@@ -23,3 +23,6 @@ python -m unittest discover -v
 Untrusted CSV enters a local, read-only Python tool and is converted to JSON; no network requests or credential handling. The anomaly heuristic may miss fraud or flag legitimate purchases, and is not machine learning. Row-number location assumes conventional line-oriented CSV; embedded newlines may make physical line references imprecise. A production pipeline needs approved schemas, retention policy, source authentication and access controls.
 
 **Status:** tested locally only when recorded by an actual run; **prototype, not production-ready. Fictional demonstration / AI-assisted development / human review required.**
+
+### Hardening update (review branch)
+Anomaly thresholds now use only fully valid rows. Invalid dates, IDs, categories and amounts cannot silently influence the amount median. These are explainable heuristics, not audited fraud detection or enterprise data lineage.

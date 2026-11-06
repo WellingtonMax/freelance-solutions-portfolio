@@ -23,3 +23,6 @@ node --test test_site.cjs
 Untrusted user input is only checked locally and displayed through `textContent`. A real backend would independently validate, authorize, rate-limit, protect personal data and retain consent before accepting enquiries. No server, authentication or multitenancy exists here. Browser compatibility, WCAG conformance, and production deployment have **not** been certified. Local form data is ephemeral, not collected.
 
 **Status:** prototype; synthetic tests included, manual accessibility review pending. **Fictional demonstration / AI-assisted development / human review required.**
+
+### Hardening update (review branch)
+The local validation function rejects non-string values and invisible Unicode control/format characters in email addresses. It is educational client-side validation only, with no data storage or submission. Production integrations require independently validated server-side intake and accessibility testing.

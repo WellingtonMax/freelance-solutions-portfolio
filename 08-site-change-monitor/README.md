@@ -22,3 +22,6 @@ python -m unittest discover -v
 Trust boundary: untrusted local HTML to bounded text extraction. Snapshots max 256 KB, 500 text blocks, 300 chars per block. This is not a complete browser renderer, so text rendered dynamically by JavaScript, attributes, accessibility changes, and media aren't detected. HTML snippets can include sensitive input data; do not pass real private snapshots without appropriate controls. A real monitor would require host allowlists, DNS/IP checks, egress protections, rate limits, robots/terms review, retained history, safe notification channels and authentication. SHA-256 does not authenticate origin.
 
 **Status:** offline prototype with synthetic tests. **Fictional demonstration / AI-assisted development / human review required; not production-ready.**
+
+### Hardening update (review branch)
+Comparison excludes head/title and inline SVG metadata from visible-body text. It does not render pages as a browser would and will miss attributes, CSS visibility changes, JavaScript content and accessible-name changes. Only local authorized HTML files are processed.
