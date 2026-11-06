@@ -28,6 +28,22 @@ class CleanerTests(unittest.TestCase):
         self.assertEqual(safe_cell(" =HYPERLINK(1)"), "'=HYPERLINK(1)")
         self.assertEqual(safe_cell("-SUM(1)"), "'-SUM(1)")
 
+    def test_rejects_formula_leading_email(self):
+        # This string passes the basic email shape check, but is dangerous
+        # when exported to spreadsheet applications as a CSV field.
+        for email in ("=HYPERLINK(1)@example.com", "+malicious@example.com"):
+            with self.subTest(email=email):
+                with self.assertRaisesRegex(ValueError, "unsafe email prefix"):
+                    normalize({"name": "Test", "email": email})
+
+    def test_rejects_output_path_collision(self):
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            source = base / "input.csv"
+            source.write_text("name,email,signup_date,city\nA,a@example.com,,City\n", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "must differ"):
+                process(source, base / "same.csv", base / "same.csv")
+
     def test_missing_name(self):
         with self.assertRaisesRegex(ValueError, "missing name"):
             normalize({"name": "", "email": "a@test.com"})
