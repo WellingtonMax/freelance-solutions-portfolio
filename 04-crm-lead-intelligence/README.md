@@ -16,7 +16,7 @@ Synthetic sample uses reserved `.example` email domains. Output is JSON with ran
 
 ## Acceptance criteria
 - Exact CSV schema: `company,role,openings,agency,email,opt_out`.
-- Exclude agencies, opted-out records and invalid fields; explain rejections.
+- Exclude agencies, opted-out records and invalid fields; explain rejections. Any opted-out or agency-flagged row suppresses the **entire normalized company**, including earlier/later otherwise eligible rows; human review must resolve conflicting source flags.
 - Deduplicate by normalized company name, keeping the strongest hiring signal.
 - Reject formula-like input, oversize files and malformed CSV; no network access.
 - Human must review lawful basis, freshness, consent, suppression and identity before any contact.
