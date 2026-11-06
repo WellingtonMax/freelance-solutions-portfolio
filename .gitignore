@@ -21,3 +21,9 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# Never commit local databases or job data
+*.sqlite3
+*.sqlite3-*
+*.db
+*.db-journal
