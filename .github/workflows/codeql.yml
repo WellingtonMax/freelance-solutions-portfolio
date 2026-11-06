@@ -7,6 +7,7 @@ on:
       - '01-excel-rescue/**'
       - '02-sales-intelligence/**'
       - '03-api-bridge/**'
+      - 'products/stratasignal/**'
       - '.github/workflows/codeql.yml'
   pull_request:
     branches: [main]

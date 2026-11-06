@@ -14,6 +14,10 @@
 | [02 Sales Intelligence](02-sales-intelligence/) | Sales KPIs in JSON and a portable HTML report | Python standard library | Implemented; verify CI |
 | [03 API Bridge](03-api-bridge/) | Controlled JSON-to-CSV API export with retries | Python standard library | Implemented; verify CI |
 
+## Product lab: critical mineral procurement intelligence
+
+**[StrataSignal](products/stratasignal/)** is a working local MVP for a managed supply-assurance service: sourcing concentration, inventory stress scenarios, documentary metadata triage and experimental delay estimates with temporal evaluation. Includes a [market study](products/stratasignal/docs/MARKET_RESEARCH_PT.md), [interactive synthetic report](products/stratasignal/demo/report.html) (download to open locally), strict inputs and security regression checks. This is an original product hypothesis, not a paid client project or a validated commercial service.
+
 ## Planned portfolio expansion (not implemented yet)
 
 4. **CRM Workflow:** lead normalization, rules engine, follow-up queues.
