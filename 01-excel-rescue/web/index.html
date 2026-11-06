@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Excel Rescue private local CSV cleaning workspace.">
+<meta name="referrer" content="no-referrer">
+<title>Excel Rescue — Private Data Workspace</title>
+<link rel="stylesheet" href="/app.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<section id="login" class="login-screen" aria-labelledby="login-title">
+  <div class="login-card">
+    <div class="brand brand-large"><span class="brand-logo">✳</span> EXCEL <b>RESCUE</b></div>
+    <div class="eyebrow">PRIVATE DATA WORKSPACE / LOCAL EDITION</div>
+    <h1 id="login-title">Your data.<br><em>Under control.</em></h1>
+    <p>Sign in to validate CSV contacts, track processing history and download clean, audited exports.</p>
+    <form id="login-form">
+      <label for="username">Username</label>
+      <input id="username" name="username" autocomplete="username" required maxlength="40" spellcheck="false">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" autocomplete="current-password" required maxlength="128">
+      <button class="primary full" type="submit" id="login-submit">Sign in securely</button>
+      <p class="feedback error" id="login-error" role="alert" aria-live="polite"></p>
+    </form>
+    <div class="login-note">Accounts are created locally by an administrator. No self-registration or external analytics.</div>
+  </div>
+  <div class="login-art" aria-hidden="true">
+    <div class="art-label">DATA QUALITY ENGINE</div>
+    <div class="art-title">From messy records<br>to <span>usable data.</span></div>
+    <div class="mock-panel"><div class="mock-row"><span class="mock-dot"></span> Email normalization <b>READY</b></div><div class="mock-row"><span class="mock-dot"></span> Duplicate checks <b>READY</b></div><div class="mock-row"><span class="mock-dot"></span> Audit exports <b>READY</b></div></div>
+  </div>
+</section>
+
+<div id="app" class="shell" hidden>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-logo">✳</span> EXCEL <b>RESCUE</b></div>
+    <div class="side-label">WORKSPACE</div>
+    <a class="side-link active" href="#workspace">▦ <span>Data operations</span></a>
+    <a class="side-link" href="#history">◷ <span>Processing history</span></a>
+    <div class="side-grow"></div>
+    <div class="side-security"><span class="secure-dot"></span> LOCAL PRIVATE INSTANCE<br><small>Login required · Encrypted password hashes</small></div>
+    <button class="sidebar-logout" id="logout" type="button">↪ Sign out</button>
+  </aside>
+
+  <main class="main" id="workspace">
+    <header class="topbar">
+      <div><div class="eyebrow">DATA OPERATIONS / WORKSPACE</div><h1>Clean data. <em>Clear decisions.</em></h1><p>Process CRM contact exports with traceable validation and private download history.</p></div>
+      <div class="profile"><span class="avatar">●</span><div><strong id="current-user">Account</strong><small>Authenticated user</small></div></div>
+    </header>
+
+    <section class="metrics" aria-label="User processing totals">
+      <article class="metric"><span>Processed files</span><strong id="metric-jobs">0</strong><small>Private job history</small></article>
+      <article class="metric"><span>Accepted rows</span><strong class="mint" id="metric-accepted">0</strong><small>Passed validation</small></article>
+      <article class="metric"><span>Rejected for review</span><strong class="rose" id="metric-rejected">0</strong><small>Reasons available in CSV</small></article>
+      <article class="metric accent-metric"><span>Source-to-output pipeline</span><strong>CSV <i>→</i> CSV</strong><small>5 MB / 20,000-row limits</small></article>
+    </section>
+
+    <div class="main-grid">
+      <section class="panel upload-panel" aria-labelledby="upload-title">
+        <div class="section-head"><div><div class="eyebrow">01 / NEW PROCESSING JOB</div><h2 id="upload-title">Upload a CSV for validation</h2><p>Files are processed locally; original uploads are not retained.</p></div><span class="pill">PYTHON PROCESSOR</span></div>
+        <form id="upload-form">
+          <label class="dropzone" for="file">
+            <span class="upload-icon">⇧</span><strong id="file-label">Choose a CSV file</strong>
+            <span>Drop-in simplicity: select a local .csv file with the expected fields.</span>
+            <input type="file" id="file" name="file" accept=".csv,text/csv" required>
+          </label>
+          <div class="requirements"><strong>Required columns:</strong> <code>name</code> <code>email</code> <code>signup_date</code> <code>city</code></div>
+          <button class="primary" id="process-button" type="submit">Validate &amp; clean CSV <span>→</span></button>
+          <p id="upload-feedback" class="feedback" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <aside class="panel controls-panel">
+        <div class="eyebrow">02 / INTEGRITY CONTROLS</div><h2>Built for accountable cleanup</h2><p>Guardrails are applied by the Python processor, not merely by this interface.</p>
+        <ul class="safeguards"><li><span>✓</span> Normalize emails and date values</li><li><span>✓</span> Reject ambiguous duplicate contacts</li><li><span>✓</span> Record invalid rows and reasons</li><li><span>✓</span> Escape formula-like spreadsheet text</li><li><span>✓</span> Bound file size, rows and field lengths</li></ul>
+        <div class="notice"><strong>Keep a copy of your source.</strong><br>Rejected duplicates require human verification before re-import.</div>
+      </aside>
+    </div>
+
+    <section class="panel history-panel" id="history" aria-labelledby="history-title">
+      <div class="section-head"><div><div class="eyebrow">03 / PRIVATE HISTORY</div><h2 id="history-title">Processing history</h2><p>Only jobs created by your account are visible here.</p></div><button class="secondary" type="button" id="refresh">↻ Refresh</button></div>
+      <div class="table-scroll"><table><thead><tr><th>FILE</th><th>DATE</th><th>ACCEPTED</th><th>REJECTED</th><th>DOWNLOADS</th><th>ACTION</th></tr></thead><tbody id="history-rows"></tbody></table></div>
+      <p id="empty-state" class="empty">No CSV files processed yet. Upload your first file above.</p>
+    </section>
+    <footer>Excel Rescue · Local-first prototype · SQLite job storage · Independent project. No production deployment or security certification is implied.</footer>
+  </main>
+</div>
+</body>
+</html>
