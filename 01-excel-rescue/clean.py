@@ -65,10 +65,10 @@ def normalize(row: dict[str, str]) -> dict[str, str]:
     if None in row or any(len(str(v or "")) > MAX_CELL for v in row.values()):
         raise ValueError("malformed row or field too long")
     email = str(row.get("email") or "").strip().lower()
+    if resembles_spreadsheet_formula(email):
+        raise ValueError("unsafe email prefix for spreadsheet export")
     if len(email) > 320 or not EMAIL_PATTERN.fullmatch(email):
         raise ValueError("invalid email")
-    if email.lstrip("\ufeff\u200b\u200c\u200d").startswith(("=", "+", "-", "@")):
-        raise ValueError("unsafe email prefix for spreadsheet export")
     name = safe_cell(row.get("name") or "")
     if not name:
         raise ValueError("missing name")
