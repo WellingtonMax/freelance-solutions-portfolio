@@ -1,16 +1,18 @@
 # Freelance Solutions Portfolio — AI-Assisted, Human-Reviewed
 
-[View the client-facing showcase](index.html) · [Python checks workflow](.github/workflows/freelance-portfolio-ci.yml)\n\n**Original demonstration projects**, developed to showcase practical deliverables for freelance clients. This is a portfolio-in-progress, not a record of paid client work.
+[View the client-facing showcase](index.html) · [Python checks workflow](.github/workflows/portfolio-ci.yml)
+
+**Original demonstration projects**, developed to showcase practical deliverables for freelance clients. This is a portfolio-in-progress, not a record of paid client work.
 
 **Approach:** requirements → implementation → repeatable tests → documentation → human review. AI-assisted development is disclosed; outcomes are verified before delivery. All sample organizations and data are fictional.
 
-## Delivery-ready demonstrations
+## Implemented demonstrations (automated test verification pending)
 
 | Project | What a client receives | Tech | Status |
 |---|---|---|---|
-| [01 Excel Rescue ](01-excel-rescue/) | CSV cleanup, duplicate removal and rejection log | Python standard library | Functional demo |
-| [02 Sales Intelligence](02-sales-intelligence/) | Sales KPIs in JSON and a portable HTML report | Python standard library | Functional demo |
-| [03 API Bridge](03-api-bridge/) | Controlled JSON-to-CSV API export with retries | Python standard library | Functional demo |
+| [01 Excel Rescue](01-excel-rescue/) | CSV cleanup, duplicate removal and rejection log | Python standard library | Implemented; verify CI |
+| [02 Sales Intelligence](02-sales-intelligence/) | Sales KPIs in JSON and a portable HTML report | Python standard library | Implemented; verify CI |
+| [03 API Bridge](03-api-bridge/) | Controlled JSON-to-CSV API export with retries | Python standard library | Implemented; verify CI |
 
 ## Planned portfolio expansion (not implemented yet)
 
