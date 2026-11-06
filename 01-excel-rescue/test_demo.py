@@ -78,6 +78,27 @@ class SampleAuditDemoTests(unittest.TestCase):
         self.assertIn('aria-pressed="true"', html)
         self.assertIn('aria-live="polite"', html)
 
+    def test_demo_enforces_strict_csp_and_local_assets(self):
+        """Regression: no inline execution or external asset dependencies."""
+        html = (ROOT / "demo.html").read_text(encoding="utf-8")
+        self.assertIn("script-src 'self'", html)
+        self.assertIn("style-src 'self'", html)
+        self.assertNotIn("'unsafe-inline'", html)
+        self.assertNotIn("'unsafe-eval'", html)
+        self.assertNotIn("<style", html.lower())
+        self.assertNotIn("<script>", html.lower())
+        self.assertIn('<script src="demo.js" defer></script>', html)
+        self.assertIn('<link rel="stylesheet" href="demo.css">', html)
+        js = (ROOT / "demo.js").read_text(encoding="utf-8")
+        css = (ROOT / "demo.css").read_text(encoding="utf-8")
+        self.assertIn('row.hidden =', js)
+        self.assertIn('status.textContent', js)
+        for forbidden in ("innerHTML", "eval(", "new Function(", "fetch(", "XMLHttpRequest", "document.write("):
+            self.assertNotIn(forbidden, js)
+        self.assertNotIn("@import", css)
+        self.assertNotIn("url(", css.lower())
+        self.assertNotIn("style=", html.lower())
+
 
 if __name__ == "__main__":
     unittest.main()
