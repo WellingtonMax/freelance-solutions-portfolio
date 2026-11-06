@@ -21,6 +21,10 @@ The optional `01-excel-rescue/demo.html` presents fixed synthetic rows from the 
 | Repositories and CI | Exposed secrets, malicious dependencies, compromised automation | No committed credentials; minimal runtime libraries; read-only token for tests; CodeQL workflow | Dependency and workflow supply-chain risk; GitHub security features/configuration must be verified |
 | AI-agent features (future) | Prompt injection, excessive agency, unauthorized tools, data exfiltration | **Policy only**: tool allowlists, trust-boundaries, least privilege, approvals, costs/time limits, logging required before implementation | No autonomous agent has been implemented or verified in this repository |
 
+### Excel Rescue export recovery (November 2026)
+
+The CSV cleaner creates both output files with exclusive-create semantics and attempts rollback of its newly created files if either write fails. Fault-injection tests simulate a denied second output and verify removal of the first output; pre-existing outputs are preserved. This does **not** make multi-file publication atomic. Other processes may observe an intermediate output, and malicious concurrent changes to output directories remain outside the trusted local-operator model. The email validation also rejects formula-like prefixes hidden behind Unicode format characters and whitespace.
+
 ## Project acceptance criteria
 
 For **every** new project or material change:
