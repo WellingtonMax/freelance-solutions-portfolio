@@ -305,6 +305,10 @@ class Handler(BaseHTTPRequestHandler):
     def route(self, method):
         self.require_host()
         path = urlsplit(self.path).path
+        # Never reuse connections when a mutation may have unread request bytes.
+        # Prevents a client-supplied body being parsed as a second HTTP request.
+        if method in ("POST", "DELETE"):
+            self.close_connection = True
         if method == "GET" and path in ("/", "/app.css", "/app.js"):
             file = "index.html" if path == "/" else path[1:]
             mime = ("text/html" if file.endswith(".html") else
