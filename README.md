@@ -16,7 +16,7 @@
 
 ## Product lab: critical mineral procurement intelligence
 
-**[StrataSignal](products/stratasignal/)** is a working local MVP for a managed supply-assurance service: sourcing concentration, inventory stress scenarios, documentary metadata triage and experimental delay estimates with temporal evaluation. Includes a [market study](products/stratasignal/docs/MARKET_RESEARCH_PT.md), [interactive synthetic report](products/stratasignal/demo/report.html) (download to open locally), strict inputs and security regression checks. This is an original product hypothesis, not a paid client project or a validated commercial service.
+**[StrataSignal](https://github.com/WellingtonMax/stratasignal)** is maintained in its own product repository. It provides local sourcing concentration, stock scenarios, metadata triage, experimental delay estimates and reporting-period comparisons. See the [product scope](https://github.com/WellingtonMax/stratasignal/blob/main/README.md), [market research](https://github.com/WellingtonMax/stratasignal/blob/main/docs/MARKET_RESEARCH_PT.md) and [synthetic monthly demonstration](https://github.com/WellingtonMax/stratasignal/blob/main/demo/monthly/report.html) (download to open locally). The portfolio keeps the showcase and links; implementation, tests and product development belong in the standalone repository. Commercial validation remains pending.
 
 ## Planned portfolio expansion (not implemented yet)
 
