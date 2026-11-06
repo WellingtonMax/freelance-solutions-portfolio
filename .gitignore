@@ -1,0 +1,23 @@
+# Generated reports and exports from portfolio demo scripts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.p12
+*.pfx
+01-excel-rescue/cleaned.csv
+01-excel-rescue/rejected.csv
+02-sales-intelligence/report.json
+02-sales-intelligence/dashboard.html
+03-api-bridge/users.csv
+
+# Editor/system files
+.DS_Store
+.idea/
+.vscode/
