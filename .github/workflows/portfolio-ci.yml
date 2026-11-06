@@ -1,4 +1,4 @@
-name: Freelance Portfolio - Python checks
+name: Freelance Portfolio - Python security regression checks
 on:
   push:
     branches: [main]
@@ -7,6 +7,8 @@ on:
       - '02-sales-intelligence/**'
       - '03-api-bridge/**'
       - '.github/workflows/portfolio-ci.yml'
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
