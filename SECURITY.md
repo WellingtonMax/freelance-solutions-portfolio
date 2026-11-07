@@ -14,6 +14,37 @@ The optional `01-excel-rescue/try.html` offers **local-only** CSV processing (no
 
 The optional `01-excel-rescue/demo.html` presents fixed synthetic rows from the repository sample and uses only local DOM visibility toggles. No file uploads, cookies, analytics, external requests, third-party dependencies, credentials, or client data are used. A restrictive Content Security Policy permits only same-origin JavaScript and CSS, blocks inline execution, outbound connections and external resources. The demo uses local `demo.js` and `demo.css` files. The HTML meta CSP is defense-in-depth, not a substitute for a reviewed HTTP response header when hosted; embedding environments and browser differences remain unverified. This is a **static educational demo**, not the Python cleaner running in the browser. Automated tests compare the displayed sample outcomes against actual Python output; visual/accessibility review across browsers remains outstanding. A hosted deployment still requires explicit approval and environment review.
 
+## New offline demonstrations (04–08, November 2026)
+
+All use **fictional inputs** and intentionally avoid third-party services, credentials, scheduled jobs, production deployments and autonomous AI agents. The following controls reflect selected trust-boundary and input-validation themes from **OWASP ASVS 5.0**, but no ASVS certification or penetration test is claimed.
+
+| Demo | Threats / trust boundary | Controls | Residual risks |
+|---|---|---|---|
+| 04 Lead Intelligence | Untrusted B2B CSV, contact privacy, formula injection, mistaken outreach eligibility | 1 MB / 5k rows, exact headers, syntax and enum checks, agency and suppression filters, formula-like name rejection, no sending or scraping, review-only output | Agency/consent/source authenticity not externally verified; synthetic scoring is not a quality probability; outputs still contain contact fields |
+| 05 Landing Page Studio | Untrusted form text and client-side script execution | Local-only validation, no outbound network, CSP, no raw HTML interpolation, no form submissions, semantic labels and keyboard affordances | Client-side validation is bypassable; real intake requires backend validation, anti-abuse, consent and privacy reviews; manual WCAG testing pending |
+| 06 Document Factory | Untrusted JSON rendered to HTML, output overwrite, excessive numeric values | 150 KB / 100 items, exact JSON schema, decimal-string prices, HTML escaping, exclusive-create output, CSP | Local operator controls paths; symlinked parent directories, filesystem races and financial workflows require review |
+| 07 Data Quality Auditor | Malformed or poisoned CSV, privacy leaks, false anomaly decisions | Exact schema, 1 MB / 10k records, strict UTF-8/CSV, output issue codes without raw field values, source SHA-256 | Hash alone does not establish authenticity; thresholds are heuristics; local access controls not provided |
+| 08 Site Change Monitor | Hostile HTML, SSRF, prohibited scraping, sensitive diff disclosure, resource exhaustion | **Local snapshots only** (no URLs/network), max 256 KB / 500 blocks, ignores script/style/template text, bounded excerpts | Not a browser renderer; excerpts may disclose private content; dynamic/attribute-only changes not detected |
+
+No agent is implemented in these demos, so the OWASP Top 10 for Agentic Applications 2026 applies as a **future design constraint**, not as a completed agent assessment. Do not place client or confidential data into these examples. CI and CodeQL results must be independently checked per commit; the existence of workflows is not evidence of passing.
+
+## Eight-project adversarial regression sprint (November 2026)
+
+This independent, **stacked PR** extends the eight-project prototype branch; neither changes to the current main branch nor a completed deployment are implied.
+
+| Demo | Failure addressed | Defensive check / residual risk |
+|---|---|---|
+| 01 Excel Rescue | Duplicate identities and oversized CSV values | Browser parser tests duplicate case/whitespace identities and 2,048-character cell bound; real-browser testing outstanding |
+| 02 Sales Intelligence | Untrusted HTML labels and duplicate CSV headers | Regression tests ensure HTML escapes and no publication for duplicate headers; two-file rollback remains a separate pending PR |
+| 03 API Bridge | Partial CSV exports on malformed records | In-memory bounded preflight, 8,192-character cell and 10 MB export ceilings; large datasets need streaming redesign |
+| 04 CRM Lead Intelligence | Opt-out bypass when email/role are invalid | Suppression evaluated before optional contact fields; agency/opt-out authenticity and consent are not independently verified |
+| 05 Landing Page Studio | Non-text input and Unicode email spoofing | Reject unexpected types and invisible email controls; this is not server-side validation |
+| 06 Document Factory | JSON key shadowing | Duplicate JSON keys rejected at any nesting depth; path and filesystem controls still operator-owned |
+| 07 Data Quality Auditor | Poisoned anomaly baseline | Invalid rows excluded from median/outlier calculation; anomaly thresholds are heuristics |
+| 08 Site Change Monitor | Non-visible metadata counted as visible changes | Ignore head/title and inline SVG text; no browser rendering or network collection |
+
+Security checks are inspired by selected OWASP ASVS 5.0 principles, not proof of compliance or a penetration test. No agent is present; OWASP Agentic Top 10 2026 remains a future design constraint. No credentials, customer records, paid services, live scraping, or outbound messaging are used.
+
 ## Threat model (initial, non-exhaustive)
 
 | Area | Relevant attack or failure | Current mitigation | Residual risk |
@@ -29,7 +60,7 @@ The optional `01-excel-rescue/demo.html` presents fixed synthetic rows from the 
 
 The CSV cleaner creates both output files with exclusive-create semantics and attempts rollback of its newly created files if either write fails. Fault-injection tests simulate a denied second output and verify removal of the first output; pre-existing outputs are preserved. This does **not** make multi-file publication atomic. Other processes may observe an intermediate output, and malicious concurrent changes to output directories remain outside the trusted local-operator model. The email validation also rejects formula-like prefixes hidden behind Unicode format characters and whitespace.
 
-## Project acceptance criteria
+### CRM company-level suppression (November 2026)\n\nThe CRM demo fails closed on company-level opt-out and agency conflicts across rows, irrespective of ordering. This avoids silently prioritizing a lead for the same company after a contradictory suppression signal. Suppression is based on user-supplied flags, not verified consent or organizational identity. Homonymous companies and false flags remain residual risks; no outreach is automated.\n\n## Project acceptance criteria
 
 For **every** new project or material change:
 
@@ -61,7 +92,7 @@ These requirements follow risk themes from [OWASP ASVS 5.0](https://owasp.org/ww
 - [Unit tests](.github/workflows/portfolio-ci.yml) run on changed demo files, with a limited read-only GitHub token.
 - [CodeQL scanning](.github/workflows/codeql.yml) is configured for Python using extended security queries. The workflow file being present is **not evidence that the scan has passed**; consult the actual GitHub Actions and Security results.
 - Public GitHub repositories may offer secret scanning and push protection; check the repository settings before relying on them.
-- No third-party runtime Python dependencies are used in demos 01–03; that reduces, but does not remove, supply-chain exposure.
+- No third-party runtime Python dependencies are used in Python demos 01–04 and 06–08; that reduces, but does not remove, supply-chain exposure.
 
 ## Scope and responsible claims
 

@@ -12,6 +12,7 @@ import csv
 import http.client
 import ipaddress
 import json
+import io
 from pathlib import Path
 import re
 import socket
@@ -24,6 +25,8 @@ from urllib.request import Request
 
 MAX_BYTES = 2_000_000
 MAX_RECORDS = 20_000
+MAX_CELL_CHARS = 8192
+MAX_EXPORT_BYTES = 10_000_000
 RETRY_CODES = {429, 500, 502, 503, 504}
 SAFE_FIELD = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
 SAFE_HOST = re.compile(r"^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
@@ -171,6 +174,8 @@ def safe_csv(value) -> str:
     if isinstance(value, (dict, list)):
         value = json.dumps(value, ensure_ascii=False)
     text = str(value).replace("\r", " ").replace("\n", " ").strip()
+    if len(text) > MAX_CELL_CHARS:
+        raise ValueError("CSV cell exceeds 8192 characters")
     if resembles_spreadsheet_formula(text):
         return "'" + text
     return text
@@ -182,13 +187,24 @@ def export_rows(records: list[dict], fields: list[str], destination: Path) -> in
         raise ValueError("Provide 1–50 unique safe column names (letters, digits, underscore)")
     if len(records) > MAX_RECORDS:
         raise ValueError("API record limit exceeded")
+    # Render and validate before file creation: malformed input must never leave
+    # behind a plausible partial export.
+    buffer = io.StringIO(newline="")
+    writer = csv.DictWriter(buffer, fieldnames=fields, extrasaction="ignore")
+    writer.writeheader()
+    for record in records:
+        if not isinstance(record, dict):
+            raise ValueError("API record must be an object")
+        writer.writerow({field: safe_csv(record.get(field)) for field in fields})
+        if buffer.tell() > MAX_EXPORT_BYTES:
+            raise ValueError("CSV export exceeds 10 MB limit")
+    content = buffer.getvalue()
+    if len(content.encode("utf-8")) > MAX_EXPORT_BYTES:
+        raise ValueError("CSV export exceeds 10 MB limit")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    # Exclusive create: never follow a pre-existing symlink or overwrite exports.
+    # Exclusive creation prevents overwriting an existing file or symlink.
     with destination.open("x", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
-        writer.writeheader()
-        for record in records:
-            writer.writerow({field: safe_csv(record.get(field)) for field in fields})
+        stream.write(content)
     return len(records)
 
 

@@ -33,6 +33,16 @@ test("reject impossible calendar date and non-ISO ambiguous format",()=>{
  const x=process("name,email,signup_date,city\nA,a@b.com,2026-02-30,X\nB,b@b.com,11/05/2026,X\nC,c@b.com,05-11-2026,X");
  assert.equal(x.accepted.length,1);assert.equal(x.accepted[0].signup_date,"2026-05-11");assert.equal(x.rejected.length,2);
 });
+test("duplicate identities are rejected regardless of case and surrounding whitespace",()=>{
+ const result=process("name,email,signup_date,city\nA,FOO@EXAMPLE.com,2026-11-05,X\nB, foo@example.com ,2026-11-05,Y");
+ assert.equal(result.accepted.length,0);
+ assert.equal(result.rejected.length,2);
+ assert.ok(result.rejected.every(r=>r.reason.includes("duplicate")));
+});
+test("oversize CSV cell rejected before processing",()=>{
+ const csv="name,email,signup_date,city\n"+"A".repeat(2049)+",a@b.com,2026-11-05,X";
+ assert.throws(()=>process(csv),/Cell exceeds/);
+});
 test("do not interpret untrusted content as HTML",()=>{
  const x=process('name,email,signup_date,city\n"<img src=x onerror=alert(1)>",a@b.com,2026-11-05,X');
  assert.match(x.cleanCsv,/<img/);
