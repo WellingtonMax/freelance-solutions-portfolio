@@ -41,3 +41,6 @@ test("do not interpret untrusted content as HTML",()=>{
  assert.match(html,/connect-src 'none'/);assert.doesNotMatch(ui,/innerHTML|eval\(|fetch\(|document\.write/);
  assert.match(ui,/\.value = output\.cleanCsv/);
 });
+
+// Keep the local preview UI regression in the existing GitHub Actions Node command.
+require("./try-ui.test.cjs");
