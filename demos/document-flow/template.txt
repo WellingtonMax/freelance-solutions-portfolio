@@ -1,0 +1,25 @@
+SERVICE ENGAGEMENT — DOCUMENT AUTOMATION DEMO
+Reference: [Agreement.Number] | Effective date: [Agreement.EffectiveDate]
+
+PARTIES
+This non-binding sample records a fictional service engagement between [Provider.Company] (the provider) and [Client.Company], located at [Client.Address] (the client).
+
+SCOPE
+[Service.Description]
+
+DELIVERABLES
+[Service.Deliverables]
+
+FEES AND PAYMENT
+The fictional fixed fee is [Service.Fee]. Payment is due within [Service.PaymentDays] days of invoice receipt, subject to approval of the agreed deliverables.
+
+DELIVERY AND UPDATES
+The estimated delivery window is [Service.DeliveryDays] business days after approved inputs are provided. Progress reporting: [Service.ProgressReporting].
+
+COORDINATION
+The demonstration contact address is [Agreement.ContactEmail].
+
+SIGNATURES
+A real PandaDoc implementation must add a native signature field assigned to an authorized recipient role. This line is an informational placeholder, not an interactive e-signature field.
+
+DEMONSTRATION ONLY — SYNTHETIC DATA, NON-BINDING SAMPLE, NOT LEGAL ADVICE.

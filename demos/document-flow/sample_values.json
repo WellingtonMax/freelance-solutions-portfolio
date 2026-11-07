@@ -1,0 +1,14 @@
+{
+  "Agreement.Number": "DEMO-2026-041",
+  "Agreement.EffectiveDate": "November 16, 2026",
+  "Client.Company": "Northstar Labs LLC",
+  "Client.Address": "102 Example Avenue, Suite 4, Sample City",
+  "Provider.Company": "Evergreen Studio Co.",
+  "Service.Description": "Website content audit, structured recommendations, and a concise implementation checklist",
+  "Service.Deliverables": "A written audit, a prioritized recommendations table, and one review meeting",
+  "Service.Fee": "USD 1,200",
+  "Service.PaymentDays": "15",
+  "Service.DeliveryDays": "10",
+  "Service.ProgressReporting": "A weekly email update and a final handoff summary",
+  "Agreement.ContactEmail": "projects@example.com"
+}

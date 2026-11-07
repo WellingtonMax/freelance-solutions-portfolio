@@ -18,6 +18,10 @@
 
 **[StrataSignal](https://github.com/WellingtonMax/stratasignal)** is maintained in its own product repository. It provides local sourcing concentration, stock scenarios, metadata triage, experimental delay estimates and reporting-period comparisons. See the [product scope](https://github.com/WellingtonMax/stratasignal/blob/main/README.md), [market research](https://github.com/WellingtonMax/stratasignal/blob/main/docs/MARKET_RESEARCH_PT.md) and [synthetic monthly demonstration](https://github.com/WellingtonMax/stratasignal/blob/main/demo/monthly/report.html) (download to open locally). The portfolio keeps the showcase and links; implementation, tests and product development belong in the standalone repository. Commercial validation remains pending.
 
+## Document automation demonstration (implemented offline)
+
+**[Document Flow — Word + PandaDoc-style variable template](demos/document-flow/)** · [Interactive preview](demos/document-flow/index.html) — merge a simulated Word revision into a variable-ready source, edit 12 fictional fields, preview the result, export CSV field mapping and a sample API JSON payload, and generate four sample Word files with automated tests. **Offline demonstration only:** no real PandaDoc API call, signing integration, or commercial customer data.
+
 ## Planned portfolio expansion (not implemented yet)
 
 4. **CRM Workflow:** lead normalization, rules engine, follow-up queues.
