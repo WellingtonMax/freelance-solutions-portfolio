@@ -1,0 +1,6 @@
+const test=require("node:test");const assert=require("node:assert/strict");const fs=require("node:fs");const path=require("node:path");const {validate,SAMPLE}=require("./review.js");
+test("synthetic report validates",()=>assert.equal(validate(JSON.stringify(SAMPLE)).first_10_changes.length,1));
+test("unchanged report with distinct hashes is valid",()=>{const d={...SAMPLE,changed:false,first_10_changes:[],truncated_change_list:false};assert.equal(validate(JSON.stringify(d)).changed,false)});
+test("malformed, oversized and invalid schema rejected",()=>{for(const s of ["{", "x".repeat(30001),JSON.stringify({...SAMPLE,first_10_changes:[{type:"evil"}]}),JSON.stringify({...SAMPLE,before_sha256:"bad"})])assert.throws(()=>validate(s))});
+test("HTML uses strict CSP and external assets",()=>{const html=fs.readFileSync(path.join(__dirname,"review.html"),"utf8");assert.match(html,/connect-src 'none'/);assert.match(html,/script-src 'self'/);assert.match(html,/style-src 'self'/);assert.doesNotMatch(html,/<style\b|<script(?![^>]*src=)/i);assert.doesNotMatch(html,/https?:\/\//i)});
+test("renderer never uses HTML insertion",()=>{const js=fs.readFileSync(path.join(__dirname,"review.js"),"utf8");assert.doesNotMatch(js,/innerHTML|insertAdjacentHTML|eval\(/)});
