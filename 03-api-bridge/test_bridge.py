@@ -106,6 +106,20 @@ class BridgeTests(unittest.TestCase):
                        transport=fake_transport)
         self.assertEqual(calls, [])
 
+    def test_oversized_value_leaves_no_partial_export(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "out.csv"
+            with self.assertRaisesRegex(ValueError, "8192"):
+                export_rows([{"description": "x" * 8193}], ["description"], path)
+            self.assertFalse(path.exists())
+
+    def test_invalid_record_leaves_no_partial_export(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "out.csv"
+            with self.assertRaisesRegex(ValueError, "object"):
+                export_rows([{"name": "ok"}, "unexpected"], ["name"], path)
+            self.assertFalse(path.exists())
+
     def test_block_csv_column_formula_and_overwrite(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "out.csv"
