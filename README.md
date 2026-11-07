@@ -18,15 +18,19 @@
 
 **[StrataSignal](https://github.com/WellingtonMax/stratasignal)** is maintained in its own product repository. It provides local sourcing concentration, stock scenarios, metadata triage, experimental delay estimates and reporting-period comparisons. See the [product scope](https://github.com/WellingtonMax/stratasignal/blob/main/README.md), [market research](https://github.com/WellingtonMax/stratasignal/blob/main/docs/MARKET_RESEARCH_PT.md) and [synthetic monthly demonstration](https://github.com/WellingtonMax/stratasignal/blob/main/demo/monthly/report.html) (download to open locally). The portfolio keeps the showcase and links; implementation, tests and product development belong in the standalone repository. Commercial validation remains pending.
 
-## Planned portfolio expansion (not implemented yet)
+## Five additional demos under review (04–08)
 
-4. **CRM Workflow:** lead normalization, rules engine, follow-up queues.
-5. **Landing Page Studio:** accessible, responsive site with validated contact form.
-6. **Document Factory:** batch generation of reports and PDF documents.
-7. **Data Quality Auditor:** schema checks, anomaly reports, data lineage.
-8. **Web Monitor:** permitted website status/change alerts without bypassing access restrictions.
-9. **Bug Fix Laboratory:** documented regression cases, patches and automated tests.
-10. **Business Operations API:** documented CRUD API, permissions and integration tests.
+These five demos are **proposed changes, not part of `main`**. Review [draft PR #11](https://github.com/WellingtonMax/freelance-solutions-portfolio/pull/11) and its [security/negative-test follow-up PR #12](https://github.com/WellingtonMax/freelance-solutions-portfolio/pull/12) before describing them as integrated deliverables. The branches must be reconciled with each other and with the current main; passing tests on a branch does not validate the eventual merged result.
+
+| Proposed demo | Fictional business scenario | Explicit limitation |
+|---|---|---|
+| 04 CRM Lead Intelligence | Normalize and triage synthetic leads | No messages or external CRM writes |
+| 05 Landing Page Studio | Accessible responsive offline landing page | No form submission or public deployment |
+| 06 Document Factory | Generate escaped quotation HTML from synthetic JSON | No verified production document workflow |
+| 07 Data Quality Auditor | Validate schema, duplicates and anomaly flags | Input provenance remains operator responsibility |
+| 08 Site Change Monitor | Compare permitted offline snapshots | No live crawling or monitoring service |
+
+**Current scope is exactly projects 01–08.** No projects 09–10 are authorized. All demos are fictional demonstrations, AI-assisted development, pending human review and environment-specific security assessment before deployment. [Sales Intelligence export recovery PR #10](https://github.com/WellingtonMax/freelance-solutions-portfolio/pull/10) is also awaiting reconciliation and review.
 
 ## Quality and ethical boundaries
 
