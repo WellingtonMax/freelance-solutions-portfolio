@@ -1,5 +1,7 @@
 import unittest
-from compare import compare, blocks, MAX_BYTES
+import tempfile
+from pathlib import Path
+from compare import compare, blocks, MAX_BYTES, read_snapshot
 
 
 class OfflineMonitorTests(unittest.TestCase):
@@ -51,6 +53,15 @@ class OfflineMonitorTests(unittest.TestCase):
         a = "".join(f"<p>old{i}</p><p>stable{i}</p>" for i in range(8)).encode()
         b = "".join(f"<p>new{i}</p><p>stable{i}</p>" for i in range(8)).encode()
         self.assertFalse(compare(a, b)["truncated_change_list"])
+
+    def test_file_read_limit_applies_even_without_stat_precheck(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "oversized.html"
+            path.write_bytes(b"x" * (MAX_BYTES + 1))
+            with self.assertRaisesRegex(ValueError, "256 KB"):
+                read_snapshot(path)
+            path.write_bytes(b"<p>ok</p>")
+            self.assertEqual(read_snapshot(path), b"<p>ok</p>")
 
     def test_no_network_or_html_execution(self):
         result = compare(b"<a href='https://example.com'>Read more</a>", b"<a href='https://evil.example'>Read more</a>")
