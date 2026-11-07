@@ -15,16 +15,16 @@ MAX_BLOCK_LENGTH = 300
 class VisibleText(HTMLParser):
     def __init__(self):
         super().__init__(convert_charrefs=True)
-        self.blocked = 0
+        self.blocked = []
         self.blocks = []
 
     def handle_starttag(self, tag, attrs):
         if tag in {"script", "style", "template", "head", "svg"}:
-            self.blocked += 1
+            self.blocked.append(tag)
 
     def handle_endtag(self, tag):
-        if tag in {"script", "style", "template", "head", "svg"} and self.blocked:
-            self.blocked -= 1
+        if self.blocked and tag == self.blocked[-1]:
+            self.blocked.pop()
 
     def handle_data(self, data):
         if self.blocked:
