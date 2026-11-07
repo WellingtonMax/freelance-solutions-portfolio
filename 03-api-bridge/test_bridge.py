@@ -106,6 +106,16 @@ class BridgeTests(unittest.TestCase):
                        transport=fake_transport)
         self.assertEqual(calls, [])
 
+    def test_invalid_records_do_not_create_partial_export(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            with self.assertRaisesRegex(ValueError, "objects"):
+                export_rows([{"id": 1}, None], ["id"], output)
+            self.assertFalse(output.exists())
+            with self.assertRaisesRegex(ValueError, "invalid records"):
+                export_rows("not-a-list", ["id"], output)
+            self.assertFalse(output.exists())
+
     def test_block_csv_column_formula_and_overwrite(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "out.csv"
