@@ -41,3 +41,37 @@ test("do not interpret untrusted content as HTML",()=>{
  assert.match(html,/connect-src 'none'/);assert.doesNotMatch(ui,/innerHTML|eval\(|fetch\(|document\.write/);
  assert.match(ui,/\.value = output\.cleanCsv/);
 });
+
+test("audit filter keyboard navigation updates rows, focus and accessible status",()=>{
+ const vm=require("node:vm");
+ const buttons=["all","accepted","rejected"].map(view=>{
+  const handlers={};
+  return {dataset:{view},handlers,attributes:{},addEventListener(type,fn){handlers[type]=fn;},
+   setAttribute(name,value){this.attributes[name]=value;},focus(){this.focused=true;}};
+ });
+ const rows=["rejected","accepted","rejected","rejected"].map(status=>({dataset:{status},hidden:false}));
+ const status={textContent:"Showing all 4 records."};
+ const document={querySelectorAll(selector){
+  if(selector==="button[data-view]")return buttons;
+  if(selector==="#audit tr")return rows;
+  throw new Error("Unexpected selector");
+ },getElementById(id){assert.equal(id,"filter-status");return status;}};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,"demo.js"),"utf8"),{document});
+ function key(index,name){
+  let prevented=false;
+  buttons[index].handlers.keydown({key:name,preventDefault(){prevented=true;}});
+  return prevented;
+ }
+ assert.equal(key(0,"ArrowRight"),true);
+ assert.equal(buttons[1].focused,true);
+ assert.equal(buttons[1].attributes["aria-pressed"],"true");
+ assert.deepEqual(rows.map(row=>row.hidden),[true,false,true,true]);
+ assert.equal(status.textContent,"Showing 1 accepted record.");
+ assert.equal(key(1,"End"),true);
+ assert.equal(status.textContent,"Showing 3 rejected records.");
+ assert.equal(key(2,"ArrowRight"),true);
+ assert.equal(status.textContent,"Showing 4 sample records.");
+ assert.equal(key(0,"Tab"),false);
+ buttons[2].handlers.click();
+ assert.equal(status.textContent,"Showing 3 rejected records.");
+});
