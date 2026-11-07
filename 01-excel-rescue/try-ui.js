@@ -2,22 +2,59 @@
 const source = document.getElementById("source");
 const feedback = document.getElementById("feedback");
 const result = document.getElementById("result");
-document.getElementById("run").addEventListener("click", async () => {
+const run = document.getElementById("run");
+const clean = document.getElementById("clean");
+const reject = document.getElementById("reject");
+const totals = document.getElementById("totals");
+
+function resetPreview() {
   result.hidden = true;
-  document.getElementById("clean").value = "";
-  document.getElementById("reject").value = "";
-  const file = source.files && source.files[0];
-  if (!file) { feedback.textContent = "Choose a CSV file first."; return; }
-  if (file.size > CsvRescuePreview.MAX_BYTES) { feedback.textContent = "Rejected: file exceeds 1 MB."; return; }
+  clean.value = "";
+  reject.value = "";
+  totals.textContent = "";
+}
+function selectedFile() {
+  return source.files && source.files[0];
+}
+source.addEventListener("change", () => {
+  resetPreview();
+  const file = selectedFile();
+  feedback.textContent = file
+    ? "Selected: " + file.name + ". Ready to process locally."
+    : "Choose a fictional CSV file to preview locally.";
+});
+run.addEventListener("click", async () => {
+  resetPreview();
+  const file = selectedFile();
+  if (!file) {
+    feedback.textContent = "Choose a CSV file before processing.";
+    source.focus();
+    return;
+  }
+  if (file.size > CsvRescuePreview.MAX_BYTES) {
+    feedback.textContent = "File exceeds the 1 MB local preview limit. Choose a smaller file.";
+    return;
+  }
+  run.disabled = true;
+  feedback.textContent = "Processing in this browser tab…";
   try {
     const text = await file.text();
+    // Selection can change while the file is being read: never show stale output.
+    if (selectedFile() !== file) return;
     const output = CsvRescuePreview.process(text);
-    document.getElementById("clean").value = output.cleanCsv;
-    document.getElementById("reject").value = output.rejectCsv;
-    document.getElementById("totals").textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
+    if (selectedFile() !== file) return;
+    clean.value = output.cleanCsv;
+    reject.value = output.rejectCsv;
+    totals.textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
     result.hidden = false;
-    feedback.textContent = "Local processing complete. No data was transmitted.";
+    feedback.textContent = output.accepted.length === 0
+      ? "Preview complete: no records accepted. Review rejection reasons."
+      : "Preview complete: " + output.accepted.length + " accepted, " + output.rejected.length + " rejected. No data was transmitted.";
   } catch (error) {
-    feedback.textContent = "Unable to process: " + (error instanceof Error ? error.message : "invalid input");
+    if (selectedFile() === file) {
+      feedback.textContent = "Unable to process: " + (error && typeof error.message === "string" ? error.message : "invalid input") + ". Your file was not uploaded.";
+    }
+  } finally {
+    run.disabled = false;
   }
 });
