@@ -87,6 +87,37 @@ class WebAppTests(unittest.TestCase):
                                 extra={"Content-Type": "application/json"})
         self.assertEqual(status, 429)
 
+    def test_username_rotation_cannot_bypass_global_login_limit(self):
+        for i in range(20):
+            body = json.dumps({"username": f"unknown{i}", "password": "wrong"}).encode()
+            status, _, _ = self.call("POST", "/api/login", body,
+                                    extra={"Content-Type": "application/json"})
+            self.assertEqual(status, 401)
+        # A different username, including a real one, is now throttled.
+        body = json.dumps({"username": "alice",
+                           "password": "a-long-secure-passphrase-001"}).encode()
+        status, _, _ = self.call("POST", "/api/login", body,
+                                extra={"Content-Type": "application/json"})
+        self.assertEqual(status, 429)
+        # Failed username rotation is bounded in the tracking dictionary.
+        self.assertLessEqual(len(self.server.attempts), 21)
+
+    def test_expired_rate_limits_release_account_and_global_bucket(self):
+        # Deterministic expiry without a 15-minute sleep. Both buckets must
+        # expire together; stale failures must not lock out a valid user.
+        ip = "127.0.0.1"
+        for index in range(20):
+            self.assertFalse(self.server.rate_check(ip, f"rotated{index}"))
+            self.server.rate_check(ip, f"rotated{index}", failed=True)
+        self.assertTrue(self.server.rate_check(ip, "alice"))
+        with self.server.attempt_lock:
+            for key in list(self.server.attempts):
+                self.server.attempts[key] = [t - 901 for t in self.server.attempts[key]]
+        cookie, csrf = self.login()
+        self.assertIn("er_session=", cookie)
+        self.assertTrue(csrf)
+        self.assertNotIn((ip, "*"), self.server.attempts)
+
     def test_processing_download_and_database_output(self):
         cookie, csrf = self.login()
         status, _, data = self.upload(cookie, csrf)
