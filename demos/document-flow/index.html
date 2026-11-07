@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Offline document automation demonstration: Word revisions, field mapping and PandaDoc-style request payload.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<link rel="stylesheet" href="styles.css"><script defer type="module" src="app.mjs"></script>
+<title>Document Flow | Word to Variables</title></head>
+<body><header class="topbar"><div class="shell topinner"><div class="brand"><span class="mark">D·F</span><span>DOCUMENT FLOW<small>PORTFOLIO LAB / AUTOMATION</small></span></div><div class="toplinks"><span class="pill">Offline simulation</span><a href="README.md">Technical notes</a></div></div></header>
+<main class="shell">
+<section class="hero"><div class="eyebrow">Original demonstration · Not a client project</div>
+<h1>From Word revisions to a <em>variable-ready</em> document.</h1>
+<p>Compare proposed text changes, consolidate a fictional template, map custom fields, and preview a PandaDoc-style API request — without submitting anything or using customer records.</p>
+<div class="metrics"><div><strong>12</strong><span>Mapped fields</span></div><div><strong>02</strong><span>Revision stages</span></div><div><strong>0</strong><span>External requests</span></div></div></section>
+<section class="workflow" aria-label="Workflow"><div><b>01</b> Review existing terms</div><span>→</span><div><b>02</b> Apply Word updates</div><span>→</span><div><b>03</b> Map variables</div><span>→</span><div><b>04</b> Test output</div></section>
+<section class="section"><div class="sectionhead"><div><div class="eyebrow">Revision trace</div><h2>What changed?</h2></div><p>Fictional change request before template consolidation.</p></div>
+<div class="compare"><article><h3 class="old">Before · existing document</h3><div><label>Payment terms</label><p>Payment due within <del>30 days</del>.</p><label>Progress updates</label><p>Updates <del>upon request</del>.</p><label>Deliverables</label><p>No separately defined review step.</p></div></article>
+<article><h3 class="new">After · Word revisions</h3><div><label>Payment terms</label><p>Payment due within <ins>15 days</ins>, subject to approval.</p><label>Progress updates</label><p><ins>Weekly email update and final summary.</ins></p><label>Deliverables</label><p><ins>Written audit, recommendations table and review meeting.</ins></p></div></article></div></section>
+<section class="section"><div class="sectionhead"><div><div class="eyebrow">Interactive playground</div><h2>Populate the demonstration</h2></div><p>Nothing is uploaded or stored. Use only fictional values.</p></div>
+<div class="appgrid"><div class="panel"><div class="panelhead"><h3>Field mapping</h3><span id="field-count" class="smallpill"></span></div>
+<div id="fields" class="fields"></div><div id="status" role="status" aria-live="polite"></div>
+<div class="actions"><button id="btn-reset" class="quiet" type="button">Reset samples</button><button id="btn-csv" type="button">Export mapping CSV</button><button id="btn-json" type="button">Export API JSON</button></div></div>
+<div class="panel"><div class="panelhead"><h3>Populated document preview</h3><span class="smallpill">Offline only</span></div>
+<div class="paper"><pre id="preview" aria-label="Populated nonbinding sample document">Loading…</pre></div><div class="actions"><button id="btn-print" type="button">Print / Save as PDF</button></div>
+<div class="api"><div class="panelhead"><h3>Request body preview</h3><span class="smallpill">Not submitted</span></div><pre id="payload">Loading…</pre></div></div></div></section>
+<section class="notice"><strong>Important limitation</strong><p>This simulates Word updates and custom-variable replacement. It is not connected to PandaDoc. Live delivery requires an approved PandaDoc template, roles and signature fields, credentials and authorized API tests. All businesses and terms are invented; this document is non-binding and is not legal advice.</p></section>
+</main><footer class="shell">AI-assisted, human-reviewed demonstration · No real client data · <a href="README.md">Read the source and limitations</a></footer>
+</body></html>
