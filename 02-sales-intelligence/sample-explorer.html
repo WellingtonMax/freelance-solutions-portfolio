@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Interactive, offline exploration of six fictional sales transactions.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Sales Intelligence | Fictional sales explorer</title>
+<style>
+:root{color-scheme:light;--ink:#15253b;--muted:#4e6078;--blue:#2056b4;--line:#c9d6e6;--bg:#f2f6fc}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,sans-serif}
+main{max-width:1100px;margin:auto;padding:28px 22px 60px}a{color:#174d9b}a:focus-visible,select:focus-visible{outline:3px solid #d17500;outline-offset:3px}
+.eyebrow{color:#28559a;font-weight:750;text-transform:uppercase;letter-spacing:.07em;font-size:.78rem}
+h1{font-size:clamp(2rem,5vw,3.2rem);line-height:1.15;margin:.3rem 0}h2{font-size:1.25rem}
+p{color:var(--muted);max-width:75ch}.intro{margin-bottom:26px}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card,.panel{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.card span{display:block;color:var(--muted);font-size:.86rem}.card strong{display:block;font-size:clamp(1.4rem,2.8vw,2rem);font-variant-numeric:tabular-nums}
+.panel{margin-top:18px}.toolbar{display:flex;gap:16px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+label{font-weight:700}select{font:inherit;min-height:44px;padding:8px 12px;border:1px solid #879ab5;border-radius:8px;background:#fff;color:var(--ink)}
+.bar-row{display:grid;grid-template-columns:minmax(90px,170px) minmax(0,1fr) minmax(75px,110px);align-items:center;gap:12px;margin:14px 0}
+.track{height:18px;border-radius:20px;background:#e5edfa;overflow:hidden}.fill{height:100%;background:#2056b4}
+.amount{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:610px}th,td{text-align:left;padding:11px 10px;border-bottom:1px solid var(--line)}
+th{background:#eaf0fa}td:last-child,th:last-child{text-align:right;font-variant-numeric:tabular-nums}
+caption{text-align:left;font-weight:600;padding:0 0 12px;color:var(--muted)}.small{font-size:.88rem}
+@media(max-width:700px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.bar-row{grid-template-columns:1fr;gap:3px}.amount{text-align:left}.panel{padding:15px}}
+@media(max-width:360px){main{padding:18px 12px}.cards{grid-template-columns:1fr}}
+@media print{body{background:white}main{padding:0}.panel,.card{break-inside:avoid;box-shadow:none}select{border:0}.scroll{overflow:visible}table{min-width:0}}
+</style>
+</head>
+<body><main>
+<a href="README.md">← Sales Intelligence source and CLI</a>
+<header class="intro"><p class="eyebrow">02 / Offline analytics · fictional demonstration</p>
+<h1>Explore six synthetic sales</h1>
+<p>This working browser explorer uses the six fictional transactions in <a href="sample_sales.csv">sample_sales.csv</a>. Filter by category to inspect exact revenue, orders, units and average order value. No uploads, network requests or customer data. This is a fixed sample, not the Python-generated report or a live dashboard.</p></header>
+<section aria-labelledby="summary"><h2 id="summary">Filtered sales summary</h2>
+<div class="cards">
+<div class="card"><span>Revenue (USD)</span><strong id="revenue">$209.50</strong></div>
+<div class="card"><span>Orders</span><strong id="orders">6</strong></div>
+<div class="card"><span>Units sold</span><strong id="units">19</strong></div>
+<div class="card"><span>Average order (USD)</span><strong id="average">$34.92</strong></div>
+</div></section>
+<section class="panel" aria-labelledby="breakdown"><div class="toolbar"><h2 id="breakdown">Revenue by category</h2><div><label for="category">Category </label>
+<select id="category"><option value="All">All categories</option><option value="Office">Office</option><option value="Home">Home</option><option value="Travel">Travel</option></select></div></div>
+<p id="status" role="status" aria-live="polite">Showing all 6 fictional orders.</p>
+<div id="bars" aria-label="Category revenue, with numeric labels">
+<div class="bar-row"><strong>Office</strong><div class="track"><div class="fill" style="width:78.3%"></div></div><span class="amount">$70.50</span></div>
+<div class="bar-row"><strong>Home</strong><div class="track"><div class="fill" style="width:54.4%"></div></div><span class="amount">$49.00</span></div>
+<div class="bar-row"><strong>Travel</strong><div class="track"><div class="fill" style="width:100%"></div></div><span class="amount">$90.00</span></div>
+</div></section>
+<section class="panel" aria-labelledby="transactions"><h2 id="transactions">Transaction detail</h2>
+<div class="scroll"><table><caption>Fictional CSV records; amounts in USD. Filter affects this table and the summary above.</caption>
+<thead><tr><th scope="col">Order</th><th scope="col">Date</th><th scope="col">Product</th><th scope="col">Category</th><th scope="col">Units</th><th scope="col">Revenue</th></tr></thead>
+<tbody id="rows">
+<tr data-category="Office" data-cents="2500" data-units="2"><td>1001</td><td>2026-11-01</td><td>Notebook</td><td>Office</td><td>2</td><td>$25.00</td></tr>
+<tr data-category="Office" data-cents="1000" data-units="10"><td>1002</td><td>2026-11-02</td><td>Pencil</td><td>Office</td><td>10</td><td>$10.00</td></tr>
+<tr data-category="Home" data-cents="2500" data-units="1"><td>1003</td><td>2026-10-21</td><td>Flask</td><td>Home</td><td>1</td><td>$25.00</td></tr>
+<tr data-category="Home" data-cents="2400" data-units="3"><td>1004</td><td>2026-10-22</td><td>Water Bottle</td><td>Home</td><td>3</td><td>$24.00</td></tr>
+<tr data-category="Office" data-cents="3550" data-units="1"><td>1005</td><td>2026-11-04</td><td>Desk Lamp</td><td>Office</td><td>1</td><td>$35.50</td></tr>
+<tr data-category="Travel" data-cents="9000" data-units="2"><td>1006</td><td>2026-11-05</td><td>Backpack</td><td>Travel</td><td>2</td><td>$90.00</td></tr>
+</tbody></table></div></section>
+<p class="small">Scope: unique completed orders only; no returns, taxes, shipping, discounts or currency conversion. Fictional data, AI-assisted development and human review. For independently generated HTML/JSON reports, use <a href="report.py">the Python reference implementation</a>.</p>
+</main>
+<script>
+"use strict";
+(function(){
+ const category=document.getElementById("category");
+ const rows=Array.from(document.querySelectorAll("#rows tr"));
+ const money=cents=>"$"+(cents/100).toFixed(2);
+ const bars=document.getElementById("bars");
+ function render(){
+  const selected=category.value;
+  let revenue=0,units=0,orders=0;
+  const categories=new Map();
+  for(const row of rows){
+   const visible=selected==="All"||row.dataset.category===selected;
+   row.hidden=!visible;
+   if(!visible)continue;
+   const cents=Number(row.dataset.cents);
+   revenue+=cents;units+=Number(row.dataset.units);orders++;
+   categories.set(row.dataset.category,(categories.get(row.dataset.category)||0)+cents);
+  }
+  document.getElementById("revenue").textContent=money(revenue);
+  document.getElementById("orders").textContent=String(orders);
+  document.getElementById("units").textContent=String(units);
+  document.getElementById("average").textContent=money(orders?Math.round(revenue/orders):0);
+  document.getElementById("status").textContent="Showing "+orders+" fictional "+(orders===1?"order":"orders")+" in "+(selected==="All"?"all categories":selected)+".";
+  bars.replaceChildren();
+  const max=Math.max(1,...categories.values());
+  for(const [name,cents] of categories){
+   const row=document.createElement("div");row.className="bar-row";
+   const label=document.createElement("strong");label.textContent=name;
+   const track=document.createElement("div");track.className="track";
+   const fill=document.createElement("div");fill.className="fill";fill.style.width=(cents/max*100).toFixed(1)+"%";
+   const value=document.createElement("span");value.className="amount";value.textContent=money(cents);
+   track.append(fill);row.append(label,track,value);bars.append(row);
+  }
+ }
+ category.addEventListener("change",render);
+ render();
+})();
+</script>
+</body></html>
