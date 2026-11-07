@@ -87,6 +87,21 @@ class WebAppTests(unittest.TestCase):
                                 extra={"Content-Type": "application/json"})
         self.assertEqual(status, 429)
 
+    def test_username_rotation_cannot_bypass_global_login_limit(self):
+        for i in range(20):
+            body = json.dumps({"username": f"unknown{i}", "password": "wrong"}).encode()
+            status, _, _ = self.call("POST", "/api/login", body,
+                                    extra={"Content-Type": "application/json"})
+            self.assertEqual(status, 401)
+        # A different username, including a real one, is now throttled.
+        body = json.dumps({"username": "alice",
+                           "password": "a-long-secure-passphrase-001"}).encode()
+        status, _, _ = self.call("POST", "/api/login", body,
+                                extra={"Content-Type": "application/json"})
+        self.assertEqual(status, 429)
+        # Failed username rotation is bounded in the tracking dictionary.
+        self.assertLessEqual(len(self.server.attempts), 21)
+
     def test_processing_download_and_database_output(self):
         cookie, csrf = self.login()
         status, _, data = self.upload(cookie, csrf)
