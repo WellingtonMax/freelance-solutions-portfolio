@@ -22,6 +22,11 @@ class OfflineMonitorTests(unittest.TestCase):
         self.assertFalse(result["changed"])
         self.assertNotEqual(result["before_sha256"], result["after_sha256"])
 
+    def test_mismatched_hidden_closing_tag_does_not_expose_script(self):
+        before = b"<p>Safe</p><script>secret</style>hidden</script><p>Visible</p>"
+        after = b"<p>Safe</p><script>other</style>hidden</script><p>Visible</p>"
+        self.assertFalse(compare(before, after)["changed"])
+
     def test_whitespace_normalization(self):
         self.assertFalse(compare(b"<p>Hello  world</p>", b"<p>Hello world</p>")["changed"])
 
