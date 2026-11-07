@@ -75,15 +75,26 @@ def compare(before, after):
             "truncated_change_list": total_changes > 10}
 
 
+def read_snapshot(path):
+    """Read at most the accepted input size plus one byte (including on file growth)."""
+    with path.open("rb") as stream:
+        data = stream.read(MAX_BYTES + 1)
+    if len(data) > MAX_BYTES:
+        raise ValueError("HTML snapshot exceeds 256 KB")
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(description="Compare two authorized local HTML snapshots")
     parser.add_argument("before", type=Path)
     parser.add_argument("after", type=Path)
     args = parser.parse_args()
-    for path in (args.before, args.after):
-        if path.stat().st_size > MAX_BYTES:
-            parser.error("snapshot exceeds 256 KB")
-    print(json.dumps(compare(args.before.read_bytes(), args.after.read_bytes()), indent=2))
+    try:
+        before = read_snapshot(args.before)
+        after = read_snapshot(args.after)
+    except (OSError, ValueError) as exc:
+        parser.error(str(exc))
+    print(json.dumps(compare(before, after), indent=2))
 
 
 if __name__ == "__main__":
