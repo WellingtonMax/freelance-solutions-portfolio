@@ -94,7 +94,11 @@ def main():
         after = read_snapshot(args.after)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
-    print(json.dumps(compare(before, after), indent=2))
+    try:
+        result = compare(before, after)
+    except ValueError as exc:
+        parser.error(str(exc))
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
