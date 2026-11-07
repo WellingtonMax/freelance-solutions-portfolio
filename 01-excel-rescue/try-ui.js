@@ -52,7 +52,7 @@ run.addEventListener("click", async () => {
       : "Preview complete: " + output.accepted.length + " accepted, " + output.rejected.length + " rejected. No data was transmitted.";
   } catch (error) {
     if (selectedFile() === file) {
-      feedback.textContent = "Unable to process: " + (error instanceof Error ? error.message : "invalid input") + ". Your file was not uploaded.";
+      feedback.textContent = "Unable to process: " + (error && typeof error.message === "string" ? error.message : "invalid input") + ". Your file was not uploaded.";
     }
   } finally {
     run.disabled = false;
