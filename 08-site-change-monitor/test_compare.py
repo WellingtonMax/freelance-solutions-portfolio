@@ -63,6 +63,40 @@ class OfflineMonitorTests(unittest.TestCase):
             path.write_bytes(b"<p>ok</p>")
             self.assertEqual(read_snapshot(path), b"<p>ok</p>")
 
+    def test_cli_invalid_snapshot_returns_controlled_error(self):
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as directory:
+            before = Path(directory) / "before.html"
+            after = Path(directory) / "after.html"
+            before.write_bytes(b"<p>valid</p>")
+            after.write_bytes(bytes([255]))
+            result = subprocess.run(
+                [sys.executable, str(Path(__file__).with_name("compare.py")), str(before), str(after)],
+                capture_output=True, text=True, timeout=5, check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("snapshot must be UTF-8", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
+    def test_cli_excessive_visible_blocks_returns_controlled_error(self):
+        import subprocess
+        import sys
+        with tempfile.TemporaryDirectory() as directory:
+            before = Path(directory) / "before.html"
+            after = Path(directory) / "after.html"
+            before.write_bytes(b"<p>valid</p>")
+            after.write_bytes(b"<p>x</p>" * 501)
+            result = subprocess.run(
+                [sys.executable, str(Path(__file__).with_name("compare.py")), str(before), str(after)],
+                capture_output=True, text=True, timeout=5, check=False,
+            )
+            self.assertEqual(result.returncode, 2)
+            self.assertIn("complexity limit", result.stderr)
+            self.assertNotIn("Traceback", result.stderr)
+            self.assertEqual(result.stdout, "")
+
     def test_no_network_or_html_execution(self):
         result = compare(b"<a href='https://example.com'>Read more</a>", b"<a href='https://evil.example'>Read more</a>")
         self.assertFalse(result["changed"])  # Only the rendered text is compared.
