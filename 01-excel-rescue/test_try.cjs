@@ -41,3 +41,6 @@ test("do not interpret untrusted content as HTML",()=>{
  assert.match(html,/connect-src 'none'/);assert.doesNotMatch(ui,/innerHTML|eval\(|fetch\(|document\.write/);
  assert.match(ui,/\.value = output\.cleanCsv/);
 });
+
+// Keep bundled sample regression checks in the existing CI entrypoint.
+require("./test_sample.cjs");
