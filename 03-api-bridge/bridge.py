@@ -12,11 +12,13 @@ import csv
 import http.client
 import ipaddress
 import json
+import os
 from pathlib import Path
 import re
 import socket
 import ssl
 import time
+import tempfile
 import unicodedata
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -189,12 +191,25 @@ def export_rows(records: list[dict], fields: list[str], destination: Path) -> in
     if any(not isinstance(record, dict) for record in records):
         raise ValueError("API records must be objects")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    # Exclusive create: never follow a pre-existing symlink or overwrite exports.
-    with destination.open("x", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
-        writer.writeheader()
-        for record in records:
-            writer.writerow({field: safe_csv(record.get(field)) for field in fields})
+    # Stage in the destination directory; never expose a partially written CSV.
+    # os.link is an atomic no-overwrite publish on the same filesystem.
+    staged = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", newline="", dir=destination.parent,
+            prefix=".api-bridge-", suffix=".tmp", delete=False,
+        ) as stream:
+            staged = Path(stream.name)
+            writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
+            writer.writeheader()
+            for record in records:
+                writer.writerow({field: safe_csv(record.get(field)) for field in fields})
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(staged, destination, follow_symlinks=False)
+    finally:
+        if staged is not None:
+            staged.unlink(missing_ok=True)
     return len(records)
 
 
