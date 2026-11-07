@@ -177,8 +177,10 @@ def safe_csv(value) -> str:
 
 
 def export_rows(records: list[dict], fields: list[str], destination: Path) -> int:
-    if (not fields or len(fields) > 50 or len(fields) != len(set(fields))
-            or any(not SAFE_FIELD.fullmatch(field) for field in fields)):
+    if (not isinstance(fields, list) or not fields or len(fields) > 50
+            or any(not isinstance(field, str) or not SAFE_FIELD.fullmatch(field)
+                   for field in fields)
+            or len(fields) != len(set(fields))):
         raise ValueError("Provide 1–50 unique safe column names (letters, digits, underscore)")
     if not isinstance(records, list) or len(records) > MAX_RECORDS:
         raise ValueError("API record limit exceeded or invalid records")
