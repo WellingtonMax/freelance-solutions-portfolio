@@ -48,7 +48,7 @@ test('feedback is associated with fields and remains local', () => {
 test('message error is a real sibling of an empty textarea', () => {
   const html = fs.readFileSync('index.html','utf8');
   assert.match(html, /<textarea\b[^>]*id="message"[^>]*><\/textarea>\s*<p class="field-error" id="message-error"><\/p>/);
-  assert.doesNotMatch(html, /<textarea\b[^>]*>[\s\S]*?<p[^>]*id="message-error"/);
+  assert.doesNotMatch(html, /<textarea\b[^>]*>[^<]*<p[^>]*id="message-error"/);
 });
 test('control characters and non-text values focus the offending field', () => {
   const {validateEnquiryFields} = require('./site.js');
