@@ -219,7 +219,7 @@ class WebServer(ThreadingHTTPServer):
         # Limit both per-account guesses and username-rotation attempts.
         # The global bucket also bounds in-memory tracking of arbitrary names.
         key = (ip, username)
-        global_key = (ip, "*")
+        global_key = (ip, None)  # Distinct from every user-supplied string
         with self.attempt_lock:
             current = time.monotonic()
             # Sweep all expired identifiers periodically, including usernames
