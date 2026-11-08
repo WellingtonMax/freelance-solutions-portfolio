@@ -229,7 +229,7 @@ test('summary uses singular/plural while errors recover from three to zero', () 
   assert.equal(inputs.message.getAttribute('aria-invalid'),'true');
   inputs.message.value = 'A fictional project request';
   inputs.message.listeners.input();
-  assert.match(feedback.textContent,/Nothing has been checked yet/);
+  assert.match(feedback.textContent,/All highlighted errors are resolved\. Validate again/);
   assert.match(fs.readFileSync('index.html','utf8'), /id="feedback" role="status" aria-live="polite"/);
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent,/Fields look valid/);
