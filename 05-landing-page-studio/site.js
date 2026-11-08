@@ -75,10 +75,11 @@ if (typeof document !== "undefined") {
     // Any edit invalidates a previously successful validation result.
     // After a failed submit, retain an error until this field actually validates.
     // Before submit, avoid showing errors while the visitor is still typing.
-    if (input.getAttribute("aria-invalid") === "true") {
+    if (input.getAttribute("aria-invalid") === "true" || lastSubmitHadErrors) {
       const values = Object.fromEntries(Object.entries(inputs).map(([field, element]) => [field, element.value]));
       const currentError = validateEnquiryAllFields(values)[key];
       if (currentError) {
+        input.setAttribute("aria-invalid", "true");
         errors[key].textContent = currentError;
       } else {
         clearError(key);
