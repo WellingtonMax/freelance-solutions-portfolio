@@ -69,6 +69,7 @@ if (typeof document !== "undefined") {
   function clearErrors() {
     for (const key of Object.keys(inputs)) clearError(key);
   }
+  let hasAttemptedValidation = false;
   for (const [key, input] of Object.entries(inputs)) input.addEventListener("input", () => {
     // After a failed submit, retain an error until this field actually validates.
     // Before submit, avoid showing errors while the visitor is still typing.
@@ -84,10 +85,13 @@ if (typeof document !== "undefined") {
     const remainingErrors = Object.keys(inputs).filter(field => inputs[field].getAttribute("aria-invalid") === "true");
     feedback.textContent = remainingErrors.length
       ? errorSummary(remainingErrors.length)
-      : "Nothing has been checked yet.";
+      : hasAttemptedValidation
+        ? "All highlighted errors are resolved. Validate again to check the form; nothing was sent."
+        : "Nothing has been checked yet.";
   });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+    hasAttemptedValidation = true;
     clearErrors();
     try {
     const fieldErrors = validateEnquiryAllFields({
