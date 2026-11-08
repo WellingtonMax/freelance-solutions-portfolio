@@ -72,7 +72,6 @@ if (typeof document !== "undefined") {
   for (const [key, input] of Object.entries(inputs)) input.addEventListener("input", () => {
     clearError(key);
     const remainingErrors = Object.keys(inputs).filter(field => inputs[field].getAttribute("aria-invalid") === "true");
-    feedback.setAttribute("role", remainingErrors.length ? "alert" : "status");
     feedback.textContent = remainingErrors.length
       ? errorSummary(remainingErrors.length)
       : "Nothing has been checked yet.";
@@ -92,15 +91,12 @@ if (typeof document !== "undefined") {
         inputs[key].setAttribute("aria-invalid", "true");
         errors[key].textContent = fieldErrors[key];
       }
-      feedback.setAttribute("role","alert");
       feedback.textContent = errorSummary(invalidFields.length);
       inputs[invalidFields[0]].focus();
     } else {
-      feedback.setAttribute("role","status");
       feedback.textContent = "Fields look valid. Demo only — nothing was sent or saved.";
     }
     } catch (_) {
-      feedback.setAttribute("role","alert");
       feedback.textContent = "Validation could not complete. Try again; nothing was sent.";
     }
   });
