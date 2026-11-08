@@ -1,5 +1,7 @@
 # 05 Landing Page Studio — first-minute UX evidence and review contract
 
+> **Current review authority — 2026-11-08.** The historical implementation notes below describe several superseded revisions. For acceptance of frontend PR #46, use the current-state contract here rather than older rows that say the corrected form returns to “Nothing has been checked yet.” Source inspected on `frontend/landing-validation-feedback-20261107`: `#feedback` retains `role="status" aria-live="polite" aria-atomic="true"`; after any attempted submit, edits with no displayed errors require revalidation, including edits after a previously successful validation. Errors remain on invalid fields until corrected; submit checks all fields and focuses the first invalid control. The status never claims that data were sent. This is **source inspection, not a browser/assistive-technology pass**. Test execution and current CI must be verified independently. Keep PRs #45/#46 in draft until evidence and structural PR #11 dependencies are resolved. No deploy or merge is authorized from this document alone.
+
 Status: design specification only; no frontend or backend code changed. Base: `feat/eight-project-sprint-20261106` (not merged into main at time of inspection). This document is scoped to project 05, one of the eight agreed projects.
 
 ## Verified interface inventory
