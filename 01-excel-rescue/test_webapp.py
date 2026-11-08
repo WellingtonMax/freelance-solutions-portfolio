@@ -118,6 +118,22 @@ class WebAppTests(unittest.TestCase):
         self.assertTrue(csrf)
         self.assertNotIn((ip, "*"), self.server.attempts)
 
+    def test_expired_unvisited_usernames_are_swept(self):
+        # Expired keys must not accumulate merely because their usernames
+        # are never used again; do not rely on wall-clock sleeps.
+        ip = "127.0.0.1"
+        for index in range(12):
+            self.server.rate_check(ip, f"stale{index}", failed=True)
+        with self.server.attempt_lock:
+            for bucket in list(self.server.attempts):
+                self.server.attempts[bucket] = [
+                    timestamp - 901 for timestamp in self.server.attempts[bucket]
+                ]
+            self.server.last_attempt_sweep -= 61
+        self.assertFalse(self.server.rate_check(ip, "fresh"))
+        with self.server.attempt_lock:
+            self.assertEqual(self.server.attempts, {})
+
     def test_processing_download_and_database_output(self):
         cookie, csrf = self.login()
         status, _, data = self.upload(cookie, csrf)
