@@ -65,7 +65,7 @@ run.addEventListener("click", async () => {
     // Selection can change while the file is being read: never show stale output.
     if (version !== selectionVersion) return;
     const output = CsvRescuePreview.process(text);
-    if (selectedFile() !== file) return;
+    if (!usingSample && selectedFile() !== file) return;
     clean.value = output.cleanCsv;
     reject.value = output.rejectCsv;
     totals.textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
