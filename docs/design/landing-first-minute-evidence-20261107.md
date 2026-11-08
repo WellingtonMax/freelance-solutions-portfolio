@@ -57,33 +57,38 @@ node --test test_site.cjs
 ```
 The commands above are instructions, **not evidence that tests were executed**.
 
-## Implementation reconciliation — 2026-11-08 (PR #46, unmerged)
+## Implementation reconciliation — 2026-11-08 (PR #46, still unmerged)
 
-This is a **design review of repository source**, not a browser or accessibility certification. The frontend branch `frontend/landing-validation-feedback-20261107` implements the first-minute CTA, disclosure, associated field messages, focus-on-error and a local-only success message. It also adds a VM-based test for retaining an unrelated error when another field changes. These changes remain unmerged; do not claim they are live.
+This review is based on the current frontend branch source, not on a running browser or screen-reader session. The previous request to report all invalid fields at once **has now been implemented in source**: `validateEnquiryAllFields()` returns per-field errors, the submit handler renders them all and focuses the first invalid field. VM tests for this behavior exist in `test_site.cjs`. Do not repeat the old first-error-only claim or imply these tests have passed.
 
-### One remaining UX gap: reveal all invalid fields on the first submission
+### One remaining UX inconsistency: feedback never changes singular/plural
 
-Current `site.js` uses `validateEnquiryFields()` to report only the **first** invalid field on submit. When name, email and summary are invalid, visitors discover the next error only after correcting the first and resubmitting. This makes the one-minute demo unnecessarily cumbersome.
+The current submit and input handlers use the same summary, **"Please correct the highlighted fields. Nothing was sent."**, for one, two or three invalid fields. The design contract above specifies singular feedback when one error remains. More importantly, the initial field-edit handler changes the summary to **"Nothing has been checked yet."** after the last displayed error is cleared, although the visitor may still have an invalid value. This is a truthful *unchecked* state, not a successful validation state, and must remain visually distinguishable from a valid submission.
 
-**Frontend handoff:** on submit, validate and show messages for **every invalid field** in one pass. Focus the first invalid field in DOM order; retain other errors and `aria-invalid` states. Editing one field must not clear other errors. Use **"Review the highlighted fields. Nothing was sent."** when multiple errors remain, and the singular variant when only one remains. Continue using `textContent`; do not reflect user input as HTML or send any data.
+**Frontend handoff (do not edit frontend files from this design branch):**
+- After submit, announce **"Please correct the highlighted field. Nothing was sent."** for exactly one invalid field and **"Please correct the highlighted fields. Nothing was sent."** for two or three.
+- After editing one field, preserve errors on untouched fields. Recalculate the singular/plural summary from the remaining displayed errors without stealing focus.
+- When no displayed errors remain after editing, use the neutral **"Nothing has been checked yet."** until a fresh submit. Never imply the data were submitted or validated.
+- Keep per-field messages adjacent to their controls with `aria-describedby`, and use `textContent` for feedback. Confirm the chosen live-region strategy with a real screen reader: changing `role` between `alert` and `status` dynamically may not announce consistently.
+- Keep network requests, storage, telemetry and submission disabled; use fictional values only.
 
-### Acceptance matrix (fictional values only)
+### Acceptance matrix
 
-| Scenario | Expected UX |
+| Scenario | Expected visible and accessible state |
 | --- | --- |
-| Empty name, invalid email, short summary; submit | Three associated field messages, three `aria-invalid=true` states, focus on name, plural summary |
-| Correct name only | Email and summary remain visibly invalid; no forced focus change |
-| Correct email next | Summary remains invalid; summary becomes singular |
-| Correct summary and submit again | No field errors; success explicitly says nothing was sent |
-| HTML-like text and control characters | No markup execution, no reflected field values, errors mapped to offending field |
-| 320/375/768/1280px and 200% zoom | No clipped text, overflow or hidden focus rings |
-| Keyboard and screen reader | Logical focus; no duplicate live-region announcements |
+| Submit with three invalid fields | Three field messages, first invalid field focused, plural summary |
+| Correct name, leave email and message invalid | Two messages remain, plural summary, no focus jump |
+| Correct email, leave message invalid | One message remains, singular summary |
+| Edit last invalid field without submitting | No old error message, neutral *unchecked* summary (not success) |
+| Submit all valid synthetic fields | No errors; explicit **"nothing was sent or saved"** result |
+| 320/375/768/1280px, 200% zoom, keyboard and screen reader | No clipping or focus loss; feedback understandable without colour alone |
 
-### Integration and evidence
+### Evidence and integration status
 
-- PR #46 is draft and depends on the eight-project feature branch. PR #11 was also draft and non-mergeable when inspected on 2026-11-08. The `main` README still lists 04–08 as planned.
-- Source inspection confirms first-error-only behavior and a VM-based preservation test. **No Node suite, browser, screen reader or CI was executed during this design review.**
-- Frontend owns implementation and tests in its own PR. Backend alone handles integration after verifying dependency order, CI and mergeability. No deployment is authorized.
+- Reviewed actual `site.js`, `index.html` and `test_site.cjs` on `frontend/landing-validation-feedback-20261107`. All-fields behavior is present in source and tests are written, **but Node, browser and screen-reader tests were not executed in this design review**. Local GitHub DNS access failed; GitHub connector file reads succeeded.
+- PR #46 remains open and draft; PR #11 remains open, draft and non-mergeable in the current GitHub response. The repository has 36 open PRs. Do not claim these features are on `main`.
+- Frontend owns the implementation and tests; backend alone decides merges after dependencies, CI and conflicts are resolved. No deploy is authorized.
 
 ## Next review
-Review the all-errors implementation, test results, keyboard behavior and 375px/desktop screenshots if available. This document is not proof that the feature has shipped.
+
+Verify singular/plural copy and announcement behavior in a real browser, then record actual Node/CI results. Avoid another design PR for the same component while frontend is working in its existing PR.
