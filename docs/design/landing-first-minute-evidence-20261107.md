@@ -103,3 +103,26 @@ Verify live-region announcement behavior in a real browser, then record actual N
 **Verify before declaring ready:** (1) inspect the actual frontend head SHA and diff; (2) confirm `#feedback` retains `role=status`, `aria-live=polite` and `aria-atomic=true` after the change; (3) check submit with three, one and zero errors, plus edits after failed submission; (4) verify first invalid field focus and accessible description; (5) run `cd 05-landing-page-studio && node --test test_site.cjs`, then test keyboard and one named browser/screen-reader combination; (6) inspect at 320/375/768/1280px and 200% zoom. Use only synthetic values, verify no network requests or raw-input HTML reflection, and report actual results rather than inferring compliance.
 
 **Integration:** This design document remains on a feature-branch-based draft PR (#45). Frontend PR #46 is also a draft on the unmerged feature branch. The structural PR #11 was observed open, draft and non-mergeable. No CI, browser or assistive-technology test was executed during this documentation correction; backend retains sole merge authority.
+
+
+## Current-state correction — 2026-11-08, PR #46 head `2c78c2399a3581e121e9f7d5a489dc94ff3b262a`
+
+**Single design QA improvement: remove the obsolete unchecked-state expectation.** The earlier "Implementation reconciliation" section above describes the last corrected field returning to "Nothing has been checked yet." That was accurate for an older revision, but is **not** the current frontend behavior. In the latest inspected `site.js`, `hasAttemptedValidation` tracks whether a submit occurred. Once all displayed errors are corrected after a failed submit, the live status becomes:
+
+> All highlighted errors are resolved. Validate again to check the form; nothing was sent.
+
+This explicitly distinguishes an untouched form from a previously checked, now edited form. **Treat this section as superseding the earlier unchecked-state row and instructions.** Do not regress to the old neutral message after correction.
+
+### Acceptance contract for frontend review
+
+1. Fresh page, before any submit: "Nothing has been checked yet."
+2. Submit empty form: three field errors, plural summary, first invalid field focused; nothing is sent.
+3. Correct only Name: two field errors remain, plural summary; focus stays where the user types.
+4. Correct Email: one field error remains, singular summary.
+5. Correct Project summary: zero highlighted errors, **explicit revalidation-required message above**, not the fresh-page message and not a success receipt.
+6. Submit again with valid synthetic values: "Fields look valid. Demo only — nothing was sent or saved."
+7. After successful validation, edit a field to an invalid value: do **not** assume the prior valid result still applies. Review whether the status should return to "Validate again" and add a frontend regression test if behavior is changed. This is a **separate potential stale-result issue**, not a claimed verified defect or a change authorized in this design-only branch.
+
+Use fictional values only. Check actual screen-reader announcement, keyboard focus, 320/375px and 200% zoom, and absence of network/storage operations before calling the UI accessible or ready. The Node tests and browser checks were **not executed** in this design review; GitHub Actions returned no pull-request workflow runs for this head at inspection. No frontend file, backend file, merge or deployment was changed by this document.
+
+**Dependency:** design PR #45 and frontend PR #46 remain draft on `feat/eight-project-sprint-20261106`; structural PR #11 remains draft and currently non-mergeable with main. Backend owns the integration decision.
