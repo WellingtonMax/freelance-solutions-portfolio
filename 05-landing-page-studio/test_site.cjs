@@ -235,3 +235,11 @@ test('summary uses singular/plural while errors recover from three to zero', () 
   assert.match(feedback.textContent,/Fields look valid/);
   assert.doesNotMatch(feedback.textContent,/was sent\.$/);
 });
+
+
+test('decorative hero artwork is hidden without inventing an image description', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  assert.match(html, /<div class="illustration" aria-hidden="true">MW<span>STUDIO 01<\/span><\/div>/);
+  assert.doesNotMatch(html, /role="img"|aria-label="Decorative illustration of a clean workshop/);
+  assert.match(html, /<h1 id="hero-title">/);
+});
