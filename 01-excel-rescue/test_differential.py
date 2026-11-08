@@ -71,8 +71,12 @@ FIXTURES = {
 }
 
 
-@unittest.skipUnless(shutil.which("node"), "Node.js required for differential tests")
 class DifferentialCsvTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        if shutil.which("node") is None:
+            raise RuntimeError("Node.js is required: differential security tests must not silently skip")
     def test_same_acceptance_and_rejection_on_synthetic_fixtures(self):
         for label, source in FIXTURES.items():
             with self.subTest(fixture=label), tempfile.TemporaryDirectory() as directory:
