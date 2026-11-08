@@ -63,7 +63,11 @@ These requirements follow risk themes from [OWASP ASVS 5.0](https://owasp.org/ww
 - Public GitHub repositories may offer secret scanning and push protection; check the repository settings before relying on them.
 - No third-party runtime Python dependencies are used in demos 01–03; that reduces, but does not remove, supply-chain exposure.
 
-## Cross-implementation differential testing (November 2026)\n\nThe Excel Rescue browser and Python engines now have synthetic-only differential tests. Node is invoked locally with a 5-second subprocess timeout, bounded fixture data, no network access and no credentials. The tests compare accepted and rejected CSV output, and explicitly record two intentional strictness differences: malformed extra row fields and unclosed quotes are rejected at file level by the browser, while Python may handle them at record level. The test does not establish full semantic equivalence or production safety. These controls support the input-validation principles of OWASP ASVS 5.0, without claiming certification. The agentic OWASP Top 10 is not applicable to this non-agent demo.\n\n## Scope and responsible claims
+## Cross-implementation differential testing (November 2026)
+
+The Excel Rescue browser and Python engines now have synthetic-only differential tests. Node is invoked locally with a 5-second subprocess timeout, bounded fixture data, no network access and no credentials. The tests compare accepted and rejected CSV output, and explicitly record two intentional strictness differences: malformed extra row fields and unclosed quotes are rejected at file level by the browser, while Python may handle them at record level. The test does not establish full semantic equivalence or production safety. These controls support the input-validation principles of OWASP ASVS 5.0, without claiming certification. The agentic OWASP Top 10 is not applicable to this non-agent demo.
+
+## Scope and responsible claims
 
 **Allowed:** "Automated tests and static-analysis workflows are configured"; "The script checks these cases"; "No sensitive customer data is used in this demo."
 
