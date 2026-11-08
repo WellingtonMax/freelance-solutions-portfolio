@@ -260,3 +260,43 @@ test('local validation feedback is an atomic polite status region', () => {
   assert.match(html, /id="feedback" role="status" aria-live="polite" aria-atomic="true"/);
   assert.doesNotMatch(html, /id="feedback"[^>]*role="alert"/);
 });
+
+test('editing a still-invalid field retains its error until corrected', () => {
+  const vm = require('node:vm');
+  function node(value = '') {
+    const attributes = new Map(), listeners = {};
+    return {
+      value, textContent: '', listeners,
+      setAttribute(k,v) { attributes.set(k,v); },
+      getAttribute(k) { return attributes.get(k) ?? null; },
+      removeAttribute(k) { attributes.delete(k); },
+      addEventListener(k,fn) { listeners[k] = fn; },
+      focus() { this.focused = true; }
+    };
+  }
+  const inputs = {name:node(''),email:node('bad'),message:node('short')};
+  const errors = {name:node(),email:node(),message:node()};
+  const feedback = node();
+  const form = {
+    elements:{namedItem(k) { return inputs[k]; }},
+    addEventListener(k,fn) { this[k] = fn; }
+  };
+  const document = {getElementById(id) {
+    if (id === 'enquiry') return form;
+    if (id === 'feedback') return feedback;
+    return errors[id.replace('-error','')];
+  }};
+  vm.runInNewContext(fs.readFileSync('site.js','utf8'),{document});
+  form.submit({preventDefault() {}});
+  inputs.email.value = 'still-invalid';
+  inputs.email.listeners.input();
+  assert.equal(inputs.email.getAttribute('aria-invalid'),'true');
+  assert.match(errors.email.textContent,/valid email/);
+  assert.match(feedback.textContent,/highlighted fields/);
+  inputs.email.value = 'fictional@example.com';
+  inputs.email.listeners.input();
+  assert.equal(inputs.email.getAttribute('aria-invalid'),null);
+  assert.equal(errors.email.textContent,'');
+  assert.equal(inputs.name.getAttribute('aria-invalid'),'true');
+  assert.equal(inputs.message.getAttribute('aria-invalid'),'true');
+});
