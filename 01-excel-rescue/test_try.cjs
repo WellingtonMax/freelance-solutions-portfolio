@@ -54,7 +54,9 @@ test("copy actions are separate, disabled until output, and fail safely",()=>{
  assert.match(ui,/navigator\.clipboard\.writeText\(value\)/);
  assert.match(ui,/textarea\.select\(\)/);
  assert.match(ui,/version !== previewVersion/);
- assert.match(ui,/copyClean\.disabled = !clean\.value/);
- assert.match(ui,/copyReject\.disabled = !reject\.value/);
+ assert.match(ui,/copyClean\.disabled = output\.accepted\.length === 0/);
+ assert.match(ui,/copyReject\.disabled = output\.rejected\.length === 0/);
+ assert.match(ui,/No accepted records to copy/);
+ assert.match(ui,/No rejected records to copy/);
  assert.doesNotMatch(ui,/innerHTML|document\.write|fetch\(/);
 });
