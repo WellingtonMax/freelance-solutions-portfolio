@@ -405,5 +405,5 @@ test('after a failed attempt, editing a previously valid field reveals a new err
   assert.equal(inputs.name.getAttribute('aria-invalid'), null);
   assert.equal(errors.name.textContent, '');
   assert.equal(inputs.email.getAttribute('aria-invalid'), 'true');
-  assert.match(feedback.textContent, /highlighted field\\./);
+  assert.match(feedback.textContent, /highlighted field\./);
 });
