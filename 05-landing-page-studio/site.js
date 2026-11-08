@@ -22,8 +22,7 @@ function validateEnquiryFields(fields) {
   const field = error.startsWith("Provide a name") ? "name" :
     error.startsWith("Provide a valid email") ? "email" :
     error.startsWith("Provide a project summary") ? "message" :
-    error === "Remove control characters." ?
-      (/[\u0000-\u001f\u007f]/.test(fields.name) ? "name" : /[\u0000-\u001f\u007f]/.test(fields.email) ? "email" : "message") : "name";
+    error === "Remove control characters." ? "name" "name";
   return {error,field};
 }
 if (typeof document !== "undefined") {
