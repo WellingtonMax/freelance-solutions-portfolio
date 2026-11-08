@@ -58,3 +58,15 @@ test('control characters and non-text values focus the offending field', () => {
   assert.equal(validateEnquiryFields({...good,email:'test\u0001@example.com'}).field,'email');
   assert.equal(validateEnquiryFields({...good,message:42}).field,'message');
 });
+
+test('ordinary text is not mistaken for control characters', () => {
+  const {validateEnquiryFields} = require('./site.js');
+  const good = {name:'Test Person',email:'test@example.com',message:'A fictional project'};
+  assert.deepEqual(validateEnquiryFields(good), {error:null,field:null});
+  for (const field of ['name','email','message']) {
+    const sample = {...good, [field]: good[field] + '\\u0001'};
+    const result = validateEnquiryFields(sample);
+    assert.equal(result.field, field);
+    assert.ok(result.error);
+  }
+});
