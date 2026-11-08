@@ -122,3 +122,69 @@ test('editing one field preserves other invalid field feedback', () => {
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent, /Fields look valid/);
 });
+
+test('all invalid fields are reported together, in document order', () => {
+  const {validateEnquiryAllFields, validateEnquiryFields} = require('./site.js');
+  const bad = {name:'',email:'invalid-email',message:'short'};
+  const errors = validateEnquiryAllFields(bad);
+  assert.deepEqual(Object.keys(errors), ['name','email','message']);
+  assert.match(errors.name, /name/);
+  assert.match(errors.email, /email/);
+  assert.match(errors.message, /summary/);
+  assert.equal(validateEnquiryFields(bad).field, 'name');
+  assert.deepEqual(validateEnquiryAllFields({
+    name:'Test Person',email:'test@example.com',message:'A fictional project'
+  }), {});
+  assert.deepEqual(Object.keys(validateEnquiryAllFields({
+    name:'Test\u0001 Person',email:'test\u200b@example.com',message:'A fictional\u0002 project'
+  })), ['name','email','message']);
+});
+
+test('submit renders all errors, focuses first, and preserves untouched errors', () => {
+  const vm = require('node:vm');
+  function node(value = '') {
+    const attributes = new Map();
+    const listeners = {};
+    return {
+      value, textContent:'', listeners, focused:false,
+      setAttribute(key, val) { attributes.set(key,val); },
+      getAttribute(key) { return attributes.get(key) ?? null; },
+      removeAttribute(key) { attributes.delete(key); },
+      addEventListener(type, fn) { listeners[type] = fn; },
+      focus() { this.focused = true; }
+    };
+  }
+  const inputs = {name:node(''),email:node('bad'),message:node('short')};
+  const errors = {name:node(),email:node(),message:node()};
+  const feedback = node();
+  const form = {
+    elements:{namedItem(key) {return inputs[key];}},
+    addEventListener(type, fn) {this[type] = fn;}
+  };
+  const document = {
+    getElementById(id) {
+      if (id === 'enquiry') return form;
+      if (id === 'feedback') return feedback;
+      return errors[id.replace('-error','')];
+    }
+  };
+  vm.runInNewContext(fs.readFileSync('site.js','utf8'), {document});
+  form.submit({preventDefault() {}});
+  for (const key of ['name','email','message']) {
+    assert.equal(inputs[key].getAttribute('aria-invalid'), 'true');
+    assert.ok(errors[key].textContent);
+  }
+  assert.equal(inputs.name.focused,true);
+  assert.match(feedback.textContent,/Nothing was sent/);
+  inputs.name.value = 'Test Person';
+  inputs.name.listeners.input();
+  assert.equal(inputs.name.getAttribute('aria-invalid'),null);
+  assert.equal(inputs.email.getAttribute('aria-invalid'),'true');
+  assert.equal(inputs.message.getAttribute('aria-invalid'),'true');
+  inputs.email.value = 'test@example.com';
+  inputs.message.value = 'A fictional project';
+  inputs.email.listeners.input();
+  inputs.message.listeners.input();
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent,/Fields look valid/);
+});
