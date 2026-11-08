@@ -70,3 +70,55 @@ test('ordinary text is not mistaken for control characters', () => {
     assert.ok(result.error);
   }
 });
+
+test('editing one field preserves other invalid field feedback', () => {
+  const vm = require('node:vm');
+  const fs = require('node:fs');
+  function node(value = '') {
+    const attributes = new Map();
+    const listeners = {};
+    return {
+      value, textContent: '', attributes, listeners, focused: false,
+      setAttribute(key, val) { attributes.set(key, val); },
+      getAttribute(key) { return attributes.get(key) ?? null; },
+      removeAttribute(key) { attributes.delete(key); },
+      addEventListener(type, fn) { listeners[type] = fn; },
+      focus() { this.focused = true; }
+    };
+  }
+  const inputs = {
+    name: node('Test Person'),
+    email: node('invalid-email'),
+    message: node('A fictional project')
+  };
+  const errors = {name: node(), email: node(), message: node()};
+  const feedback = node();
+  const form = {
+    elements: {namedItem(key) { return inputs[key]; }},
+    addEventListener(type, fn) { this[type] = fn; }
+  };
+  const document = {
+    getElementById(id) {
+      if (id === 'enquiry') return form;
+      if (id === 'feedback') return feedback;
+      return errors[id.replace('-error', '')];
+    }
+  };
+  vm.runInNewContext(fs.readFileSync('site.js', 'utf8'), {document});
+  form.submit({preventDefault() {}});
+  assert.equal(inputs.email.getAttribute('aria-invalid'), 'true');
+  assert.ok(errors.email.textContent);
+  assert.equal(inputs.email.focused, true);
+  inputs.name.value = 'Changed Person';
+  inputs.name.listeners.input();
+  assert.equal(inputs.email.getAttribute('aria-invalid'), 'true');
+  assert.ok(errors.email.textContent);
+  assert.match(feedback.textContent, /correct the highlighted field/);
+  inputs.email.value = 'valid@example.com';
+  inputs.email.listeners.input();
+  assert.equal(inputs.email.getAttribute('aria-invalid'), null);
+  assert.equal(errors.email.textContent, '');
+  assert.match(feedback.textContent, /Nothing has been checked yet/);
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent, /Fields look valid/);
+});
