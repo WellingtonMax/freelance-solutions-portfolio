@@ -224,7 +224,7 @@ test('summary uses singular/plural while errors recover from three to zero', () 
   assert.equal(inputs.email.getAttribute('aria-invalid'),'true');
   inputs.email.value = 'fictional@example.com';
   inputs.email.listeners.input();
-  assert.match(feedback.textContent,/highlighted field\\./);
+  assert.match(feedback.textContent,/highlighted field\./);
   assert.doesNotMatch(feedback.textContent,/highlighted fields/);
   assert.equal(inputs.message.getAttribute('aria-invalid'),'true');
   inputs.message.value = 'A fictional project request';
@@ -233,5 +233,5 @@ test('summary uses singular/plural while errors recover from three to zero', () 
   assert.equal(feedback.getAttribute('role'),'status');
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent,/Fields look valid/);
-  assert.doesNotMatch(feedback.textContent,/was sent\\.$/);
+  assert.doesNotMatch(feedback.textContent,/was sent\.$/);
 });
