@@ -57,7 +57,12 @@ if (typeof document !== "undefined") {
   const feedback = document.getElementById("feedback");
   const inputs = {name:form.elements.namedItem("name"),email:form.elements.namedItem("email"),message:form.elements.namedItem("message")};
   const errors = {name:document.getElementById("name-error"),email:document.getElementById("email-error"),message:document.getElementById("message-error")};
-  function clearError(key) {
+  function errorSummary(count) {
+    return count === 1
+      ? "Please correct the highlighted field. Nothing was sent."
+      : "Please correct the highlighted fields. Nothing was sent.";
+  }
+    function clearError(key) {
     inputs[key].removeAttribute("aria-invalid");
     errors[key].textContent = "";
   }
@@ -69,7 +74,7 @@ if (typeof document !== "undefined") {
     const remainingErrors = Object.keys(inputs).filter(field => inputs[field].getAttribute("aria-invalid") === "true");
     feedback.setAttribute("role", remainingErrors.length ? "alert" : "status");
     feedback.textContent = remainingErrors.length
-      ? "Please correct the highlighted fields. Nothing was sent."
+      ? errorSummary(remainingErrors.length)
       : "Nothing has been checked yet.";
   });
   form.addEventListener("submit", (event) => {
@@ -88,7 +93,7 @@ if (typeof document !== "undefined") {
         errors[key].textContent = fieldErrors[key];
       }
       feedback.setAttribute("role","alert");
-      feedback.textContent = "Please correct the highlighted fields. Nothing was sent.";
+      feedback.textContent = errorSummary(invalidFields.length);
       inputs[invalidFields[0]].focus();
     } else {
       feedback.setAttribute("role","status");
