@@ -70,6 +70,7 @@ if (typeof document !== "undefined") {
     for (const key of Object.keys(inputs)) clearError(key);
   }
   let hasAttemptedValidation = false;
+  let lastSubmitHadErrors = false;
   for (const [key, input] of Object.entries(inputs)) input.addEventListener("input", () => {
     // Any edit invalidates a previously successful validation result.
     // After a failed submit, retain an error until this field actually validates.
@@ -87,7 +88,9 @@ if (typeof document !== "undefined") {
     feedback.textContent = remainingErrors.length
       ? errorSummary(remainingErrors.length)
       : hasAttemptedValidation
-        ? "All highlighted errors are resolved. Validate again to check the form; nothing was sent."
+        ? lastSubmitHadErrors
+          ? "All highlighted errors are resolved. Validate again to check the form; nothing was sent."
+          : "Form changed since validation. Validate again; nothing was sent."
         : "Nothing has been checked yet.";
   });
   form.addEventListener("submit", (event) => {
@@ -101,6 +104,7 @@ if (typeof document !== "undefined") {
       message: form.elements.namedItem("message").value
     });
     const invalidFields = Object.keys(inputs).filter(key => fieldErrors[key]);
+    lastSubmitHadErrors = invalidFields.length > 0;
     if (invalidFields.length) {
       for (const key of invalidFields) {
         inputs[key].setAttribute("aria-invalid", "true");
