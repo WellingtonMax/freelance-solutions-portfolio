@@ -70,7 +70,17 @@ if (typeof document !== "undefined") {
     for (const key of Object.keys(inputs)) clearError(key);
   }
   for (const [key, input] of Object.entries(inputs)) input.addEventListener("input", () => {
-    clearError(key);
+    // After a failed submit, retain an error until this field actually validates.
+    // Before submit, avoid showing errors while the visitor is still typing.
+    if (input.getAttribute("aria-invalid") === "true") {
+      const values = Object.fromEntries(Object.entries(inputs).map(([field, element]) => [field, element.value]));
+      const currentError = validateEnquiryAllFields(values)[key];
+      if (currentError) {
+        errors[key].textContent = currentError;
+      } else {
+        clearError(key);
+      }
+    }
     const remainingErrors = Object.keys(inputs).filter(field => inputs[field].getAttribute("aria-invalid") === "true");
     feedback.textContent = remainingErrors.length
       ? errorSummary(remainingErrors.length)
