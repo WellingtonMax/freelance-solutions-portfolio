@@ -102,6 +102,18 @@ class WebAppTests(unittest.TestCase):
         # Failed username rotation is bounded in the tracking dictionary.
         self.assertLessEqual(len(self.server.attempts), 21)
 
+    def test_literal_star_username_cannot_alias_global_bucket(self):
+        # Usernames are strings; the IP-wide bucket must never be a string.
+        ip = "127.0.0.1"
+        self.assertFalse(self.server.rate_check(ip, "*", failed=True))
+        with self.server.attempt_lock:
+            self.assertEqual(len(self.server.attempts[(ip, "*")]), 1)
+            self.assertEqual(len(self.server.attempts[(ip, None)]), 1)
+        self.server.rate_clear(ip, "*")
+        with self.server.attempt_lock:
+            self.assertNotIn((ip, "*"), self.server.attempts)
+            self.assertEqual(len(self.server.attempts[(ip, None)]), 1)
+
     def test_expired_rate_limits_release_account_and_global_bucket(self):
         # Deterministic expiry without a 15-minute sleep. Both buckets must
         # expire together; stale failures must not lock out a valid user.
