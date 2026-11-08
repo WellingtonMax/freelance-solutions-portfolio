@@ -32,7 +32,7 @@ test("fictional sample click renders actual accepted/rejected CSV outputs", asyn
   assert.equal(element("result").hidden, false);
   assert.equal(element("totals").textContent, "4 input rows · 1 accepted · 3 rejected");
   assert.match(element("clean").value, /bob@example.com/);
-  assert.match(element("reject").value, /(?:^|\\r?\\n)5,invalid email(?:\\r?\\n|$)/);
+  assert.match(element("reject").value, /(?:^|\r?\n)5,invalid email(?:\r?\n|$)/);
   assert.equal(element("copy-clean").disabled, false);
   assert.equal(element("copy-reject").disabled, false);
   assert.equal(element("result-heading").focused, true);
