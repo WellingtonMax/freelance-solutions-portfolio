@@ -99,11 +99,14 @@ class DifferentialCsvTests(unittest.TestCase):
                 # also tolerates an unterminated quote by default.
                 if label in ("extra_columns", "unclosed_quote"):
                     self.assertFalse(browser["ok"], f"{label}: browser must fail closed")
-                    self.assertEqual(len(list(csv.DictReader((base / "clean.csv").open(encoding="utf-8")))), 0)
+                    with (base / "clean.csv").open(encoding="utf-8", newline="") as clean_file:
+                        self.assertEqual(len(list(csv.DictReader(clean_file))), 0)
                     continue
                 self.assertTrue(browser["ok"], f"{label}: {browser.get('message')}")
-                python_clean = list(csv.DictReader((base / "clean.csv").open(encoding="utf-8", newline="")))
-                python_reject = list(csv.DictReader((base / "rejected.csv").open(encoding="utf-8", newline="")))
+                with (base / "clean.csv").open(encoding="utf-8", newline="") as clean_file, \
+                     (base / "rejected.csv").open(encoding="utf-8", newline="") as rejected_file:
+                    python_clean = list(csv.DictReader(clean_file))
+                    python_reject = list(csv.DictReader(rejected_file))
                 js_clean = list(csv.DictReader(io.StringIO(browser["result"]["cleanCsv"], newline="")))
                 js_reject = list(csv.DictReader(io.StringIO(browser["result"]["rejectCsv"], newline="")))
                 self.assertEqual(python_clean, js_clean, f"{label}: accepted records diverged")
