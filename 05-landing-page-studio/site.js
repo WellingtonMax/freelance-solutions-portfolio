@@ -62,7 +62,7 @@ if (typeof document !== "undefined") {
       ? "Please correct the highlighted field. Nothing was sent."
       : "Please correct the highlighted fields. Nothing was sent.";
   }
-    function clearError(key) {
+  function clearError(key) {
     inputs[key].removeAttribute("aria-invalid");
     errors[key].textContent = "";
   }
