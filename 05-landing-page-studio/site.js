@@ -16,17 +16,55 @@ function validateEnquiry(fields) {
     return "Remove control characters.";
   return null;
 }
+function validateEnquiryFields(fields) {
+  const error = validateEnquiry(fields);
+  if (!error) return {error:null, field:null};
+  const field = error.startsWith("Provide a name") ? "name" :
+    error.startsWith("Provide a valid email") ? "email" :
+    error.startsWith("Provide a project summary") ? "message" :
+    error === "Remove control characters." ?
+      (/[\u0000-\u001f\u007f]/.test(fields.name) ? "name" : /[\u0000-\u001f\u007f]/.test(fields.email) ? "email" : "message") : "name";
+  return {error,field};
+}
 if (typeof document !== "undefined") {
   const form = document.getElementById("enquiry");
   const feedback = document.getElementById("feedback");
+  const inputs = {name:form.elements.namedItem("name"),email:form.elements.namedItem("email"),message:form.elements.namedItem("message")};
+  const errors = {name:document.getElementById("name-error"),email:document.getElementById("email-error"),message:document.getElementById("message-error")};
+  function clearErrors() {
+    for (const key of Object.keys(inputs)) {
+      inputs[key].removeAttribute("aria-invalid");
+      errors[key].textContent = "";
+    }
+  }
+  for (const input of Object.values(inputs)) input.addEventListener("input", () => {
+    clearErrors();
+    feedback.setAttribute("role","status");
+    feedback.textContent = "Nothing has been checked yet.";
+  });
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    const error = validateEnquiry({
+    clearErrors();
+    try {
+    const result = validateEnquiryFields({
       name: form.elements.namedItem("name").value,
       email: form.elements.namedItem("email").value,
       message: form.elements.namedItem("message").value
     });
-    feedback.textContent = error || "Looks valid. Demo only — nothing was sent or saved.";
+    if (result.error) {
+      inputs[result.field].setAttribute("aria-invalid","true");
+      errors[result.field].textContent = result.error;
+      feedback.setAttribute("role","alert");
+      feedback.textContent = "Please correct the highlighted field. Nothing was sent.";
+      inputs[result.field].focus();
+    } else {
+      feedback.setAttribute("role","status");
+      feedback.textContent = "Fields look valid. Demo only — nothing was sent or saved.";
+    }
+    } catch (_) {
+      feedback.setAttribute("role","alert");
+      feedback.textContent = "Validation could not complete. Try again; nothing was sent.";
+    }
   });
 }
-if (typeof module !== "undefined") module.exports = { validateEnquiry };
+if (typeof module !== "undefined") module.exports = { validateEnquiry, validateEnquiryFields };
