@@ -213,6 +213,7 @@ class WebServer(ThreadingHTTPServer):
         self.store = store
         self.attempts = {}
         self.attempt_lock = threading.Lock()
+        self.last_attempt_sweep = time.monotonic()
 
     def rate_check(self, ip, username, failed=False):
         # Limit both per-account guesses and username-rotation attempts.
@@ -221,6 +222,16 @@ class WebServer(ThreadingHTTPServer):
         global_key = (ip, "*")
         with self.attempt_lock:
             current = time.monotonic()
+            # Sweep all expired identifiers periodically, including usernames
+            # that will never be queried again. Keep the sweep under the lock.
+            if current - self.last_attempt_sweep >= 60:
+                for bucket, timestamps in list(self.attempts.items()):
+                    recent = [t for t in timestamps if current - t < 900]
+                    if recent:
+                        self.attempts[bucket] = recent
+                    else:
+                        self.attempts.pop(bucket, None)
+                self.last_attempt_sweep = current
             for bucket in (key, global_key):
                 recent = [t for t in self.attempts.get(bucket, ()) if current - t < 900]
                 if recent:
