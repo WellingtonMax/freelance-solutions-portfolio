@@ -25,3 +25,22 @@ test('no network submission, inline JS or unsafe HTML sinks', () => {
   assert.doesNotMatch(html,/<[a-z][^>]*\s+on[a-z]+\s*=/i);
   assert.doesNotMatch(js,/\b(fetch|XMLHttpRequest|sendBeacon|innerHTML|eval)\b/);
 });
+
+test('field-level error mapping for fictional inputs', () => {
+  const {validateEnquiryFields} = require('./site.js');
+  assert.equal(validateEnquiryFields({name:'',email:'test@example.com',message:'A fictional project'}).field,'name');
+  assert.equal(validateEnquiryFields({name:'Test',email:'bad',message:'A fictional project'}).field,'email');
+  assert.equal(validateEnquiryFields({name:'Test',email:'test@example.com',message:'short'}).field,'message');
+  assert.equal(validateEnquiryFields({name:'Test',email:'test@example.com',message:'A fictional project'}).error,null);
+});
+test('feedback is associated with fields and remains local', () => {
+  const html=fs.readFileSync('index.html','utf8');
+  const js=fs.readFileSync('site.js','utf8');
+  for (const key of ['name','email','message']) {
+    assert.match(html,new RegExp('id="'+key+'-error"'));
+    assert.match(html,new RegExp('aria-describedby="'+key+'-error"'));
+  }
+  assert.ok(js.includes('inputs[result.field].focus()'));
+  assert.ok(js.includes('setAttribute("aria-invalid","true")'));
+  assert.match(html,/Nothing has been checked yet/);
+});
