@@ -118,7 +118,7 @@ test('editing one field preserves other invalid field feedback', () => {
   inputs.email.listeners.input();
   assert.equal(inputs.email.getAttribute('aria-invalid'), null);
   assert.equal(errors.email.textContent, '');
-  assert.match(feedback.textContent, /Nothing has been checked yet/);
+  assert.match(feedback.textContent, /All highlighted errors are resolved\. Validate again/);
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent, /Fields look valid/);
 });
@@ -299,4 +299,13 @@ test('editing a still-invalid field retains its error until corrected', () => {
   assert.equal(errors.email.textContent,'');
   assert.equal(inputs.name.getAttribute('aria-invalid'),'true');
   assert.equal(inputs.message.getAttribute('aria-invalid'),'true');
+});
+
+// The untouched form must not imply that validation already occurred.
+test('untouched form retains initial feedback while corrected form requests revalidation', () => {
+  const source = fs.readFileSync('site.js', 'utf8');
+  assert.match(fs.readFileSync('index.html','utf8'), /Nothing has been checked yet/);
+  assert.match(source, /let hasAttemptedValidation = false/);
+  assert.match(source, /hasAttemptedValidation = true/);
+  assert.match(source, /All highlighted errors are resolved\. Validate again/);
 });
