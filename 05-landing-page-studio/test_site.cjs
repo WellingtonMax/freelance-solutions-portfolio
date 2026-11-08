@@ -188,3 +188,50 @@ test('submit renders all errors, focuses first, and preserves untouched errors',
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent,/Fields look valid/);
 });
+
+test('summary uses singular/plural while errors recover from three to zero', () => {
+  const vm = require('node:vm');
+  function node(value = '') {
+    const attributes = new Map(), listeners = {};
+    return {
+      value, textContent: '', listeners,
+      setAttribute(k,v) { attributes.set(k,v); },
+      getAttribute(k) { return attributes.get(k) ?? null; },
+      removeAttribute(k) { attributes.delete(k); },
+      addEventListener(k,fn) { listeners[k] = fn; },
+      focus() { this.focused = true; }
+    };
+  }
+  const inputs = {name:node(''),email:node('bad'),message:node('short')};
+  const errors = {name:node(),email:node(),message:node()};
+  const feedback = node();
+  const form = {
+    elements:{namedItem(k) { return inputs[k]; }},
+    addEventListener(k,fn) { this[k] = fn; }
+  };
+  const document = {getElementById(id) {
+    if (id === 'enquiry') return form;
+    if (id === 'feedback') return feedback;
+    return errors[id.replace('-error','')];
+  }};
+  vm.runInNewContext(fs.readFileSync('site.js','utf8'),{document});
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent,/highlighted fields/);
+  assert.equal(inputs.name.focused,true);
+  inputs.name.value = 'Fictional Person';
+  inputs.name.listeners.input();
+  assert.match(feedback.textContent,/highlighted fields/);
+  assert.equal(inputs.email.getAttribute('aria-invalid'),'true');
+  inputs.email.value = 'fictional@example.com';
+  inputs.email.listeners.input();
+  assert.match(feedback.textContent,/highlighted field\\./);
+  assert.doesNotMatch(feedback.textContent,/highlighted fields/);
+  assert.equal(inputs.message.getAttribute('aria-invalid'),'true');
+  inputs.message.value = 'A fictional project request';
+  inputs.message.listeners.input();
+  assert.match(feedback.textContent,/Nothing has been checked yet/);
+  assert.equal(feedback.getAttribute('role'),'status');
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent,/Fields look valid/);
+  assert.doesNotMatch(feedback.textContent,/was sent\\.$/);
+});
