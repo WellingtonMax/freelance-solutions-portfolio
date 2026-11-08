@@ -309,3 +309,52 @@ test('untouched form retains initial feedback while corrected form requests reva
   assert.match(source, /hasAttemptedValidation = true/);
   assert.match(source, /All highlighted errors are resolved\. Validate again/);
 });
+
+test('successful local validation becomes pending again after any edit', () => {
+  const vm = require('node:vm');
+  function node(value = '') {
+    const attrs = new Map(), listeners = {};
+    return {
+      value, textContent: '', listeners,
+      setAttribute(k,v) { attrs.set(k,v); },
+      getAttribute(k) { return attrs.get(k) ?? null; },
+      removeAttribute(k) { attrs.delete(k); },
+      addEventListener(k,fn) { listeners[k] = fn; },
+      focus() { this.focused = true; }
+    };
+  }
+  const inputs = {
+    name:node('Fictional Person'),
+    email:node('fictional@example.com'),
+    message:node('A fictional project request')
+  };
+  const errors = {name:node(), email:node(), message:node()};
+  const feedback = node();
+  const form = {
+    elements:{namedItem(k) { return inputs[k]; }},
+    addEventListener(k,fn) { this[k] = fn; }
+  };
+  const document = {getElementById(id) {
+    if (id === 'enquiry') return form;
+    if (id === 'feedback') return feedback;
+    return errors[id.replace('-error','')];
+  }};
+  vm.runInNewContext(fs.readFileSync('site.js','utf8'),{document});
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent,/Fields look valid/);
+  inputs.message.value = 'An updated fictional project request';
+  inputs.message.listeners.input();
+  assert.match(feedback.textContent,/Validate again to check the form/);
+  assert.doesNotMatch(feedback.textContent,/Fields look valid/);
+  assert.equal(inputs.message.getAttribute('aria-invalid'),null);
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent,/Fields look valid/);
+  inputs.email.value = 'not-an-email';
+  inputs.email.listeners.input();
+  assert.match(feedback.textContent,/Validate again to check the form/);
+  assert.doesNotMatch(feedback.textContent,/Fields look valid/);
+  form.submit({preventDefault() {}});
+  assert.equal(inputs.email.getAttribute('aria-invalid'),'true');
+  assert.match(errors.email.textContent,/valid email/);
+  assert.match(feedback.textContent,/correct the highlighted field/);
+});
