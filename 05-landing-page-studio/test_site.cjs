@@ -344,14 +344,16 @@ test('successful local validation becomes pending again after any edit', () => {
   assert.match(feedback.textContent,/Fields look valid/);
   inputs.message.value = 'An updated fictional project request';
   inputs.message.listeners.input();
-  assert.match(feedback.textContent,/Validate again to check the form/);
+  assert.match(feedback.textContent,/Form changed since validation\. Validate again/);
+  assert.doesNotMatch(feedback.textContent,/All highlighted errors are resolved/);
   assert.doesNotMatch(feedback.textContent,/Fields look valid/);
   assert.equal(inputs.message.getAttribute('aria-invalid'),null);
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent,/Fields look valid/);
   inputs.email.value = 'not-an-email';
   inputs.email.listeners.input();
-  assert.match(feedback.textContent,/Validate again to check the form/);
+  assert.match(feedback.textContent,/Form changed since validation\. Validate again/);
+  assert.doesNotMatch(feedback.textContent,/All highlighted errors are resolved/);
   assert.doesNotMatch(feedback.textContent,/Fields look valid/);
   form.submit({preventDefault() {}});
   assert.equal(inputs.email.getAttribute('aria-invalid'),'true');
