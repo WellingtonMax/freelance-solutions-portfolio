@@ -65,3 +65,19 @@ Stack source actions and output panels vertically; preserve a visible, keyboard-
 Frontend owns `try.html`, `try-ui.js`, `try.js` and `demo.css`; coordinate before editing shared CSS. Backend owns `webapp.py` and Python security contracts. Avoid editing the shared `index.html` while PR #19 is open and conflicted. This design document intentionally avoids concurrent source edits.
 
 Reviewed: main README, project README, `try.html`, `demo.html`, `WEBAPP.md`, initial `webapp.py` sections, portfolio CI workflow and open PR/issue listings on 2026-11-07. `AGENTS.md` was not found on main. **No browser, Node, Python or CI tests were executed for this documentation-only change.** Run `node --test 01-excel-rescue/test_try.cjs` and `python -m unittest discover -v` in `01-excel-rescue` after implementation. Human review required; no merge or deployment authorized.
+
+
+## 2026-11-08 design audit — results are visible but not actionable
+
+Evidence: frontend PR #38 at head `81989849f7aa038ad780029df8c837a911385ccb` provides a bundled sample, a run button, totals and two read-only CSV textareas. The sample path and result-heading focus are implemented in source. **Do not reimplement them.** However, `try.html` has no explicit copy/download control, and `try-ui.js` has no copy-feedback state. Users must discover how to select text in two long fields. The earlier design contract proposed copy controls, but the implementation has not yet met that acceptance criterion. No browser execution is implied by this source review.
+
+### One prioritized frontend handoff: copy a result with truthful feedback
+
+- Place an explicit **Copy accepted CSV** control adjacent to the accepted output, and **Copy rejected CSV** adjacent to the rejected output. Keep read-only, selectable text as the fallback. Do not introduce a remote service, download dependency or clipboard permission request on load.
+- On click, copy **exactly** the current corresponding textarea value, without changing CSV quoting, escaping, ordering or formulas. Never copy from the opposite output. Do not construct HTML from CSV values.
+- If the output is empty, disable its copy control or clearly explain **No accepted records to copy** / **No rejected records to copy**. An empty textarea must not be presented as a successful export.
+- On confirmed success, announce **Accepted CSV copied** or **Rejected CSV copied** in a persistent `role="status"` region. On clipboard API denial/unavailability (including some `file://` contexts), announce **Copy unavailable. Select the CSV text to copy manually.** Never report success before the write resolves.
+- Preserve visible focus and keyboard operation; avoid shifting focus to the result heading when copying. Keep both actions and labels accessible at 320/375/768/1280px and 200% zoom, with no page-level horizontal overflow.
+- Tests: success on both outputs; denied/rejected clipboard write; missing clipboard API; empty output; hostile CSV text with quotes, newlines and formula prefixes; no network or `innerHTML`. Manual browser checks remain required for permissions and assistive technology.
+
+**Ownership:** FRONTEND implements in its existing #38 branch or a clearly dependent frontend PR after checking concurrent edits. DESIGN owns only this specification. BACKEND retains integration authority. Current #36 and #38 are open drafts against `main`; do not infer CI approval or merge readiness. No change to Python, auth, storage, or security boundaries is requested.
