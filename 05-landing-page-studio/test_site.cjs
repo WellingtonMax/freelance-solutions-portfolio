@@ -407,3 +407,38 @@ test('after a failed attempt, editing a previously valid field reveals a new err
   assert.equal(inputs.email.getAttribute('aria-invalid'), 'true');
   assert.match(feedback.textContent, /highlighted field\./);
 });
+
+
+test('multi-field summary states the remaining error count after each correction', () => {
+  const vm = require('node:vm');
+  const attributes = () => new Map();
+  const node = (value = '') => ({
+    value, textContent:'', attrs:attributes(), listeners:{},
+    setAttribute(k,v) { this.attrs.set(k,v); },
+    getAttribute(k) { return this.attrs.get(k) ?? null; },
+    removeAttribute(k) { this.attrs.delete(k); },
+    addEventListener(k,fn) { this.listeners[k] = fn; },
+    focus() { this.focused = true; }
+  });
+  const inputs = {name:node(''), email:node('bad'), message:node('short')};
+  const errors = {name:node(), email:node(), message:node()};
+  const feedback = node();
+  const form = {elements:{namedItem(k) { return inputs[k]; }}, addEventListener(k,fn) { this[k] = fn; }};
+  const document = {getElementById(id) {
+    if (id === 'enquiry') return form;
+    if (id === 'feedback') return feedback;
+    return errors[id.replace('-error','')];
+  }};
+  vm.runInNewContext(fs.readFileSync('site.js','utf8'), {document});
+  form.submit({preventDefault() {}});
+  assert.match(feedback.textContent, /3 remaining/);
+  inputs.name.value = 'Fictional Person';
+  inputs.name.listeners.input();
+  assert.match(feedback.textContent, /2 remaining/);
+  inputs.email.value = 'fictional@example.com';
+  inputs.email.listeners.input();
+  assert.match(feedback.textContent, /highlighted field\\. Nothing was sent/);
+  inputs.message.value = 'A fictional project request';
+  inputs.message.listeners.input();
+  assert.match(feedback.textContent, /All highlighted errors are resolved/);
+});
