@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Independent fictional veterinary membership and rewards dashboard demo. No real customer data or billing.">
+  <meta name="color-scheme" content="light">
+  <title>PawLedger — Veterinary Rewards Demo</title>
+  <style>
+    :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1c3047;background:#f5f8fc;font-synthesis:none}
+    *{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit}
+    .app{display:grid;grid-template-columns:244px minmax(0,1fr);min-height:100vh}
+    aside{background:#0b2435;color:#dcebf4;padding:27px 16px;display:flex;flex-direction:column;gap:28px}
+    .brand{display:flex;gap:12px;align-items:center;padding:1px 10px 16px;border-bottom:1px solid #294355}
+    .brand-mark{width:39px;height:39px;display:grid;place-items:center;background:linear-gradient(145deg,#3ad4bb,#4ea5ff);color:#082b31;border-radius:12px;font-size:21px;font-weight:900}
+    .brand strong{display:block;color:white;letter-spacing:-.035em;font-size:21px;line-height:1.1}.brand small{color:#93afc0;font-size:10px;letter-spacing:.15em;text-transform:uppercase}
+    .nav-label{padding:0 12px;color:#7292a4;font-size:10px;letter-spacing:.17em;text-transform:uppercase;font-weight:750}
+    nav{display:grid;gap:7px}.nav-btn{border:0;display:flex;align-items:center;gap:13px;padding:12px 14px;width:100%;color:#b9ccda;background:transparent;text-align:left;border-radius:11px;font-size:13px;font-weight:650}
+    .nav-btn.active{background:#1d4659;color:#d4fff3;border:1px solid #376c75}.nav-btn:hover:not(.active){background:#143549;color:white}
+    .nav-ico{display:inline-grid;place-items:center;width:20px;font-size:19px}
+    .side-bottom{margin-top:auto;padding:16px 12px;border-radius:13px;background:#14394b;border:1px solid #2e5764;font-size:12px}
+    .side-bottom span{display:block;color:#9db7c5;line-height:1.6;margin-top:7px}
+    main{min-width:0}header{background:#fff;border-bottom:1px solid #e5ebf1;display:flex;justify-content:space-between;align-items:center;gap:20px;padding:22px clamp(20px,3.5vw,55px)}
+    header .context{font-size:12px;color:#79909f;font-weight:600}header .context b{color:#344f62}
+    .header-tools{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+    .select{background:#fff;border:1px solid #d8e1e9;border-radius:9px;padding:10px 12px;font-size:12px;color:#304f61;max-width:220px}
+    .pill{border:1px solid #b9e7db;border-radius:100px;background:#e5f9f1;color:#21735d;padding:6px 11px;font-size:11px;font-weight:800;white-space:nowrap}
+    .content{padding:36px clamp(20px,3.5vw,55px) 70px;max-width:1550px;margin:0 auto}
+    .eyebrow{text-transform:uppercase;color:#159c89;font-size:11px;letter-spacing:.16em;font-weight:850}
+    .intro{display:flex;align-items:end;justify-content:space-between;gap:20px;margin:0 0 29px;flex-wrap:wrap}
+    h1{font-size:clamp(27px,3vw,36px);line-height:1.1;letter-spacing:-.055em;margin:9px 0}h2{font-size:19px;letter-spacing:-.035em;margin:0}
+    .subtitle{color:#718596;font-size:13px;margin:0}
+    .btn{border:1px solid #d5e0e8;background:white;padding:10px 16px;color:#26495a;border-radius:9px;font-weight:750;font-size:12px;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+    .btn.primary{background:#0e897f;border-color:#0e897f;color:white;box-shadow:0 6px 14px #0e897f22}.btn.dark{background:#143f56;border-color:#143f56;color:white}.btn:hover{filter:brightness(.95)}
+    .btn:focus-visible,.nav-btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #4acbb4;outline-offset:2px}
+    .actions{display:flex;gap:9px;flex-wrap:wrap}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin:0 0 23px}
+    .stat,.panel{background:white;border:1px solid #e4ebf0;border-radius:15px;box-shadow:0 10px 29px #263b4b07}
+    .stat{padding:22px}.stat-head{display:flex;justify-content:space-between;align-items:center;color:#8091a1;font-size:12px;font-weight:650}
+    .stat-icon{background:#edf8f6;color:#138d7d;border-radius:10px;padding:9px 11px;font-size:17px}.stat-value{display:block;font-weight:820;font-size:29px;letter-spacing:-.045em;margin:15px 0 4px}
+    .stat-foot{font-size:11px;color:#8396a6}.stat-foot em{color:#188b72;font-style:normal;font-weight:800}
+    .dashboard-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(250px,1fr);gap:20px}
+    .panel{overflow:hidden}.panel-header{padding:21px 24px;border-bottom:1px solid #edf0f3;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .panel-header p{color:#8696a5;font-size:12px;margin:5px 0 0}
+    .table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}
+    th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#96a4b2;font-weight:850;background:#fbfcfe;padding:13px 24px}
+    td{font-size:12px;padding:16px 24px;border-top:1px solid #eff2f5;color:#50677a}
+    td strong{font-size:12px;color:#233f51}td small{display:block;color:#9aaab6;margin-top:4px}
+    .status{display:inline-block;border-radius:100px;padding:5px 10px;font-size:10px;text-transform:capitalize;font-weight:800}
+    .status.active{background:#e6f7ed;color:#24845b}.status.canceled{background:#fff0ed;color:#ba6253}.status.inactive{background:#eef2f5;color:#6d8799}
+    .money.plus{color:#1b9875;font-weight:800}.money.minus{color:#c07961;font-weight:800}
+    .promo-item{padding:19px 23px;border-bottom:1px solid #edf0f3}
+    .promo-item:last-child{border-bottom:0}.promo-top{display:flex;align-items:center;justify-content:space-between;font-size:12px;margin-bottom:12px}
+    .promo-top strong{color:#2a4859}.promo-top span{color:#8398a7}
+    .progress{height:8px;border-radius:100px;background:#e9f0f3;overflow:hidden}.progress span{display:block;height:100%;background:linear-gradient(90deg,#11a48b,#47c6b5);border-radius:inherit}
+    .promo-item p{font-size:11px;color:#98a5af;margin:9px 0 0}
+    .toolbar{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:17px}
+    .input{background:white;border:1px solid #dce5ed;border-radius:9px;padding:11px 13px;color:#284456;min-width:220px;font-size:13px}
+    .input:focus{outline:2px solid #26b19b}.linkish{background:none;color:#138f86;border:0;font-size:12px;font-weight:800;padding:0}
+    .chip{display:inline-flex;align-items:center;padding:6px 10px;border-radius:8px;background:#edf7f5;color:#198e78;font-size:11px;font-weight:750}
+    .rule-card{padding:24px}.rule-card label{font-size:12px;font-weight:750;display:block;margin:16px 0 7px}
+    .rule-card input{width:100%;padding:11px;border:1px solid #dbe4eb;border-radius:9px}
+    .rule-card p{color:#7890a0;font-size:12px;line-height:1.7}
+    .empty{padding:36px;color:#869aa9;text-align:center;font-size:13px}
+    .footnote{font-size:11px;color:#8294a4;margin:28px 0 0;line-height:1.7}
+    .notice{background:#eef8fb;border:1px solid #cce8ed;color:#477483;border-radius:12px;padding:14px 19px;font-size:12px;line-height:1.7;margin-bottom:22px}
+    .modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:#071e2c99;z-index:20}.modal.open{display:flex}
+    .dialog{width:min(100%,480px);background:#fff;border-radius:16px;box-shadow:0 24px 70px #05192744;overflow:hidden}
+    .dialog-head{padding:24px;border-bottom:1px solid #e9eff3;display:flex;align-items:center;justify-content:space-between}.dialog-head button{border:0;background:none;font-size:24px;color:#6b8898}
+    .dialog-body{padding:24px}.dialog-body label{display:block;font-size:12px;font-weight:800;margin:12px 0 6px}.dialog-body input,.dialog-body select{width:100%;border:1px solid #dce5eb;padding:12px;border-radius:9px;background:#fff;color:#274454}
+    .dialog-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:25px}.hint{font-size:11px;color:#7f95a4}
+    .toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;background:#153d51;color:white;border-radius:11px;box-shadow:0 12px 35px #14394b44;font-size:12px;display:none;z-index:30;max-width:340px}
+    .toast.show{display:block}.toast.error{background:#923e42}
+    @media(max-width:1120px){.stats{grid-template-columns:repeat(2,1fr)}.dashboard-grid{grid-template-columns:1fr}}
+    @media(max-width:740px){.app{grid-template-columns:1fr}aside{padding:14px;gap:9px}.brand{border:0;padding:0}.side-bottom,.nav-label{display:none}nav{display:flex;gap:5px;overflow-x:auto}nav .nav-btn{white-space:nowrap;padding:10px}header{padding:14px 18px;flex-wrap:wrap}.content{padding:25px 18px}.stats{gap:10px}.stat{padding:15px}.stat-value{font-size:23px}th,td{padding:13px 12px}}
+    @media(max-width:450px){.stats{grid-template-columns:1fr 1fr}.stat-head{font-size:10px}.nav-ico{display:none}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <div class="brand"><div class="brand-mark" aria-hidden="true">✚</div><div><strong>PawLedger</strong><small>Rewards platform / demo</small></div></div>
+    <div><div class="nav-label">Workspace</div><nav aria-label="Main navigation" id="nav">
+      <button class="nav-btn active" data-view="overview"><span class="nav-ico">◫</span>Overview</button>
+      <button class="nav-btn" data-view="members"><span class="nav-ico">♙</span>Members</button>
+      <button class="nav-btn" data-view="rewards"><span class="nav-ico">✧</span>Rewards & loyalty</button>
+      <button class="nav-btn" data-view="transactions"><span class="nav-ico">⇆</span>Transactions</button>
+      <button class="nav-btn" data-view="settings"><span class="nav-ico">⚙</span>Program settings</button>
+    </nav></div>
+    <div class="side-bottom"><strong>Independent concept</strong><span>Fictional clinics, fictional customers. No payment processing, account login or live Stripe integration.</span></div>
+  </aside>
+  <main>
+    <header><div class="context">Workspace / <b id="breadcrumb">Overview</b></div>
+      <div class="header-tools">
+        <label for="clinic" class="context">Hospital</label>
+        <select class="select" id="clinic" aria-label="Choose fictional clinic"></select>
+        <span class="pill">● DEMO MODE</span>
+      </div>
+    </header>
+    <div class="content">
+      <div class="notice"><strong>Portfolio demonstration, not customer software.</strong> Business operations are simulated using fictional sample data, stored only in this browser tab until refresh. No live payments, real users or sensitive records. Do not enter real customer information.</div>
+      <div id="page" aria-live="polite"></div>
+      <p class="footnote">PawLedger is an independent concept for a veterinary membership and loyalty application. No affiliation with My Vet Perks. Prototype is not production-ready; all financial values and customer identities are synthetic. <a href="README.md">Implementation notes &amp; limitations</a>.</p>
+    </div>
+  </main>
+</div>
+<div class="modal" id="modal" role="presentation"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title"><div class="dialog-head"><h2 id="modal-title"></h2><button type="button" data-action="close" aria-label="Close dialog">×</button></div><div class="dialog-body" id="modal-content"></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script type="module" src="./app.mjs"></script>
+</body>
+</html>

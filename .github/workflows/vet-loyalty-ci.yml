@@ -1,0 +1,34 @@
+name: Vet loyalty demo — domain tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'demos/vet-loyalty/**'
+      - '.github/workflows/vet-loyalty-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'demos/vet-loyalty/**'
+      - '.github/workflows/vet-loyalty-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Domain tests
+        working-directory: demos/vet-loyalty
+        run: node --test test_engine.mjs
+      - name: Syntax checks
+        working-directory: demos/vet-loyalty
+        run: |
+          node --check engine.mjs
+          node --check app.mjs
