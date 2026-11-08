@@ -22,6 +22,18 @@ class AtomicPublicationFailureTests(unittest.TestCase):
             self.assertFalse(target.exists())
             self.assertEqual(list(Path(directory).iterdir()), [])
 
+    def test_fsync_failure_removes_staging_file(self):
+        # A write may succeed but durability synchronization may fail.
+        # The unpublished staging file must not survive that failure.
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            target = root / "export.csv"
+            with patch("bridge.os.fsync", side_effect=OSError("synthetic sync failure")):
+                with self.assertRaisesRegex(OSError, "synthetic sync failure"):
+                    export_rows([{"id": 1}], ["id"], target)
+            self.assertFalse(target.exists())
+            self.assertEqual(list(root.iterdir()), [])
+
     def test_existing_symlink_is_not_replaced(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
