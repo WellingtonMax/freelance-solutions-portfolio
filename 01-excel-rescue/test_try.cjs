@@ -44,6 +44,7 @@ test("do not interpret untrusted content as HTML",()=>{
 
 // Keep bundled sample regression checks in the existing CI entrypoint.
 require("./test_sample.cjs");
+require("./test_sample_ui.cjs");
 
 test("copy actions are separate, disabled until output, and fail safely",()=>{
  const html=fs.readFileSync(path.join(__dirname,"try.html"),"utf8");
