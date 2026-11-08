@@ -230,7 +230,7 @@ test('summary uses singular/plural while errors recover from three to zero', () 
   inputs.message.value = 'A fictional project request';
   inputs.message.listeners.input();
   assert.match(feedback.textContent,/Nothing has been checked yet/);
-  assert.equal(feedback.getAttribute('role'),'status');
+  assert.match(fs.readFileSync('index.html','utf8'), /id="feedback" role="status" aria-live="polite"/);
   form.submit({preventDefault() {}});
   assert.match(feedback.textContent,/Fields look valid/);
   assert.doesNotMatch(feedback.textContent,/was sent\.$/);
@@ -242,4 +242,14 @@ test('decorative hero artwork is hidden without inventing an image description',
   assert.match(html, /<div class="illustration" aria-hidden="true">MW<span>STUDIO 01<\/span><\/div>/);
   assert.doesNotMatch(html, /role="img"|aria-label="Decorative illustration of a clean workshop/);
   assert.match(html, /<h1 id="hero-title">/);
+});
+
+
+test('live feedback keeps one stable status role during validation', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  const js = fs.readFileSync('site.js', 'utf8');
+  assert.match(html, /id="feedback" role="status" aria-live="polite"/);
+  assert.doesNotMatch(js, /feedback\.setAttribute\(["']role["']/);
+  assert.match(js, /inputs\[invalidFields\[0\]\]\.focus\(\)/);
+  assert.match(js, /errorSummary\(remainingErrors\.length\)/);
 });
