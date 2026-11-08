@@ -70,8 +70,15 @@ run.addEventListener("click", async () => {
     reject.value = output.rejectCsv;
     totals.textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
     result.hidden = false;
-    copyClean.disabled = !clean.value;
-    copyReject.disabled = !reject.value;
+    copyClean.disabled = output.accepted.length === 0;
+    copyReject.disabled = output.rejected.length === 0;
+    copyFeedback.textContent = output.accepted.length === 0 && output.rejected.length === 0
+      ? "No records available to copy. Review the input CSV."
+      : output.accepted.length === 0
+        ? "No accepted records to copy. Review the rejected CSV."
+        : output.rejected.length === 0
+          ? "No rejected records to copy. All accepted records are available above."
+          : "Accepted and rejected CSV outputs are ready to copy.";
     resultHeading.focus();
     feedback.textContent = output.accepted.length === 0
       ? "Preview complete: no records accepted. Review rejection reasons."
