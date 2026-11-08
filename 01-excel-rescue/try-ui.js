@@ -10,8 +10,16 @@ const run = document.getElementById("run");
 const clean = document.getElementById("clean");
 const reject = document.getElementById("reject");
 const totals = document.getElementById("totals");
+const copyClean = document.getElementById("copy-clean");
+const copyReject = document.getElementById("copy-reject");
+const copyFeedback = document.getElementById("copy-feedback");
+let previewVersion = 0;
 
 function resetPreview() {
+  previewVersion++;
+  copyClean.disabled = true;
+  copyReject.disabled = true;
+  copyFeedback.textContent = "Copy an output to use it locally. If copying is unavailable, select the CSV text manually.";
   result.hidden = true;
   clean.value = "";
   reject.value = "";
@@ -62,6 +70,8 @@ run.addEventListener("click", async () => {
     reject.value = output.rejectCsv;
     totals.textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
     result.hidden = false;
+    copyClean.disabled = !clean.value;
+    copyReject.disabled = !reject.value;
     resultHeading.focus();
     feedback.textContent = output.accepted.length === 0
       ? "Preview complete: no records accepted. Review rejection reasons."
@@ -74,3 +84,28 @@ run.addEventListener("click", async () => {
     run.disabled = false;
   }
 });
+
+// Clipboard access may be blocked for file:// or insecure origins. Never claim success on failure.
+async function copyOutput(textarea, button, label) {
+  if (button.disabled || result.hidden || !textarea.value) return;
+  const version = previewVersion;
+  const value = textarea.value;
+  if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
+    copyFeedback.textContent = "Clipboard access is unavailable. Select and copy the " + label + " CSV manually.";
+    textarea.focus();
+    textarea.select();
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(value);
+    if (version !== previewVersion || textarea.value !== value) return;
+    copyFeedback.textContent = label + " CSV copied to clipboard.";
+  } catch (_error) {
+    if (version !== previewVersion || textarea.value !== value) return;
+    copyFeedback.textContent = "Clipboard permission denied. Select and copy the " + label + " CSV manually.";
+    textarea.focus();
+    textarea.select();
+  }
+}
+copyClean.addEventListener("click", () => copyOutput(clean, copyClean, "Accepted"));
+copyReject.addEventListener("click", () => copyOutput(reject, copyReject, "Rejected"));
