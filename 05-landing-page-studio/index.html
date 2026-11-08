@@ -11,23 +11,23 @@
 <nav aria-label="Main navigation"><a href="#services">Services</a><a href="#contact">Contact</a></nav></div></header>
 <main id="main">
 <section class="hero wrap" id="home" aria-labelledby="hero-title">
-<div><p class="eyebrow">Fictional small business · accessible demo</p>
+<div><p class="eyebrow">Fictional website demonstration</p>
 <h1 id="hero-title">A better way to build what comes next.</h1>
 <p>Practical workspace design, refurbishment planning, and thoughtful results. This is a sample design, not a real service offer.</p>
-<a class="cta" href="#contact">Preview the enquiry form</a></div>
+<a class="cta" href="#contact">Try local form validation</a><p class="cta-note">No enquiry is submitted.</p></div>
 <div class="illustration" role="img" aria-label="Decorative illustration of a clean workshop with worktable">MW<span>STUDIO 01</span></div>
 </section>
 <section class="wrap services" id="services"><h2>Three ways we could help</h2>
 <div class="cards"><article><h3>Plan</h3><p>Make project requirements understandable.</p></article>
 <article><h3>Design</h3><p>Present an accessible, clear design system.</p></article>
 <article><h3>Deliver</h3><p>Document outcomes for a straightforward handover.</p></article></div></section>
-<section class="wrap contact" id="contact"><div><h2>Try the demo form</h2>
-<p>Validation runs in your browser. Nothing is sent or saved. Use fictitious details only.</p></div>
+<section class="wrap contact" id="contact"><div><h2>Test the enquiry form</h2>
+<p>Use fictional details. This checks input in your browser only; nothing is sent or saved.</p></div>
 <form id="enquiry" novalidate aria-describedby="privacy-note">
-<label for="full-name">Name</label><input id="full-name" name="name" autocomplete="off" maxlength="80" required>
-<label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" maxlength="254" required>
-<label for="message">Project summary</label><textarea id="message" name="message" maxlength="1000" rows="4" required></textarea>
+<label for="full-name">Name</label><input id="full-name" name="name" autocomplete="off" maxlength="80" required aria-describedby="name-error"><p class="field-error" id="name-error"></p>
+<label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" maxlength="254" required aria-describedby="email-error"><p class="field-error" id="email-error"></p>
+<label for="message">Project summary</label><textarea id="message" name="message" maxlength="1000" rows="4" required aria-describedby="message-error"><p class="field-error" id="message-error"></p></textarea>
 <p id="privacy-note">Offline demonstration. No form submissions or telemetry.</p>
-<button type="submit">Validate enquiry locally</button><p id="feedback" role="status" aria-live="polite"></p></form></section>
+<button type="submit">Validate enquiry locally</button><p id="feedback" role="status" aria-live="polite">Nothing has been checked yet.</p><noscript>This demo requires JavaScript for local validation. No data will be submitted.</noscript></form></section>
 </main><footer><div class="wrap">Fictional demonstration · AI-assisted development · Human review required · Not deployed for client use</div></footer>
 </body></html>
