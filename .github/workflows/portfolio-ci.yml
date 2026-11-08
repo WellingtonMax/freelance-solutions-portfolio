@@ -25,6 +25,11 @@ jobs:
       - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+      - name: Verify Node.js runtime
+        run: node --version
       - name: Excel Rescue
         working-directory: 01-excel-rescue
         run: python -m unittest discover -v
