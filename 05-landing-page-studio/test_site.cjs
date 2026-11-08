@@ -253,3 +253,10 @@ test('live feedback keeps one stable status role during validation', () => {
   assert.match(js, /inputs\[invalidFields\[0\]\]\.focus\(\)/);
   assert.match(js, /errorSummary\(remainingErrors\.length\)/);
 });
+
+// Accessibility contract: status updates are announced as complete messages.
+test('local validation feedback is an atomic polite status region', () => {
+  const html = fs.readFileSync('index.html', 'utf8');
+  assert.match(html, /id="feedback" role="status" aria-live="polite" aria-atomic="true"/);
+  assert.doesNotMatch(html, /id="feedback"[^>]*role="alert"/);
+});
