@@ -64,7 +64,7 @@ test('ordinary text is not mistaken for control characters', () => {
   const good = {name:'Test Person',email:'test@example.com',message:'A fictional project'};
   assert.deepEqual(validateEnquiryFields(good), {error:null,field:null});
   for (const field of ['name','email','message']) {
-    const sample = {...good, [field]: good[field] + '\\u0001'};
+    const sample = {...good, [field]: good[field] + '\u0001'};
     const result = validateEnquiryFields(sample);
     assert.equal(result.field, field);
     assert.ok(result.error);
