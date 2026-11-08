@@ -28,7 +28,7 @@ function validateEnquiryFields(fields) {
   if (error.startsWith("Provide a valid email")) return {error, field:"email"};
   if (error.startsWith("Provide a project summary")) return {error, field:"message"};
   if (error === "Remove control characters.") {
-    const control = /[\\u0000-\\u001f\\u007f]/;
+    const control = /[\u0000-\u001f\u007f]/;
     return {error, field:keys.find(key => control.test(fields[key])) || "name"};
   }
   return {error, field:"name"};
