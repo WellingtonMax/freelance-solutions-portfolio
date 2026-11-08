@@ -61,11 +61,11 @@ The commands above are instructions, **not evidence that tests were executed**.
 
 This review is based on the current frontend branch source, not on a running browser or screen-reader session. The previous request to report all invalid fields at once **has now been implemented in source**: `validateEnquiryAllFields()` returns per-field errors, the submit handler renders them all and focuses the first invalid field. VM tests for this behavior exist in `test_site.cjs`. Do not repeat the old first-error-only claim or imply these tests have passed.
 
-### One remaining UX inconsistency: feedback never changes singular/plural
+### Resolved in frontend source: singular/plural feedback (not yet runtime-verified)
 
-The current submit and input handlers use the same summary, **"Please correct the highlighted fields. Nothing was sent."**, for one, two or three invalid fields. The design contract above specifies singular feedback when one error remains. More importantly, the initial field-edit handler changes the summary to **"Nothing has been checked yet."** after the last displayed error is cleared, although the visitor may still have an invalid value. This is a truthful *unchecked* state, not a successful validation state, and must remain visually distinguishable from a valid submission.
+At frontend head `67759ad`, `errorSummary(count)` now selects singular for one error and plural for multiple errors, including after edits. The handler returns to **"Nothing has been checked yet."** when the last displayed error clears; this is an *unchecked* state, not a successful validation state. This source-level implementation has **not** been verified in a real browser or screen reader.
 
-**Frontend handoff (do not edit frontend files from this design branch):**
+**Regression contract now implemented in source (retain these acceptance checks):**
 - After submit, announce **"Please correct the highlighted field. Nothing was sent."** for exactly one invalid field and **"Please correct the highlighted fields. Nothing was sent."** for two or three.
 - After editing one field, preserve errors on untouched fields. Recalculate the singular/plural summary from the remaining displayed errors without stealing focus.
 - When no displayed errors remain after editing, use the neutral **"Nothing has been checked yet."** until a fresh submit. Never imply the data were submitted or validated.
@@ -91,4 +91,15 @@ The current submit and input handlers use the same summary, **"Please correct th
 
 ## Next review
 
-Verify singular/plural copy and announcement behavior in a real browser, then record actual Node/CI results. Avoid another design PR for the same component while frontend is working in its existing PR.
+Verify live-region announcement behavior in a real browser, then record actual Node/CI results. Avoid another design PR for the same component while frontend is working in its existing PR.
+
+
+## Focused UX review — stable live-region announcement contract (2026-11-08)
+
+**Observed source at frontend PR #46 head `67759ad`:** the existing `#feedback` paragraph starts with `role="status" aria-live="polite"`, while `site.js` dynamically replaces its role with `alert` after invalid submission or editing and switches it back to `status` when errors disappear. Screen readers do not uniformly re-register a live region when its role changes after page load. This is an **accessibility risk**, not proof of an observed failure; no assistive-technology test has been executed.
+
+**Single improvement for frontend handoff:** use one stable, pre-existing announcement region and a predictable urgency policy. Prefer a persistent `role="status" aria-live="polite" aria-atomic="true"` for the short summary, and rely on the existing focus move to the first invalid input plus its `aria-describedby` message to expose immediate field errors. Do not dynamically change the region's role. If testing demonstrates that urgent alerts are required, add a separate, initially empty, permanently declared alert region instead of changing roles on the same element; ensure the summary is announced only once. Preserve the current visual wording and offline/no-submission semantics.
+
+**Acceptance:** (1) after invalid submit, keyboard focus reaches the first invalid field and its associated message can be read; (2) three → two → one → zero visible errors updates the summary without moving focus during typing; (3) valid submit announces validation only, not delivery; (4) no duplicated summary announcements in at least one real screen-reader/browser combination; (5) no new network, storage, telemetry or raw-input HTML rendering; (6) existing Node tests pass, with a regression assertion that the summary region keeps a stable role. Record exact browser, OS, screen reader and result rather than claiming WCAG conformance from markup inspection.
+
+**Integration gate:** PR #45 and #46 remain draft, based on the unmerged eight-project feature branch; PR #11 remains non-mergeable. Current search returned 36 open PRs. No code, CI, browser or screen-reader test was executed by this design review. Frontend owns any markup/JS/test changes; backend alone handles dependency-aware merges.
