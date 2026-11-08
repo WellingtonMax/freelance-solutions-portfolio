@@ -360,3 +360,50 @@ test('successful local validation becomes pending again after any edit', () => {
   assert.match(errors.email.textContent,/valid email/);
   assert.match(feedback.textContent,/correct the highlighted field/);
 });
+
+
+test('after a failed attempt, editing a previously valid field reveals a new error', () => {
+  const vm = require('node:vm');
+  function node(value = '') {
+    const attrs = new Map(), listeners = {};
+    return {
+      value, textContent: '', listeners,
+      setAttribute(k, v) { attrs.set(k, v); },
+      getAttribute(k) { return attrs.get(k) ?? null; },
+      removeAttribute(k) { attrs.delete(k); },
+      addEventListener(k, fn) { listeners[k] = fn; },
+      focus() { this.focused = true; }
+    };
+  }
+  const inputs = {
+    name: node('Fictional Person'),
+    email: node('bad'),
+    message: node('A fictional project request')
+  };
+  const errors = {name: node(), email: node(), message: node()};
+  const feedback = node();
+  const form = {
+    elements: {namedItem(k) { return inputs[k]; }},
+    addEventListener(k, fn) { this[k] = fn; }
+  };
+  const document = {getElementById(id) {
+    if (id === 'enquiry') return form;
+    if (id === 'feedback') return feedback;
+    return errors[id.replace('-error', '')];
+  }};
+  vm.runInNewContext(fs.readFileSync('site.js', 'utf8'), {document});
+  form.submit({preventDefault() {}});
+  assert.equal(inputs.email.getAttribute('aria-invalid'), 'true');
+  assert.equal(inputs.name.getAttribute('aria-invalid'), null);
+  inputs.name.value = ' ';
+  inputs.name.listeners.input();
+  assert.equal(inputs.name.getAttribute('aria-invalid'), 'true');
+  assert.match(errors.name.textContent, /name/);
+  assert.match(feedback.textContent, /highlighted fields/);
+  inputs.name.value = 'Fictional Person';
+  inputs.name.listeners.input();
+  assert.equal(inputs.name.getAttribute('aria-invalid'), null);
+  assert.equal(errors.name.textContent, '');
+  assert.equal(inputs.email.getAttribute('aria-invalid'), 'true');
+  assert.match(feedback.textContent, /highlighted field\\./);
+});
