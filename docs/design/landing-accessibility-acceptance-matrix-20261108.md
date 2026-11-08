@@ -1,6 +1,6 @@
 # Landing Page Studio — reproducible accessibility acceptance matrix
 
-Scope: project 05, PR #46 at `ec99291d4d276100e97a8c59fc754892ba0b5c88`; review against the latest PR head before acceptance. Design/UX QA handoff only. No browser or assistive-technology test is claimed here.
+Scope: project 05, PR #46 head `6e74ce14be6d33de563295e290a91540e880155b` as inspected on 2026-11-08; re-check the head before acceptance. Design/UX QA handoff only. No browser or assistive-technology test is claimed here.
 
 ## Single improvement: verify validation recovery as a complete keyboard journey
 
@@ -24,6 +24,8 @@ The interface currently renders per-field messages via `textContent`, focuses th
 | Skip link and keyboard order | TBD | Reach main and form without pointer | Not run | Pending |
 | Three invalid fields | TBD | Focus first invalid; three associated errors | Not run | Pending |
 | Edit one invalid field | TBD | Only its error clears | Not run | Pending |
+| Resolve final highlighted error without submitting | TBD | Ask for revalidation; do not revert to untouched message | Not run | Pending |
+| Edit after successful local validation | TBD | Withdraw previous success; show “Form changed since validation. Validate again; nothing was sent.” | Not run | Pending |
 | Valid fictional values | TBD | Local-only confirmation | Not run | Pending |
 | Hostile characters | TBD | Safe, specific errors | Not run | Pending |
 | Narrow/zoom layout | TBD | No overflow or clipping | Not run | Pending |
@@ -36,7 +38,9 @@ PR #46 is a draft based on `feat/eight-project-sprint-20261106`, not main. PR #1
 
 If an announcement is missing, frontend should preserve the existing safe `textContent` approach, then test a narrowly scoped fix. Do not add live error alerts to every field without testing for duplicate speech. Backend owns final integration order and merges.
 
-## UX finding — distinguish correction from a fresh untouched form (2026-11-08)
+## Historical UX finding — distinguish correction from a fresh untouched form (2026-11-08)
+
+**Superseded by frontend PR #46 head `6e74ce1` (source inspected, not runtime-tested):** the earlier defect below was addressed in source. `site.js` now retains an attempted-validation flag, uses the corrected-errors message after a failed submit, and after editing a previously successful validation displays **“Form changed since validation. Validate again; nothing was sent.”** Do not treat the historical observation or the earlier proposed **“Details changed”** copy as a current implementation requirement. The manual scenarios above remain pending. This update is a documentation reconciliation only.
 
 Source reviewed: frontend PR #46 head `7fcbde84515a45d573726fe964598fb8789c9fd1`, `05-landing-page-studio/site.js`. On each input event, when no `aria-invalid="true"` fields remain, the status is reset to **“Nothing has been checked yet.”** This also happens after a failed submit followed by successful correction of all three fields. It is a misleading state: validation *has* happened, but the user still must press **Validate enquiry locally** again. This is a design finding, not a browser-observed defect.
 
