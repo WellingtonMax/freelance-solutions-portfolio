@@ -44,3 +44,16 @@ test("do not interpret untrusted content as HTML",()=>{
 
 // Keep bundled sample regression checks in the existing CI entrypoint.
 require("./test_sample.cjs");
+
+test("copy actions are separate, disabled until output, and fail safely",()=>{
+ const html=fs.readFileSync(path.join(__dirname,"try.html"),"utf8");
+ const ui=fs.readFileSync(path.join(__dirname,"try-ui.js"),"utf8");
+ for (const id of ["copy-clean","copy-reject"]) assert.match(html,new RegExp(`id="${id}"[^>]*disabled`));
+ assert.match(html,/id="copy-feedback" role="status"/);
+ assert.match(ui,/navigator\.clipboard\.writeText\(value\)/);
+ assert.match(ui,/textarea\.select\(\)/);
+ assert.match(ui,/version !== previewVersion/);
+ assert.match(ui,/copyClean\.disabled = !clean\.value/);
+ assert.match(ui,/copyReject\.disabled = !reject\.value/);
+ assert.doesNotMatch(ui,/innerHTML|document\.write|fetch\(/);
+});
