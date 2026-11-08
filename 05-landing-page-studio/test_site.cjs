@@ -437,7 +437,7 @@ test('multi-field summary states the remaining error count after each correction
   assert.match(feedback.textContent, /2 remaining/);
   inputs.email.value = 'fictional@example.com';
   inputs.email.listeners.input();
-  assert.match(feedback.textContent, /highlighted field\\. Nothing was sent/);
+  assert.match(feedback.textContent, /highlighted field\. Nothing was sent/);
   inputs.message.value = 'A fictional project request';
   inputs.message.listeners.input();
   assert.match(feedback.textContent, /All highlighted errors are resolved/);
