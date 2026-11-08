@@ -57,5 +57,33 @@ node --test test_site.cjs
 ```
 The commands above are instructions, **not evidence that tests were executed**.
 
+## Implementation reconciliation — 2026-11-08 (PR #46, unmerged)
+
+This is a **design review of repository source**, not a browser or accessibility certification. The frontend branch `frontend/landing-validation-feedback-20261107` implements the first-minute CTA, disclosure, associated field messages, focus-on-error and a local-only success message. It also adds a VM-based test for retaining an unrelated error when another field changes. These changes remain unmerged; do not claim they are live.
+
+### One remaining UX gap: reveal all invalid fields on the first submission
+
+Current `site.js` uses `validateEnquiryFields()` to report only the **first** invalid field on submit. When name, email and summary are invalid, visitors discover the next error only after correcting the first and resubmitting. This makes the one-minute demo unnecessarily cumbersome.
+
+**Frontend handoff:** on submit, validate and show messages for **every invalid field** in one pass. Focus the first invalid field in DOM order; retain other errors and `aria-invalid` states. Editing one field must not clear other errors. Use **"Review the highlighted fields. Nothing was sent."** when multiple errors remain, and the singular variant when only one remains. Continue using `textContent`; do not reflect user input as HTML or send any data.
+
+### Acceptance matrix (fictional values only)
+
+| Scenario | Expected UX |
+| --- | --- |
+| Empty name, invalid email, short summary; submit | Three associated field messages, three `aria-invalid=true` states, focus on name, plural summary |
+| Correct name only | Email and summary remain visibly invalid; no forced focus change |
+| Correct email next | Summary remains invalid; summary becomes singular |
+| Correct summary and submit again | No field errors; success explicitly says nothing was sent |
+| HTML-like text and control characters | No markup execution, no reflected field values, errors mapped to offending field |
+| 320/375/768/1280px and 200% zoom | No clipped text, overflow or hidden focus rings |
+| Keyboard and screen reader | Logical focus; no duplicate live-region announcements |
+
+### Integration and evidence
+
+- PR #46 is draft and depends on the eight-project feature branch. PR #11 was also draft and non-mergeable when inspected on 2026-11-08. The `main` README still lists 04–08 as planned.
+- Source inspection confirms first-error-only behavior and a VM-based preservation test. **No Node suite, browser, screen reader or CI was executed during this design review.**
+- Frontend owns implementation and tests in its own PR. Backend alone handles integration after verifying dependency order, CI and mergeability. No deployment is authorized.
+
 ## Next review
-Frontend should reference this spec in its own PR, include before/after screenshots at 375px and desktop if available, and record actual test outcomes. Human review required before merge; no deploy authorized.
+Review the all-errors implementation, test results, keyboard behavior and 375px/desktop screenshots if available. This document is not proof that the feature has shipped.
