@@ -81,3 +81,14 @@ Evidence: frontend PR #38 at head `81989849f7aa038ad780029df8c837a911385ccb` pro
 - Tests: success on both outputs; denied/rejected clipboard write; missing clipboard API; empty output; hostile CSV text with quotes, newlines and formula prefixes; no network or `innerHTML`. Manual browser checks remain required for permissions and assistive technology.
 
 **Ownership:** FRONTEND implements in its existing #38 branch or a clearly dependent frontend PR after checking concurrent edits. DESIGN owns only this specification. BACKEND retains integration authority. Current #36 and #38 are open drafts against `main`; do not infer CI approval or merge readiness. No change to Python, auth, storage, or security boundaries is requested.
+
+
+## 2026-11-08 follow-up — blocker: fictional sample never reaches results
+
+**Static source evidence:** In frontend PR #38, `try-ui.js` sets `const file = sampleSelected ? null : selectedFile()` when the fictional sample is chosen. After processing the bundled sample, it unconditionally checks `if (selectedFile() !== file) return;`. A cleared file input normally yields `selectedFile() === undefined`, whereas `file === null`; the guard therefore returns before assigning CSV outputs, showing totals, enabling copy controls, or focusing the result heading. This breaks the primary first-minute demo journey. This is a source-level finding, not a claim of browser execution.
+
+**One required frontend fix:** Preserve the stale-selection protection for local files, but apply file-identity comparison only to the local-file path; the sample path must instead validate its selection/version and remain explicitly selected. Do not bypass the `selectionVersion` guard or weaken CSP. Keep output hidden if the user switches sources while a file read is pending.
+
+**Acceptance:** (1) Click **Try fictional sample**, then **Validate CSV in this browser**: visible totals are 4 input, 1 accepted, 3 rejected; both output panels appear and their copy controls reflect nonempty content. (2) Switch to a local file and back: no stale result survives. (3) Select a different local file during an asynchronous read: old output never appears. (4) Empty, malformed, oversized and hostile CSV input remains safely handled; no untrusted HTML insertion. (5) Add a DOM-level or browser test that exercises the sample click and checks actual visible results; static regex assertions alone cannot catch this regression.
+
+**Status reconciliation:** The copy controls requested above are now present in PR #38 (HTML and `try-ui.js`), so do not reimplement them. Their browser behavior and permission fallbacks remain unverified. This regression is higher priority than further visual polish. DESIGN does not edit frontend-owned files; FRONTEND owns the repair, and BACKEND owns merge sequencing. PR #11 remains a separate prerequisite/conflict risk. No merge is recommended until positive runtime and CI evidence exists.
