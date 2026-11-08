@@ -26,7 +26,6 @@ Building practical tools that turn repetitive work and scattered data into usabl
 | **[Freelance Solutions Portfolio](https://github.com/WellingtonMax/freelance-solutions-portfolio)** | Python, SQLite, data tools, dashboards, API exports | Original, AI-assisted and human-reviewed portfolio demonstrations with source, walkthroughs, and test configuration. Work in progress; not a record of paid client delivery. |
 | **[DishDeck](https://github.com/WellingtonMax/dish-deck)** | TypeScript, Express, MongoDB, JWT | Earlier restaurant catalog API exercise. Source and setup documented; security hardening is required before production use. |
 | **[Calldex](https://github.com/WellingtonMax/calldex)** | React, Ant Design, browser storage | Legacy contact-management UI experiment. Browser-local storage and demo-only login; not a secure customer system. |
-| **[User Data Manager](https://github.com/WellingtonMax/gerenciador-de-dados-de-usuarios)** | Java, Spring Boot, JPA, MySQL | Earlier backend training exercise for user and address registration. |
 
 ### Current focus
 
