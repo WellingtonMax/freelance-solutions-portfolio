@@ -19,11 +19,19 @@ function validateEnquiry(fields) {
 function validateEnquiryFields(fields) {
   const error = validateEnquiry(fields);
   if (!error) return {error:null, field:null};
-  const field = error.startsWith("Provide a name") ? "name" :
-    error.startsWith("Provide a valid email") ? "email" :
-    error.startsWith("Provide a project summary") ? "message" :
-    error === "Remove control characters." ? "name" : "name";
-  return {error,field};
+  const keys = ["name", "email", "message"];
+  if (!fields || typeof fields !== "object")
+    return {error, field:"name"};
+  if (error === "Form values must be text.")
+    return {error, field:keys.find(key => typeof fields[key] !== "string") || "name"};
+  if (error.startsWith("Provide a name")) return {error, field:"name"};
+  if (error.startsWith("Provide a valid email")) return {error, field:"email"};
+  if (error.startsWith("Provide a project summary")) return {error, field:"message"};
+  if (error === "Remove control characters.") {
+    const control = /[\\u0000-\\u001f\\u007f]/;
+    return {error, field:keys.find(key => control.test(fields[key])) || "name"};
+  }
+  return {error, field:"name"};
 }
 if (typeof document !== "undefined") {
   const form = document.getElementById("enquiry");
