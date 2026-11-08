@@ -1,6 +1,6 @@
 # Landing Page Studio — reproducible accessibility acceptance matrix
 
-Scope: project 05, PR #46 head `6e74ce14be6d33de563295e290a91540e880155b` as inspected on 2026-11-08; re-check the head before acceptance. Design/UX QA handoff only. No browser or assistive-technology test is claimed here.
+Scope: project 05, PR #46 head `975d001ceba9fbaa76e66710aee28c075a7807df` inspected in source on 2026-11-08; re-check the head before acceptance. Design/UX QA handoff only. No browser or assistive-technology test is claimed here.
 
 ## Single improvement: verify validation recovery as a complete keyboard journey
 
@@ -12,7 +12,7 @@ The interface currently renders per-field messages via `textContent`, focuses th
 2. Keyboard-only: Tab from the address bar. The “Skip to content” link must become visible on focus and move to `#main`. Continue through navigation, CTA and the form in DOM order. Visible focus indicator must not be clipped.
 3. Submit the empty form. Focus must move to Name. Each invalid input must expose `aria-invalid="true"` and its own visible message through `aria-describedby`. The status must say nothing was sent, without implying an actual submission.
 4. Correct Name with `Sample Person`. Its error must clear, while Email and Project summary errors remain. The summary must reflect the remaining errors; focus must not jump unexpectedly on typing.
-5. Enter `sample@example.invalid` and `Fictional workspace redesign enquiry`. Submit again. All error states must clear and the status must explicitly say nothing was sent or saved. Verify no requests or storage mutations; this is a local-only prototype.
+5. After the first invalid submit, edit a previously valid Name field into a blank or whitespace-only value. Its field-specific error must appear immediately, without hiding the existing Email/Message errors. Correct it and verify only its own error clears. Then enter `sample@example.invalid` and `Fictional workspace redesign enquiry`. Submit again. All error states must clear and the status must explicitly say nothing was sent or saved. Verify no requests or storage mutations; this is a local-only prototype.
 6. Retry with `Bad\u0001Name`, `bad-address` and `short`; confirm meaningful field-specific errors, no HTML injection, no reflected raw input in feedback and no crash.
 7. Repeat at 320px, 375px, desktop >= 1280px and 200% zoom: no horizontal page scrolling, clipped messages or inaccessible controls. At narrow widths the CTA and privacy disclaimer must precede decorative art.
 8. With NVDA + Firefox or VoiceOver + Safari (record browser/OS/reader versions), submit invalid values and verify whether the first focused input announces both its label and the associated error. Verify whether the atomic status is announced once and is not duplicated or suppressed by the focus move. Record actual observations, not just DOM inspection.
@@ -24,6 +24,7 @@ The interface currently renders per-field messages via `textContent`, focuses th
 | Skip link and keyboard order | TBD | Reach main and form without pointer | Not run | Pending |
 | Three invalid fields | TBD | Focus first invalid; three associated errors | Not run | Pending |
 | Edit one invalid field | TBD | Only its error clears | Not run | Pending |
+| Make previously valid field invalid after failed submit | TBD | New field error appears immediately; existing errors persist; summary count adjusts | Not run | Pending |
 | Resolve final highlighted error without submitting | TBD | Ask for revalidation; do not revert to untouched message | Not run | Pending |
 | Edit after successful local validation | TBD | Withdraw previous success; show “Form changed since validation. Validate again; nothing was sent.” | Not run | Pending |
 | Valid fictional values | TBD | Local-only confirmation | Not run | Pending |
@@ -31,6 +32,10 @@ The interface currently renders per-field messages via `textContent`, focuses th
 | Narrow/zoom layout | TBD | No overflow or clipping | Not run | Pending |
 | Screen-reader announcement | TBD | Label + error, non-duplicated status | Not run | Pending |
 | Network/storage inspection | TBD | No submission or persistence | Not run | Pending |
+
+## Source-level evidence and limitations (2026-11-08)
+
+At frontend head `975d001`, `site.js` revalidates the edited field when `lastSubmitHadErrors` is true, and `test_site.cjs` includes `after a failed attempt, editing a previously valid field reveals a new error`. This is **static review of a regression test, not an executed test**. The test suite, actual keyboard behavior and screen-reader announcements remain pending; the last queried commit had no pull-request-triggered workflow runs returned. Avoid treating the absence of runs as a passing CI result.
 
 ## Integration constraints
 
