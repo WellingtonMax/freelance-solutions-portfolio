@@ -47,14 +47,14 @@ test('feedback is associated with fields and remains local', () => {
 
 test('message error is a real sibling of an empty textarea', () => {
   const html = fs.readFileSync('index.html','utf8');
-  assert.match(html, /<textarea\\b[^>]*id="message"[^>]*><\\/textarea>\\s*<p class="field-error" id="message-error"><\\/p>/);
-  assert.doesNotMatch(html, /<textarea\\b[^>]*>[\\s\\S]*?<p[^>]*id="message-error"/);
+  assert.match(html, /<textarea\b[^>]*id="message"[^>]*><\/textarea>\s*<p class="field-error" id="message-error"><\/p>/);
+  assert.doesNotMatch(html, /<textarea\b[^>]*>[\s\S]*?<p[^>]*id="message-error"/);
 });
 test('control characters and non-text values focus the offending field', () => {
   const {validateEnquiryFields} = require('./site.js');
   const good = {name:'Test Person',email:'test@example.com',message:'A fictional project'};
-  assert.equal(validateEnquiryFields({...good,name:'Test\\u0001 Person'}).field,'name');
-  assert.equal(validateEnquiryFields({...good,message:'A fictional\\u0001 project'}).field,'message');
-  assert.equal(validateEnquiryFields({...good,email:'test\\u0001@example.com'}).field,'email');
+  assert.equal(validateEnquiryFields({...good,name:'Test\u0001 Person'}).field,'name');
+  assert.equal(validateEnquiryFields({...good,message:'A fictional\u0001 project'}).field,'message');
+  assert.equal(validateEnquiryFields({...good,email:'test\u0001@example.com'}).field,'email');
   assert.equal(validateEnquiryFields({...good,message:42}).field,'message');
 });
