@@ -60,7 +60,7 @@ if (typeof document !== "undefined") {
   function errorSummary(count) {
     return count === 1
       ? "Please correct the highlighted field. Nothing was sent."
-      : "Please correct the highlighted fields. Nothing was sent.";
+      : `Please correct the highlighted fields (${count} remaining). Nothing was sent.`;
   }
   function clearError(key) {
     inputs[key].removeAttribute("aria-invalid");
