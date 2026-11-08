@@ -70,7 +70,10 @@ if (typeof document !== "undefined") {
     for (const key of Object.keys(inputs)) clearError(key);
   }
   let hasAttemptedValidation = false;
+  let lastValidationPassed = false;
   for (const [key, input] of Object.entries(inputs)) input.addEventListener("input", () => {
+    // Any edit invalidates a previously successful validation result.
+    lastValidationPassed = false;
     // After a failed submit, retain an error until this field actually validates.
     // Before submit, avoid showing errors while the visitor is still typing.
     if (input.getAttribute("aria-invalid") === "true") {
@@ -92,6 +95,7 @@ if (typeof document !== "undefined") {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     hasAttemptedValidation = true;
+    lastValidationPassed = false;
     clearErrors();
     try {
     const fieldErrors = validateEnquiryAllFields({
@@ -108,6 +112,7 @@ if (typeof document !== "undefined") {
       feedback.textContent = errorSummary(invalidFields.length);
       inputs[invalidFields[0]].focus();
     } else {
+      lastValidationPassed = true;
       feedback.textContent = "Fields look valid. Demo only — nothing was sent or saved.";
     }
     } catch (_) {
