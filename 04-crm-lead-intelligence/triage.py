@@ -19,6 +19,8 @@ def safe_text(value, maximum=160):
     if not isinstance(value, str) or not value.strip() or len(value) > maximum:
         raise ValueError("missing or oversized text field")
     value = unicodedata.normalize("NFKC", value).strip()
+    if not value or len(value) > maximum:
+        raise ValueError("missing or oversized text field after normalization")
     if any(ord(c) < 32 for c in value):
         raise ValueError("control character in field")
     if value.lstrip("\u200b\u200c\u200d\ufeff ").startswith(tuple(DANGEROUS)):
