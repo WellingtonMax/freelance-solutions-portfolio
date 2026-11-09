@@ -3,6 +3,8 @@ function validateEnquiry(fields) {
   // Use the same rules as the field-level feedback shown in the browser.
   return validateEnquiryFields(fields).error;
 }
+// Reject invisible formatting and bidirectional overrides that can mislead a reviewer.
+const unsafeText = /[\u0000-\u001f\u007f\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/u;
 function validateEnquiryAllFields(fields) {
   const errors = {};
   const keys = ["name", "email", "message"];
@@ -18,19 +20,19 @@ function validateEnquiryAllFields(fields) {
   if (errors.name === undefined) {
     const name = fields.name.trim();
     if (!name || name.length > 80) errors.name = "Provide a name (1–80 characters).";
-    else if (/[\u0000-\u001f\u007f]/.test(name)) errors.name = "Remove control characters.";
+    else if (unsafeText.test(name)) errors.name = "Remove invisible or control characters.";
   }
   if (errors.email === undefined) {
     const email = fields.email.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254
-        || /[\u200B-\u200F\u2060\uFEFF\u0000-\u001F\u007F]/u.test(email))
+        || unsafeText.test(email))
       errors.email = "Provide a valid email format.";
   }
   if (errors.message === undefined) {
     const message = fields.message.trim();
     if (message.length < 10 || message.length > 1000)
       errors.message = "Provide a project summary (10–1000 characters).";
-    else if (/[\u0000-\u001f\u007f]/.test(message)) errors.message = "Remove control characters.";
+    else if (unsafeText.test(message)) errors.message = "Remove invisible or control characters.";
   }
   return errors;
 }
