@@ -135,6 +135,31 @@ class ReportTests(unittest.TestCase):
                     process(source, root / "out.json", output_html)
             self.assertEqual(keep.read_text(encoding="utf-8"), "do not delete")
 
+    def test_rollback_does_not_delete_replaced_output(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "source.csv"
+            output_json = root / "out.json"
+            output_html = root / "out.html"
+            source.write_text(SAMPLE, encoding="utf-8")
+            original_open = Path.open
+
+            def replace_then_fail(path, *args, **kwargs):
+                if path == output_html and args and args[0] == "x":
+                    # Simulate another writer replacing our first output.
+                    output_json.unlink()
+                    output_json.write_text("replacement belongs to another writer",
+                                           encoding="utf-8")
+                    raise PermissionError("simulated second output failure")
+                return original_open(path, *args, **kwargs)
+
+            with patch.object(Path, "open", autospec=True, side_effect=replace_then_fail):
+                with self.assertRaisesRegex(PermissionError, "simulated"):
+                    process(source, output_json, output_html)
+            self.assertEqual(output_json.read_text(encoding="utf-8"),
+                             "replacement belongs to another writer")
+            self.assertFalse(output_html.exists())
+
     def test_cleanup_failure_preserves_original_error(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
