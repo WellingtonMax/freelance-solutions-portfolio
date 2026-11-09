@@ -74,6 +74,16 @@ class AccessibleAuditFilterContract(unittest.TestCase):
         css = (ROOT / "demo.css").read_text(encoding="utf-8")
         self.assertIn(".scroll:focus-visible{outline:", css)
 
+    def test_mobile_filters_wrap_and_scroll_guidance_is_visible(self):
+        """Protect narrow-screen discoverability without claiming browser coverage."""
+        markup = (ROOT / "demo.html").read_text(encoding="utf-8")
+        css = (ROOT / "demo.css").read_text(encoding="utf-8")
+        self.assertIn("On narrow screens, scroll the table sideways", markup)
+        self.assertIn("@media(max-width:720px){", css)
+        mobile_rules = css.split("@media(max-width:720px){", 1)[1]
+        self.assertIn(".controls{flex-wrap:wrap;width:100%}", mobile_rules)
+        self.assertIn(".controls button{flex:1 1 110px;min-width:0}", mobile_rules)
+
     def test_filter_logic_updates_pressed_state_rows_and_announcement(self):
         script = (ROOT / "demo.js").read_text(encoding="utf-8")
         self.assertIn('item.setAttribute("aria-pressed"', script)
