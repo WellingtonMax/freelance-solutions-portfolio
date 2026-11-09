@@ -29,7 +29,7 @@ test('every card offers a truthful destination, with no dead relative links', ()
   const cards = [...work.matchAll(/<article\s+class="card[^"]*"[^>]*>[\s\S]*?<\/article>/gi)].map(m => m[0]);
   for (const card of cards) {
     const title = card.match(/<h3>([^<]+)<\/h3>/)?.[1] || 'unknown';
-    const hrefs = [...card.matchAll(/<a\s+href="([^"]+)"/g)].map(m => m[1]);
+    const hrefs = [...card.matchAll(/<a\\b[^>]*\\bhref="([^"]+)"/gi)].map(m => m[1]);
     assert.ok(hrefs.length, title + ' needs at least one action');
     for (const href of hrefs) {
       assert.ok(!/^(?:javascript:|data:)/i.test(href), title + ': unsafe link scheme');
@@ -86,4 +86,11 @@ test('in-page navigation resolves to real, unique targets', () => {
   for (const target of anchors) {
     assert.ok(known.has(target), 'broken in-page navigation target: #' + target);
   }
+});
+
+// Regression: links remain auditable when accessibility/class attributes precede href.
+test('card link extraction handles attributes before href', () => {
+  const fixture = '<a class="action" aria-label="Open" href="missing.html">Broken</a>';
+  const hrefs = [...fixture.matchAll(/<a\\b[^>]*\\bhref="([^"]+)"/gi)].map(match => match[1]);
+  assert.deepEqual(hrefs, ['missing.html']);
 });
