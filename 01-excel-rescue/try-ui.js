@@ -17,6 +17,8 @@ let previewVersion = 0;
 
 function resetPreview() {
   previewVersion++;
+  // A new selection cancels the old read and must restore the action immediately.
+  run.disabled = false;
   copyClean.disabled = true;
   copyReject.disabled = true;
   copyFeedback.textContent = "Copy an output to use it locally. If copying is unavailable, select the CSV text manually.";
@@ -59,6 +61,7 @@ run.addEventListener("click", async () => {
     return;
   }
   run.disabled = true;
+  const processingVersion = previewVersion;
   feedback.textContent = "Processing in this browser tab…";
   try {
     const text = usingSample ? ExcelRescueSample : await file.text();
@@ -88,7 +91,8 @@ run.addEventListener("click", async () => {
       feedback.textContent = "Unable to process: " + (error && typeof error.message === "string" ? error.message : "invalid input") + ". Your file was not uploaded.";
     }
   } finally {
-    run.disabled = false;
+    // An older read must not unlock a newer processing operation.
+    if (processingVersion === previewVersion) run.disabled = false;
   }
 });
 
