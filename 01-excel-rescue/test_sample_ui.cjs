@@ -105,3 +105,37 @@ test("file read failures show actionable feedback without exposing exception det
   assert.equal(element("result").hidden, true);
   assert.equal(element("run").disabled, false);
 });
+
+test("clipboard denial offers manual copy without leaking errors or claiming success", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: id.startsWith("copy-"), files: [], handlers: {},
+      focus() { this.focused = true; },
+      select() { this.selected = true; },
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  const context = {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: { clipboard: { writeText: async () => {
+      throw new Error("private/path/customer.csv");
+    } } }
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
+  element("sample").handlers.click();
+  await element("run").handlers.click();
+  await element("copy-clean").handlers.click();
+  assert.match(element("copy-feedback").textContent, /Clipboard permission denied/);
+  assert.doesNotMatch(element("copy-feedback").textContent, /private\/path|copied to clipboard/);
+  assert.equal(element("clean").focused, true);
+  assert.equal(element("clean").selected, true);
+  element("source").files = [{ name: "new.csv", size: 0 }];
+  element("source").handlers.change();
+  assert.equal(element("copy-clean").disabled, true);
+  assert.equal(element("result").hidden, true);
+});
