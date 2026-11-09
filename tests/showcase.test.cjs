@@ -53,7 +53,7 @@ test('every card offers a truthful destination, with no dead relative links', ()
           const decoded = decodeURIComponent(fragment);
           assert.match(decoded, /^[A-Za-z][\w:-]*$/, title + ': invalid fragment identifier');
           const targetHtml = fs.readFileSync(target, 'utf8');
-          const ids = [...targetHtml.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+          const ids = [...targetHtml.matchAll(/\bid\s*=\s*(?:"([^"]+)"|\x27([^\x27]+)\x27)/g)].map(match => match[1] ?? match[2]);
           assert.ok(ids.includes(decoded), title + ': missing fragment target #' + decoded);
         }
       }
@@ -83,7 +83,7 @@ test('the discovery page exposes navigable sections and synthetic-data disclosur
 });
 
 test('in-page navigation resolves to real, unique targets', () => {
-  const ids = [...html.matchAll(/\bid="([A-Za-z][\w:-]*)"/g)].map(match => match[1]);
+  const ids = [...html.matchAll(/\bid\s*=\s*(?:"([A-Za-z][\w:-]*)"|\x27([A-Za-z][\w:-]*)\x27)/g)].map(match => match[1] ?? match[2]);
   assert.equal(new Set(ids).size, ids.length, 'duplicate id attributes break anchor navigation');
   const known = new Set(ids);
   const anchors = linkDestinations(html)
@@ -100,4 +100,13 @@ test('href extraction handles single quotes and ignores data-href decoys', () =>
   assert.deepEqual(linkDestinations(fixture), ['demo.html#results']);
   assert.deepEqual(linkDestinations('<a data-href="fake.html">No destination</a>'), []);
   assert.deepEqual(linkDestinations('<a class="action" href="real.html">Open</a>'), ['real.html']);
+});
+
+// Regression: single-quoted IDs must not bypass duplicate or fragment checks.
+test('anchor target discovery includes single-quoted HTML ids', () => {
+  const fixture = `<section id='work'><div id="results"></div><p id='results'></p></section>`;
+  const ids = [...fixture.matchAll(/\bid\s*=\s*(?:"([A-Za-z][\w:-]*)"|'([A-Za-z][\w:-]*)')/g)]
+    .map(match => match[1] ?? match[2]);
+  assert.deepEqual(ids, ['work', 'results', 'results']);
+  assert.notEqual(new Set(ids).size, ids.length, 'duplicate ids across quote styles must be detected');
 });
