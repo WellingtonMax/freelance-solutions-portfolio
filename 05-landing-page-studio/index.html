@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Fictional Meridian Workshop — sample accessible small-business landing page.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; form-action 'none'; connect-src 'none'; base-uri 'none'">
+<title>Meridian Workshop | Fictional Landing Page</title>
+<link rel="stylesheet" href="style.css"><script src="site.js" defer></script>
+</head><body>
+<a class="skip" href="#main">Skip to content</a>
+<header><div class="wrap nav"><a href="#home" class="logo">Meridian<span>Workshop</span></a>
+<nav aria-label="Main navigation"><a href="#services">Services</a><a href="#contact">Contact</a></nav></div></header>
+<main id="main">
+<section class="hero wrap" id="home" aria-labelledby="hero-title">
+<div><p class="eyebrow">Fictional small business · accessible demo</p>
+<h1 id="hero-title">A better way to build what comes next.</h1>
+<p>Practical workspace design, refurbishment planning, and thoughtful results. This is a sample design, not a real service offer.</p>
+<a class="cta" href="#contact">Preview the enquiry form</a></div>
+<div class="illustration" role="img" aria-label="Decorative illustration of a clean workshop with worktable">MW<span>STUDIO 01</span></div>
+</section>
+<section class="wrap services" id="services"><h2>Three ways we could help</h2>
+<div class="cards"><article><h3>Plan</h3><p>Make project requirements understandable.</p></article>
+<article><h3>Design</h3><p>Present an accessible, clear design system.</p></article>
+<article><h3>Deliver</h3><p>Document outcomes for a straightforward handover.</p></article></div></section>
+<section class="wrap contact" id="contact"><div><h2>Try the demo form</h2>
+<p>Validation runs in your browser. Nothing is sent or saved. Use fictitious details only.</p></div>
+<form id="enquiry" novalidate aria-describedby="privacy-note">
+<label for="full-name">Name</label><input id="full-name" name="name" autocomplete="off" maxlength="80" required>
+<label for="email">Email</label><input id="email" name="email" type="email" autocomplete="off" maxlength="254" required>
+<label for="message">Project summary</label><textarea id="message" name="message" maxlength="1000" rows="4" required></textarea>
+<p id="privacy-note">Offline demonstration. No form submissions or telemetry.</p>
+<button type="submit">Validate enquiry locally</button><p id="feedback" role="status" aria-live="polite"></p></form></section>
+</main><footer><div class="wrap">Fictional demonstration · AI-assisted development · Human review required · Not deployed for client use</div></footer>
+</body></html>
