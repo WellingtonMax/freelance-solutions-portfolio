@@ -3,6 +3,8 @@ import argparse
 import difflib
 import hashlib
 import json
+import os
+import stat
 import re
 from html.parser import HTMLParser
 from pathlib import Path
@@ -77,8 +79,18 @@ def compare(before, after):
 
 def read_snapshot(path):
     """Read at most the accepted input size plus one byte (including on file growth)."""
-    with path.open("rb") as stream:
-        data = stream.read(MAX_BYTES + 1)
+    # O_NONBLOCK avoids hanging on a FIFO; O_NOFOLLOW rejects final symlinks.
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("snapshot must be a regular file")
+        with os.fdopen(fd, "rb") as stream:
+            fd = -1  # stream now owns the descriptor
+            data = stream.read(MAX_BYTES + 1)
+    finally:
+        if fd != -1:
+            os.close(fd)
     if len(data) > MAX_BYTES:
         raise ValueError("HTML snapshot exceeds 256 KB")
     return data
@@ -94,7 +106,11 @@ def main():
         after = read_snapshot(args.after)
     except (OSError, ValueError) as exc:
         parser.error(str(exc))
-    print(json.dumps(compare(before, after), indent=2))
+    try:
+        result = compare(before, after)
+    except ValueError as exc:
+        parser.error(str(exc))
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
