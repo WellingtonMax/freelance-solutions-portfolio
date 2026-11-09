@@ -1,66 +1,61 @@
-# Freelance Solutions Portfolio — AI-Assisted, Human-Reviewed
+# Freelance Solutions Portfolio
 
-[View the client-facing showcase](index.html) · [Python test workflow](.github/workflows/portfolio-ci.yml) · [CodeQL security scanning](.github/workflows/codeql.yml) · [Security policy and threat model](SECURITY.md) · [Adversarial test report (Nov 2026)](RED_TEAM_REPORT_2026-11-06.md)
+**Eight practical software demonstrations for small-business workflows** — spreadsheets, analytics, API exports, lead review, landing pages, document generation, data auditing and offline change detection.
 
-**Original demonstration projects**, developed to showcase practical deliverables for freelance clients. This is a portfolio-in-progress, not a record of paid client work.
+[Explore the eight-project showcase](index.html) · [How to evaluate the work](CLIENT_START_HERE.md) · [Automated test workflow](.github/workflows/portfolio-ci.yml) · [Security policy](SECURITY.md)
 
-**Approach:** security-aware scope and threat modeling → implementation → negative/security tests → documentation → human review. AI-assisted development is disclosed; outcomes are verified before delivery. All sample organizations and data are fictional.
+> **Portfolio in progress.** These are original **fictional demonstrations**, not completed paid engagements or customer testimonials. Development is **AI-assisted**; human review is required before commercial use. The presence of code in `main` does **not** mean a project is production-ready, hosted or independently security-certified.
 
-## Implemented demonstrations 01–03 (unit tests and adversarial checks configured in GitHub Actions; check current CI status)
+## The eight core projects
 
-| Project | What a client receives | Tech | Status |
+All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. Some offer browser previews; others are **local command-line tools**, not live web applications. Open each README for exact commands and limitations.
+
+| Project | The problem it demonstrates | What you can inspect | Delivery status |
 |---|---|---|---|
-| [01 Excel Rescue](01-excel-rescue/) · [Sample audit demo](01-excel-rescue/demo.html) · [Local web app](01-excel-rescue/WEBAPP.md) | CSV cleanup, user login, local SQLite job history and audit exports | Python standard library / SQLite | Local app implemented; verify CI; not public-hosting ready |
-| [02 Sales Intelligence](02-sales-intelligence/) | Sales KPIs in JSON and a portable HTML report | Python standard library | Implemented; verify CI |
-| [03 API Bridge](03-api-bridge/) | Controlled JSON-to-CSV API export with retries | Python standard library | Implemented; verify CI |
+| **01 · [Excel Rescue](01-excel-rescue/README.md)** | Clean inconsistent CRM CSV exports and explain rejected or duplicate records | [Browser-only CSV preview](01-excel-rescue/try.html) · [Synthetic audit walkthrough](01-excel-rescue/demo.html) · [Case study](01-excel-rescue/CASE_STUDY.md) | Local Python tool and optional localhost web app; **prototype**, not public-hosting ready |
+| **02 · [Sales Intelligence](02-sales-intelligence/README.md)** | Turn transaction CSV files into actionable revenue metrics | JSON KPIs, offline HTML report · [Case study](02-sales-intelligence/CASE_STUDY.md) | Offline reporting demonstration; no live business dashboard |
+| **03 · [API Bridge](03-api-bridge/README.md)** | Export data from an approved JSON API into CSV | Python exporter, mocked-network tests · [Case study](03-api-bridge/CASE_STUDY.md) | Local integration prototype; optional public test API, no enterprise auth |
+| **04 · [CRM Lead Intelligence](04-crm-lead-intelligence/README.md)** | Review and prioritize a fictional B2B lead list without contacting anyone | [Synthetic CSV](04-crm-lead-intelligence/sample.csv), suppression rules, JSON review output and tests | Offline, **review-only** prototype; no outreach, CRM login or contact verification |
+| **05 · [Landing Page Studio](05-landing-page-studio/README.md)** | Demonstrate a responsive small-business landing page and enquiry validation | [Open the HTML page](05-landing-page-studio/index.html), CSS/JavaScript and tests | Browser prototype; form validates **locally** and never submits data |
+| **06 · [Document Factory](06-document-factory/README.md)** | Generate consistent sample quotations from structured information | [Synthetic JSON](06-document-factory/sample.json), Python generator, escaped/printable HTML and tests | Offline prototype; does **not** create PDF files automatically |
+| **07 · [Data Quality Auditor](07-data-quality-auditor/README.md)** | Detect invalid records, duplicates and unusual amounts in CSV exports | [Synthetic CSV](07-data-quality-auditor/sample.csv), rules, JSON findings, source hash and tests | Offline rules-based prototype; no enterprise data lineage or fraud certification |
+| **08 · [Site Change Monitor](08-site-change-monitor/README.md)** | Compare two already-authorized HTML captures | [Before](08-site-change-monitor/before.html) / [after](08-site-change-monitor/after.html) fixtures, visible-text diff and tests | **Offline snapshot comparison**; no crawling, live monitoring or alerts |
 
-## Client-ready walkthroughs (fictional demonstrations)
+**Current readiness:** integration into `main` is confirmed, but none of these entries should be represented as a fully deployed or commercially validated service merely because tests exist. Browser/mobile accessibility reviews, environment-specific security checks and end-to-end acceptance evidence remain necessary according to each project's scope.
 
-Each case study explains a hypothetical business request, deliverables, a reproducible local verification procedure, and the limits of the demonstration. These are **not client contracts or testimonials**. Development is **AI-assisted** and requires **human review** before client delivery.
+## Evaluate a demonstration in a few minutes
 
-| Business need | Case study | Inspect the evidence | Deployment status |
-|---|---|---|---|
-| Clean unreliable CRM contact exports | [Excel Rescue case study](01-excel-rescue/CASE_STUDY.md) | [Synthetic CSV](01-excel-rescue/sample.csv) · [Offline sample audit](01-excel-rescue/demo.html) · [Tests](01-excel-rescue/test_clean.py) | Offline demonstration; not production-ready |
-| Understand sales from exported transactions | [Sales Intelligence case study](02-sales-intelligence/CASE_STUDY.md) | [Synthetic sales CSV](02-sales-intelligence/sample_sales.csv) · [Tests](02-sales-intelligence/test_report.py) | Offline demonstration; not production-ready |
-| Export permitted API data to CSV | [API Bridge case study](03-api-bridge/CASE_STUDY.md) | [Exporter](03-api-bridge/bridge.py) · [Mocked transport tests](03-api-bridge/test_bridge.py) | Integration prototype; not production-ready |
+1. Start with the [visual showcase](index.html). Its eight numbered entries link to real files in `main`; some links lead to source/instructions instead of a running application.
+2. Choose a project and open its **README**. Check the fictional business brief, sample input, expected output and stated exclusions.
+3. Run its documented example locally and compare the outcome with its tests. For a concrete command-line example:
 
-**How to evaluate:** open a case study, run its documented commands locally, inspect generated outputs, and review [security controls and residual risks](SECURITY.md). GitHub Actions status must be checked against the relevant commit; a configured workflow alone is not proof of passing tests. The API example may require network access; its automated tests use a simulated transport. No real customer data or credentials are included.
+```sh
+cd 07-data-quality-auditor
+python audit.py sample.csv
+python -m unittest discover -v
+```
 
+4. Review the [security policy and residual risks](SECURITY.md), then inspect [GitHub Actions](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions) for the **specific commit** under consideration. A configured workflow is not evidence that every future commit passed.
 
-## Veterinary membership & rewards — independent concept demo
+### Testing and technical choices
 
-**[PawLedger: interactive veterinary loyalty dashboard](demos/vet-loyalty/index.html)** · [Source, technical boundaries and production plan](demos/vet-loyalty/README.md) · [Rewards engine tests](demos/vet-loyalty/test_engine.mjs)
+- Python-based core tools use **Python 3.11+** and the standard library. Browser demonstrations use local HTML/CSS/JavaScript; JavaScript tests use Node.js's built-in test runner (Node 20+ for the standalone examples).
+- The [portfolio CI workflow](.github/workflows/portfolio-ci.yml) exercises the core Python and JavaScript test suites and checks that all eight projects remain reachable from the showcase. [CodeQL](.github/workflows/codeql.yml) provides static-analysis signals, not a penetration test or security certification.
+- [Adversarial testing notes](RED_TEAM_REPORT_2026-11-06.md) document selected negative-test findings at the time of that report; newer code must be evaluated independently.
 
-Responsive two-hospital concept with fictional members, enrollment, percentage rewards, buy-X-get-one vouchers, simulated purchases and redemptions, searchable records and safe synthetic CSV export. Pure JavaScript rewards engine tests include idempotency, integer cents and tenant-scoping checks. **In-memory portfolio demo only:** no persistence, authentication, live Stripe or real client association.
+## Additional concept demonstrations — outside the core eight
 
-## Product lab: critical mineral procurement intelligence
+These are separate portfolio examples, **not** projects 09 or 10 and not substitutes for completing the eight core projects.
 
-**[StrataSignal](https://github.com/WellingtonMax/stratasignal)** is maintained in its own product repository. It provides local sourcing concentration, stock scenarios, metadata triage, experimental delay estimates and reporting-period comparisons. See the [product scope](https://github.com/WellingtonMax/stratasignal/blob/main/README.md), [market research](https://github.com/WellingtonMax/stratasignal/blob/main/docs/MARKET_RESEARCH_PT.md) and [synthetic monthly demonstration](https://github.com/WellingtonMax/stratasignal/blob/main/demo/monthly/report.html) (download to open locally). The portfolio keeps the showcase and links; implementation, tests and product development belong in the standalone repository. Commercial validation remains pending.
+- **[PawLedger — veterinary membership and rewards](demos/vet-loyalty/README.md):** [interactive fictional browser concept](demos/vet-loyalty/index.html) with simulated member/rewards operations. No live Stripe, authentication, persistent database or real clinic/customer association.
+- **[Document Flow — Word / PandaDoc-style variables](demos/document-flow/README.md):** [offline interactive preview](demos/document-flow/index.html) of a fictional variable-mapping workflow. No live PandaDoc connection or electronic signing. Its optional Word sample generator uses a separate `python-docx` dependency.
+- **[StrataSignal](https://github.com/WellingtonMax/stratasignal):** an independent critical-minerals intelligence concept maintained in **another repository**. Its development and product claims are not part of the eight-project acceptance checklist here.
 
-## Document automation demonstration (implemented offline)
+## Security, ethics and limitations
 
-**[Document Flow — Word + PandaDoc-style variable template](demos/document-flow/)** · [Interactive preview](demos/document-flow/index.html) — merge a simulated Word revision into a variable-ready source, edit 12 fictional fields, preview the result, export CSV field mapping and a sample API JSON payload, and generate four sample Word files with automated tests. **Offline demonstration only:** no real PandaDoc API call, signing integration, or commercial customer data.
+- **Synthetic examples by default:** sample companies, contacts and business situations are fictional. The optional API Bridge walkthrough can use an explicitly identified **public test API**, so not every example originates from a fictional dataset.
+- **No customer secrets or private work:** do not commit credentials, real client data, private code, patient records or proprietary exports to this public repository.
+- **Risk controls are scoped:** examples include bounded input, schema validation, CSV/HTML injection defenses and restricted file/network behavior where relevant. Read [SECURITY.md](SECURITY.md) and each project README for remaining threats; references to OWASP guidance do **not** establish compliance.
+- **Production deployment is separate work:** authorization, privacy requirements, user/tenant isolation, accessibility, logging, backups, credentials, monitoring and client-specific acceptance criteria require independent review wherever applicable.
 
-## Integrated prototype demos 04–08 (fictional, AI-assisted, human review required)
-
-These five sources and synthetic fixtures were integrated via [PR #54](https://github.com/WellingtonMax/freelance-solutions-portfolio/pull/54). The corresponding CI and CodeQL workflows succeeded for the **PR head**; check current main-branch checks separately. These are not paid client projects, production services, or verified commercial deployments.
-
-| Project | Demonstration | Evidence and boundaries |
-|---|---|---|
-| [04 CRM Lead Intelligence](04-crm-lead-intelligence/) | CSV-based, review-only lead prioritization with company-wide suppression | [README](04-crm-lead-intelligence/README.md) · [Synthetic CSV](04-crm-lead-intelligence/sample.csv) · [Tests](04-crm-lead-intelligence/test_triage.py); no outreach |
-| [05 Landing Page Studio](05-landing-page-studio/) | Responsive offline page and local enquiry validation | [Open HTML demo](05-landing-page-studio/index.html) · [README](05-landing-page-studio/README.md) · [Tests](05-landing-page-studio/test_site.cjs); no submission |
-| [06 Document Factory](06-document-factory/) | HTML quotation generation from bounded fictional JSON | [README](06-document-factory/README.md) · [Sample](06-document-factory/sample.json) · [Tests](06-document-factory/test_factory.py); no signing or PDF claim |
-| [07 Data Quality Auditor](07-data-quality-auditor/) | Offline CSV rule checks, anomaly findings, input hash | [README](07-data-quality-auditor/README.md) · [Synthetic CSV](07-data-quality-auditor/sample.csv) · [Tests](07-data-quality-auditor/test_audit.py) |
-| [08 Site Change Monitor](08-site-change-monitor/) | Offline comparison of authorized HTML snapshots | [README](08-site-change-monitor/README.md) · [Sample before](08-site-change-monitor/before.html) / [after](08-site-change-monitor/after.html) · [Tests](08-site-change-monitor/test_compare.py); no live scraping |
-
-**Readiness:** all five are integrated prototypes with tested code paths, **not yet commercially viable**. Desktop/mobile hands-on walkthroughs, browser/accessibility validation (where relevant), release-specific security reviews and complete client-facing case studies remain open.
-
-## Quality and ethical boundaries
-
-- Never present these demos as completed paid contracts or customer testimonials.
-- No client data, credentials, private repositories or proprietary material in these examples.
-- Automated tests cover demonstrated behavior; further security and environment-specific testing is needed for deployment.
-- Dependencies are deliberately minimized: Python-based demo scripts use the standard library; the Landing Page Studio tests use Node.js.
-- Each project README includes reproducible commands.
-
-**Maintainer:** WellingtonMax. **Workflow:** AI-assisted development with responsible human review.
+**Maintainer:** [WellingtonMax](https://github.com/WellingtonMax) · **Development disclosure:** AI-assisted, fictional demonstration, human review required.
