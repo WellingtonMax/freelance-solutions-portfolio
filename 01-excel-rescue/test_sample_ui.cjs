@@ -176,3 +176,28 @@ test("late clipboard completion cannot announce success after changing CSV", asy
   assert.equal(element("copy-clean").disabled, true);
   assert.equal(element("result").hidden, true);
 });
+
+test("hostile local filename is never echoed into visible status", () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: id.startsWith("copy-"), files: [], handlers: {},
+      focus() {}, select() {},
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: {}
+  });
+  const hostile = "private/customer\\u202Efdp.csv <img src=x onerror=alert(1)>";
+  element("source").files = [{name: hostile, size: 20}];
+  element("source").handlers.change();
+  assert.equal(element("feedback").textContent, "CSV file selected. Ready to process locally.");
+  assert.doesNotMatch(element("feedback").textContent, /customer|<img|\\u202E/);
+  assert.equal(element("result").hidden, true);
+});
