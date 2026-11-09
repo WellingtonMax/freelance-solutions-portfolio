@@ -101,10 +101,13 @@ async function copyOutput(textarea, button, label) {
   if (button.disabled || result.hidden || !textarea.value) return;
   const version = previewVersion;
   const value = textarea.value;
+  // Avoid duplicate clipboard writes while an earlier permission prompt is pending.
+  button.disabled = true;
   if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
     copyFeedback.textContent = "Clipboard access is unavailable. Select and copy the " + label + " CSV manually.";
     textarea.focus();
     textarea.select();
+    if (version === previewVersion) button.disabled = false;
     return;
   }
   try {
@@ -116,6 +119,9 @@ async function copyOutput(textarea, button, label) {
     copyFeedback.textContent = "Clipboard permission denied. Select and copy the " + label + " CSV manually.";
     textarea.focus();
     textarea.select();
+  } finally {
+    // A selection change owns the new disabled state; stale copies cannot override it.
+    if (version === previewVersion) button.disabled = false;
   }
 }
 copyClean.addEventListener("click", () => copyOutput(clean, copyClean, "Accepted"));
