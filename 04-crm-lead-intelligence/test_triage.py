@@ -50,6 +50,13 @@ class LeadTriageTests(unittest.TestCase):
         self.assertFalse(result["leads"])
         self.assertIn("syntax", result["rejected"][0]["reason"])
 
+    def test_nfkc_expansion_cannot_bypass_field_limit(self):
+        # U+FB03 expands from one code point to three ASCII letters.
+        value = "\ufb03" * 60
+        result = analyze_bytes((HEADER + f"{value},Engineer,1,no,a@acme.example,no\n").encode())
+        self.assertFalse(result["leads"])
+        self.assertIn("oversized", result["rejected"][0]["reason"])
+
     def test_formula_prefix_is_rejected(self):
         value = HEADER + "=CMD(),Analyst,1,no,test@demo.example,no\n"
         self.assertFalse(analyze_bytes(value.encode())["leads"])
