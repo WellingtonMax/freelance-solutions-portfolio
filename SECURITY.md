@@ -22,6 +22,11 @@ The optional `01-excel-rescue/demo.html` presents fixed synthetic rows from the 
 | File handling | Accidental input overwrite, oversized datasets | CSV size/row bounds, exclusive output creation, API response/record limits | Filesystem races, untrusted directories and concurrent writers require environment-specific controls |
 | HTML reporting | Script injection or fraudulent financial decisions from corrupted source | HTML encoding for labels, source hash in JSON, optional independent total reconciliation | Data source authentication and ERP-grade cross-checking require actual enterprise integration |
 | Remote API | Credential exposure, SSRF, malicious redirects, unreliable network | No API_TOKEN forwarding, HTTPS, exact operator-controlled host allowlist, public DNS IP checks, pinned-IP TLS, no proxies/redirects, request/response limits | Not a multi-user network API; operators control allowlists and URLs; firewall egress policies and enterprise authentication are outside demo scope |
+| CRM Lead Intelligence (04) | Opt-out bypass, formula injection, malformed/oversized CSV | Strict schema/size, normalized-company suppression, no outbound contact, negative tests | Consent flags and identities are unverified; mandatory human review |
+| Landing Page Studio (05) | HTML/script injection, form data leakage | Same-origin/offline CSP, textContent output, local-only validation, no submission | Browser-only validation cannot replace a protected backend |
+| Document Factory (06) | HTML injection, JSON ambiguity and excessive input | Bounded JSON, duplicate-key rejection, HTML encoding, tests | No template sandbox, signing, client document confidentiality or production guarantees |
+| Data Quality Auditor (07) | Poisoned anomaly baselines, CSV formula risks | Schema checks, rejected-record exclusion, input size cap and source hash | Heuristics are not authoritative and hashes alone do not authenticate senders |
+| Site Change Monitor (08) | Hostile local HTML, long diff computation, filesystem special files | No network, bounded input/diff, visible-text parsing, symlink/FIFO rejection on supported systems | Not a general-purpose browser parser; filesystem races and unsupported platforms require review |
 | Repositories and CI | Exposed secrets, malicious dependencies, compromised automation | No committed credentials; minimal runtime libraries; read-only token for tests; CodeQL workflow | Dependency and workflow supply-chain risk; GitHub security features/configuration must be verified |
 | AI-agent features (future) | Prompt injection, excessive agency, unauthorized tools, data exfiltration | **Policy only**: tool allowlists, trust-boundaries, least privilege, approvals, costs/time limits, logging required before implementation | No autonomous agent has been implemented or verified in this repository |
 
@@ -61,7 +66,7 @@ These requirements follow risk themes from [OWASP ASVS 5.0](https://owasp.org/ww
 - [Unit tests](.github/workflows/portfolio-ci.yml) run on changed demo files, with a limited read-only GitHub token.
 - [CodeQL scanning](.github/workflows/codeql.yml) is configured for Python using extended security queries. The workflow file being present is **not evidence that the scan has passed**; consult the actual GitHub Actions and Security results.
 - Public GitHub repositories may offer secret scanning and push protection; check the repository settings before relying on them.
-- No third-party runtime Python dependencies are used in demos 01–03; that reduces, but does not remove, supply-chain exposure.
+- Python demonstration scripts avoid third-party runtime packages; browser demo tests use Node's built-in runner. This reduces, but does not remove, supply-chain exposure.
 
 ## Cross-implementation differential testing (November 2026)
 
