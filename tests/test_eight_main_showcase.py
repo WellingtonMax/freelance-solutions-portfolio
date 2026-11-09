@@ -52,10 +52,12 @@ class MainShowcaseTests(unittest.TestCase):
         self.assertIn("human review", self.page.lower())
 
     def test_readme_matches_integrated_tree(self):
-        self.assertIn("Integrated prototype demos 04–08", self.readme)
+        self.assertIn("## The eight core projects", self.readme)
         self.assertNotIn("Planned portfolio expansion", self.readme)
         for number, (_, target) in EXPECTED.items():
             with self.subTest(project=number):
+                self.assertIn(f"| **{number} ·", self.readme)
+                self.assertIn(f"]({target})", self.readme)
                 self.assertTrue((ROOT / target).is_file())
 
 
