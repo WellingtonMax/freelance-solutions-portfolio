@@ -28,6 +28,17 @@ class LeadTriageTests(unittest.TestCase):
             self.assertEqual(result["leads"], [])
             self.assertTrue(any(r["reason"] == "opted out" for r in result["rejected"]))
 
+    def test_opt_out_with_invalid_contact_data_still_suppresses_company(self):
+        # Consent suppression must not depend on an email being syntactically valid
+        # or on a numeric openings field. Test both row orders.
+        candidate = "Acme,Engineer,5,no,a@acme.example,no"
+        opt_out = "Acme,Engineer,not-a-number,no,invalid,yes"
+        for rows in ((candidate, opt_out), (opt_out, candidate)):
+            with self.subTest(rows=rows):
+                result = analyze_bytes((HEADER + "\n".join(rows) + "\n").encode())
+                self.assertEqual(result["leads"], [])
+                self.assertTrue(any(r["reason"] == "opted out" for r in result["rejected"]))
+
     def test_agency_conflict_suppresses_company(self):
         csv_data = HEADER + (
             "Agency Co,Developer,3,no,one@agency.example,no\n"
