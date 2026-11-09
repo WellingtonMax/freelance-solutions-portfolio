@@ -12,6 +12,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from html import escape
 import json
+import os
 from pathlib import Path
 
 REQUIRED = {"order_id", "date", "product", "category", "quantity", "unit_price"}
@@ -163,10 +164,33 @@ def process(source: Path, report_path: Path, html_path: Path,
     report_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
     # Exclusive creation prevents clobbering prior reports or following symlinks.
-    with report_path.open("x", encoding="utf-8") as stream:
-        stream.write(json.dumps(result, indent=2, ensure_ascii=False))
-    with html_path.open("x", encoding="utf-8") as stream:
-        stream.write(render_html(result))
+    # Prepare both payloads before creating either output. A failed second
+    # write must not leave a misleading half-published report pair.
+    json_payload = json.dumps(result, indent=2, ensure_ascii=False)
+    html_payload = render_html(result)
+    created = []
+    try:
+        with report_path.open("x", encoding="utf-8") as stream:
+            created.append((report_path, os.fstat(stream.fileno())))
+            stream.write(json_payload)
+        with html_path.open("x", encoding="utf-8") as stream:
+            created.append((html_path, os.fstat(stream.fileno())))
+            stream.write(html_payload)
+    except OSError:
+        # Preserve the original I/O failure if cleanup itself fails.
+        # Check inode identity before cleanup: a concurrent replacement must
+        # not be mistaken for our output. This remains best-effort because a
+        # hostile writer could race between stat and unlink; use trusted dirs.
+        for path, original in reversed(created):
+            try:
+                current = path.lstat()
+                if (current.st_dev, current.st_ino) == (original.st_dev, original.st_ino):
+                    path.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError:
+                pass  # Preserve the original failure; manual cleanup may be needed.
+        raise
     return result
 
 
