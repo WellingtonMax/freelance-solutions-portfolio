@@ -177,11 +177,17 @@ def safe_csv(value) -> str:
 
 
 def export_rows(records: list[dict], fields: list[str], destination: Path) -> int:
-    if (not fields or len(fields) > 50 or len(fields) != len(set(fields))
-            or any(not SAFE_FIELD.fullmatch(field) for field in fields)):
+    if (not isinstance(fields, list) or not fields or len(fields) > 50
+            or any(not isinstance(field, str) or not SAFE_FIELD.fullmatch(field)
+                   for field in fields)
+            or len(fields) != len(set(fields))):
         raise ValueError("Provide 1–50 unique safe column names (letters, digits, underscore)")
-    if len(records) > MAX_RECORDS:
-        raise ValueError("API record limit exceeded")
+    if not isinstance(records, list) or len(records) > MAX_RECORDS:
+        raise ValueError("API record limit exceeded or invalid records")
+    # Reject malformed caller-supplied rows before creating any output artifact.
+    # This also protects direct library callers that bypass fetch_json validation.
+    if any(not isinstance(record, dict) for record in records):
+        raise ValueError("API records must be objects")
     destination.parent.mkdir(parents=True, exist_ok=True)
     # Exclusive create: never follow a pre-existing symlink or overwrite exports.
     with destination.open("x", encoding="utf-8", newline="") as stream:
