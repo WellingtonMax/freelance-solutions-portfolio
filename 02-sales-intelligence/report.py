@@ -12,6 +12,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from html import escape
 import json
+import os
 from pathlib import Path
 
 REQUIRED = {"order_id", "date", "product", "category", "quantity", "unit_price"}
@@ -170,19 +171,25 @@ def process(source: Path, report_path: Path, html_path: Path,
     created = []
     try:
         with report_path.open("x", encoding="utf-8") as stream:
-            created.append(report_path)
+            created.append((report_path, os.fstat(stream.fileno())))
             stream.write(json_payload)
         with html_path.open("x", encoding="utf-8") as stream:
-            created.append(html_path)
+            created.append((html_path, os.fstat(stream.fileno())))
             stream.write(html_payload)
     except OSError:
         # Preserve the original I/O failure if cleanup itself fails.
-        # Never remove files that were not created by this invocation.
-        for path in reversed(created):
+        # Check inode identity before cleanup: a concurrent replacement must
+        # not be mistaken for our output. This remains best-effort because a
+        # hostile writer could race between stat and unlink; use trusted dirs.
+        for path, original in reversed(created):
             try:
-                path.unlink(missing_ok=True)
+                current = path.lstat()
+                if (current.st_dev, current.st_ino) == (original.st_dev, original.st_ino):
+                    path.unlink()
+            except FileNotFoundError:
+                pass
             except OSError:
-                pass  # Best-effort cleanup; residual files require manual review.
+                pass  # Preserve the original failure; manual cleanup may be needed.
         raise
     return result
 
