@@ -12,6 +12,9 @@ class FilterMarkup(HTMLParser):
         self.buttons = []
         self.statuses = []
         self.rows = []
+        self.scroll_regions = []
+        self.region_has_table = []
+        self.div_stack = []
         self.in_audit = False
 
     def handle_starttag(self, tag, attrs):
@@ -24,10 +27,20 @@ class FilterMarkup(HTMLParser):
             self.statuses.append(attrs)
         if tag == "tr" and self.in_audit:
             self.rows.append(attrs)
+        if tag == "div":
+            is_scroll = "scroll" in attrs.get("class", "").split()
+            self.div_stack.append(is_scroll)
+            if is_scroll:
+                self.scroll_regions.append(attrs)
+                self.region_has_table.append(False)
+        if tag == "table" and self.div_stack and self.div_stack[-1]:
+            self.region_has_table[-1] = True
 
     def handle_endtag(self, tag):
         if tag == "tbody":
             self.in_audit = False
+        if tag == "div" and self.div_stack:
+            self.div_stack.pop()
 
 
 class AccessibleAuditFilterContract(unittest.TestCase):
@@ -52,9 +65,12 @@ class AccessibleAuditFilterContract(unittest.TestCase):
         parser = FilterMarkup()
         markup = (ROOT / "demo.html").read_text(encoding="utf-8")
         parser.feed(markup)
-        self.assertIn('class="scroll" role="region"', markup)
-        self.assertIn('aria-label="Audit table', markup)
-        self.assertIn('tabindex="0"><table>', markup)
+        self.assertEqual(len(parser.scroll_regions), 1)
+        region = parser.scroll_regions[0]
+        self.assertEqual(region.get("role"), "region")
+        self.assertEqual(region.get("tabindex"), "0")
+        self.assertTrue(region.get("aria-label", "").strip())
+        self.assertTrue(parser.region_has_table[0])
         css = (ROOT / "demo.css").read_text(encoding="utf-8")
         self.assertIn(".scroll:focus-visible{outline:", css)
 
