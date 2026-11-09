@@ -37,3 +37,45 @@ test("fictional sample click renders actual accepted/rejected CSV outputs", asyn
   assert.equal(element("copy-reject").disabled, false);
   assert.equal(element("result-heading").focused, true);
 });
+
+test("stale file read cannot unlock a newer validation", async () => {
+  const elements = new Map();
+  const element = id => {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result", disabled: false,
+      files: [], handlers: {}, focus() {}, select() {},
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  };
+  const context = {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: {}
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
+  const pending = [];
+  const file = () => ({
+    size: 100,
+    text: () => new Promise(resolve => pending.push(resolve))
+  });
+  element("source").files = [file()];
+  element("source").handlers.change();
+  const first = element("run").handlers.click();
+  assert.equal(element("run").disabled, true);
+  element("source").files = [file()];
+  element("source").handlers.change();
+  assert.equal(element("run").disabled, false, "new selection restores the action");
+  const second = element("run").handlers.click();
+  assert.equal(element("run").disabled, true);
+  pending[0](require("./sample-data.js"));
+  await first;
+  assert.equal(element("run").disabled, true, "stale completion cannot unlock current read");
+  assert.equal(element("result").hidden, true, "stale results remain hidden");
+  pending[1](require("./sample-data.js"));
+  await second;
+  assert.equal(element("run").disabled, false);
+  assert.equal(element("result").hidden, false);
+  assert.match(element("totals").textContent, /4 input rows/);
+});
