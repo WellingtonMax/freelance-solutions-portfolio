@@ -88,7 +88,7 @@ run.addEventListener("click", async () => {
       : "Preview complete: " + output.accepted.length + " accepted, " + output.rejected.length + " rejected. No data was transmitted.";
   } catch (error) {
     if (version === selectionVersion) {
-      feedback.textContent = "Unable to process: " + (error && typeof error.message === "string" ? error.message : "invalid input") + ". Your file was not uploaded.";
+      feedback.textContent = "Unable to read or validate this CSV. Check UTF-8 encoding and required headers, then try again. Your file was not uploaded.";
     }
   } finally {
     // An older read must not unlock a newer processing operation.
