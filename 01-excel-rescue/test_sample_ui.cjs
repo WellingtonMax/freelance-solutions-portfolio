@@ -101,7 +101,7 @@ test("file read failures show actionable feedback without exposing exception det
   element("source").handlers.change();
   await element("run").handlers.click();
   assert.match(element("feedback").textContent, /Check UTF-8 encoding and required headers/);
-  assert.doesNotMatch(element("feedback").textContent, /private\\/path|customer\\.csv/);
+  assert.equal(element("feedback").textContent.includes("private/path/customer.csv"), false);
   assert.equal(element("result").hidden, true);
   assert.equal(element("run").disabled, false);
 });
