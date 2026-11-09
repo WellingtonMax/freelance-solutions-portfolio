@@ -84,6 +84,15 @@ class AccessibleAuditFilterContract(unittest.TestCase):
         self.assertIn(".controls{flex-wrap:wrap;width:100%}", mobile_rules)
         self.assertIn(".controls button{flex:1 1 110px;min-width:0}", mobile_rules)
 
+    def test_small_mobile_metrics_use_two_columns_without_clipping(self):
+        """At narrow widths, three KPI columns compete for legible label space."""
+        css = (ROOT / "demo.css").read_text(encoding="utf-8")
+        self.assertIn("@media(max-width:420px){", css)
+        narrow = css.split("@media(max-width:420px){", 1)[1]
+        self.assertIn(".metrics{grid-template-columns:repeat(2,minmax(0,1fr))}", narrow)
+        self.assertIn(".bar-card{grid-column:1/-1}", narrow)
+        self.assertIn(".metric>span{display:block;overflow-wrap:anywhere}", narrow)
+
     def test_filter_logic_updates_pressed_state_rows_and_announcement(self):
         script = (ROOT / "demo.js").read_text(encoding="utf-8")
         self.assertIn('item.setAttribute("aria-pressed"', script)
