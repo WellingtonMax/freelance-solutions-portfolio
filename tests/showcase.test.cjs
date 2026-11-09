@@ -66,3 +66,15 @@ test('the discovery page exposes navigable sections and synthetic-data disclosur
   assert.match(html, /@media\(max-width:560px\)/);
   assert.doesNotMatch(work, /09\s*\/|10\s*\/|Bug Fix Laboratory|Business Operations API/i);
 });
+
+test('in-page navigation resolves to real, unique targets', () => {
+  const ids = [...html.matchAll(/\bid="([A-Za-z][\w:-]*)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length, 'duplicate id attributes break anchor navigation');
+  const known = new Set(ids);
+  const anchors = [...html.matchAll(/<a\b[^>]*\bhref="#([A-Za-z][\w:-]*)"/gi)]
+    .map(match => match[1]);
+  assert.ok(anchors.length > 0, 'expected at least one in-page navigation link');
+  for (const target of anchors) {
+    assert.ok(known.has(target), 'broken in-page navigation target: #' + target);
+  }
+});
