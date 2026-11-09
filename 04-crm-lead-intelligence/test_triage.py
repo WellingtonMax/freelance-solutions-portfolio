@@ -45,6 +45,13 @@ class LeadTriageTests(unittest.TestCase):
         value = HEADER + "=CMD(),Analyst,1,no,test@demo.example,no\n"
         self.assertFalse(analyze_bytes(value.encode())["leads"])
 
+    def test_unicode_expansion_cannot_bypass_field_limit(self):
+        # NFKC expands the ligature to three ASCII letters.
+        oversized = "ﬃ" * 54
+        result = analyze_bytes((HEADER + f"{oversized},Engineer,1,no,a@a.example,no\\n").replace("\\n", "\n").encode())
+        self.assertEqual(result["leads"], [])
+        self.assertIn("normalization", result["rejected"][0]["reason"])
+
     def test_unknown_header_fails_closed(self):
         with self.assertRaises(ValueError):
             analyze_bytes(b"company,role,agency\n")
