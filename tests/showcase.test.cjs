@@ -87,6 +87,7 @@ test('in-page navigation resolves to real, unique targets', () => {
   assert.equal(new Set(ids).size, ids.length, 'duplicate id attributes break anchor navigation');
   const known = new Set(ids);
   const anchors = linkDestinations(html)
+    .filter(href => href.startsWith('#'))
     .map(href => href.slice(1));
   assert.ok(anchors.length > 0, 'expected at least one in-page navigation link');
   for (const target of anchors) {
