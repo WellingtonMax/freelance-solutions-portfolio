@@ -233,3 +233,36 @@ test("switching to fictional sample ignores a late failed local read", async () 
   assert.match(element("totals").textContent, /4 input rows/);
   assert.doesNotMatch(element("feedback").textContent, /private|Unable to read/);
 });
+
+test("pending clipboard write disables repeat clicks and restores action on completion", async () => {
+  const elements = new Map();
+  const element = id => {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: id.startsWith("copy-"), files: [], handlers: {},
+      focus() {}, select() {}, addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  };
+  let finish;
+  let writes = 0;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: { clipboard: { writeText: () => {
+      writes++;
+      return new Promise(resolve => { finish = resolve; });
+    } } }
+  });
+  element("sample").handlers.click();
+  await element("run").handlers.click();
+  const pending = element("copy-clean").handlers.click();
+  assert.equal(element("copy-clean").disabled, true);
+  await element("copy-clean").handlers.click();
+  assert.equal(writes, 1, "a pending permission prompt must not trigger a second write");
+  finish();
+  await pending;
+  assert.equal(element("copy-clean").disabled, false);
+  assert.match(element("copy-feedback").textContent, /copied to clipboard/);
+});
