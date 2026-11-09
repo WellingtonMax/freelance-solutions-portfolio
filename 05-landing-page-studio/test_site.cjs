@@ -454,3 +454,17 @@ test('single-error API and field-level feedback stay consistent for hostile inpu
     assert.equal(validateEnquiry(fields), validateEnquiryFields(fields).error);
   }
 });
+
+
+test('rejects invisible and bidirectional spoofing across all enquiry fields', () => {
+  const {validateEnquiryAllFields} = require('./site.js');
+  const good = {name:'Fictional Person',email:'fictional@example.com',message:'A fictional project request'};
+  for (const marker of ['\u005cu200b','\u005cu202e','\u005cu2066','\u005cu2069','\u005cufeff']) {
+    for (const field of ['name','email','message']) {
+      const value = good[field];
+      const errors = validateEnquiryAllFields({...good,[field]:value.slice(0,2)+marker+value.slice(2)});
+      assert.ok(errors[field], `expected ${field} to reject U+${marker.codePointAt(0).toString(16)}`);
+    }
+  }
+  assert.deepEqual(validateEnquiryAllFields(good), {});
+});
