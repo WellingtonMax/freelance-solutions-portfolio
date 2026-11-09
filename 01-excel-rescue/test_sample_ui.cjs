@@ -201,3 +201,35 @@ test("hostile local filename is never echoed into visible status", () => {
   assert.doesNotMatch(element("feedback").textContent, /customer|<img|\\u202E/);
   assert.equal(element("result").hidden, true);
 });
+
+test("switching to fictional sample ignores a late failed local read", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: false, files: [], handlers: {},
+      focus() { this.focused = true; }, select() {},
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  let rejectRead;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: {}
+  });
+  element("source").files = [{ size: 20, text: () => new Promise((_resolve, reject) => { rejectRead = reject; }) }];
+  element("source").handlers.change();
+  const oldRun = element("run").handlers.click();
+  element("sample").handlers.click();
+  await element("run").handlers.click();
+  const status = element("feedback").textContent;
+  rejectRead(new Error("private/customer/records.csv"));
+  await oldRun;
+  assert.equal(element("feedback").textContent, status, "old error cannot replace sample success");
+  assert.equal(element("result").hidden, false);
+  assert.match(element("totals").textContent, /4 input rows/);
+  assert.doesNotMatch(element("feedback").textContent, /private|Unable to read/);
+});
