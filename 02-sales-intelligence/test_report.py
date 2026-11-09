@@ -3,6 +3,7 @@ import hashlib
 from decimal import Decimal
 from html import escape
 import io
+import os
 from pathlib import Path
 import tempfile
 import unittest
@@ -142,14 +143,18 @@ class ReportTests(unittest.TestCase):
             output_json = root / "out.json"
             output_html = root / "out.html"
             source.write_text(SAMPLE, encoding="utf-8")
+            # Prepare a distinct inode before the exporter creates its output.
+            # Unlink + recreate can recycle the original inode on Linux, making
+            # a supposedly different writer indistinguishable by st_dev/st_ino.
+            replacement = root / "other-writer.json"
+            replacement.write_text("replacement belongs to another writer",
+                                   encoding="utf-8")
             original_open = Path.open
 
             def replace_then_fail(path, *args, **kwargs):
                 if path == output_html and args and args[0] == "x":
-                    # Simulate another writer replacing our first output.
-                    output_json.unlink()
-                    output_json.write_text("replacement belongs to another writer",
-                                           encoding="utf-8")
+                    # Atomic rename preserves the distinct replacement inode.
+                    os.replace(replacement, output_json)
                     raise PermissionError("simulated second output failure")
                 return original_open(path, *args, **kwargs)
 
