@@ -34,7 +34,7 @@ class MainShowcaseTests(unittest.TestCase):
     def test_each_card_links_to_real_integrated_source(self):
         for number, (title, target) in EXPECTED.items():
             with self.subTest(project=number):
-                cards = re.findall(r"<article class=\"card\">[\\s\\S]*?</article>", self.page)
+                cards = re.findall(r'<article class="card">.*?</article>', self.page, flags=re.DOTALL)
                 matches = [card for card in cards if f"<span>{number} /" in card]
                 self.assertEqual(len(matches), 1)
                 self.assertIn(f"<h3>{title}</h3>", matches[0])
@@ -44,7 +44,7 @@ class MainShowcaseTests(unittest.TestCase):
     def test_prototype_labels_do_not_claim_production(self):
         for number in ("04", "05", "06", "07", "08"):
             card = next(card for card in re.findall(
-                r"<article class=\"card\">[\\s\\S]*?</article>", self.page
+                r'<article class="card">.*?</article>', self.page, flags=re.DOTALL
             ) if f"<span>{number} /" in card)
             self.assertIn("Prototype", card)
             self.assertNotIn("Production-ready", card)
