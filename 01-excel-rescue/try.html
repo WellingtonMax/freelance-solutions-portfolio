@@ -8,8 +8,8 @@
 <p>Choose a CSV file with the headers <code>name,email,signup_date,city</code> (any order). Processing happens in this browser tab. No uploads or external connections. Maximum 1 MB, 2,000 rows. Preview logic is independently implemented and is not a substitute for the Python CLI or production data validation.</p>
 <section class="panel"><h2>Local file preview</h2>
 <p><button id="sample" type="button">Try fictional sample</button> <span>or choose a local CSV below</span></p>
-<label for="source">Choose local CSV (UTF-8)</label><p><input id="source" type="file" accept=".csv,text/csv"></p>
-<button id="run" type="button">Validate CSV in this browser</button><p id="feedback" role="status" aria-live="polite">No file selected.</p>
+<label for="source">Choose local CSV (UTF-8)</label><p><input id="source" aria-describedby="feedback" type="file" accept=".csv,text/csv"></p>
+<button id="run" type="button" aria-controls="result" aria-describedby="feedback">Validate CSV in this browser</button><p id="feedback" role="status" aria-live="polite" aria-atomic="true">No file selected.</p>
 <div id="result" hidden><h3 id="result-heading" tabindex="-1">Review the records before using either output</h3><p id="totals"></p>
 <label for="clean">Accepted records — copyable CSV</label><button type="button" id="copy-clean" aria-describedby="copy-feedback" disabled>Copy accepted CSV</button><textarea id="clean" readonly rows="7"></textarea>
 <label for="reject">Needs manual review — rejected records CSV</label><button type="button" id="copy-reject" aria-describedby="copy-feedback" disabled>Copy rejected CSV</button><textarea id="reject" readonly rows="7"></textarea><p id="copy-feedback" role="status" aria-live="polite">Copy an output to use it locally. If copying is unavailable, select the CSV text manually.</p></div>
