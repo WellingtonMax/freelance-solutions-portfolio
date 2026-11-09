@@ -139,3 +139,40 @@ test("clipboard denial offers manual copy without leaking errors or claiming suc
   assert.equal(element("copy-clean").disabled, true);
   assert.equal(element("result").hidden, true);
 });
+
+
+test("late clipboard completion cannot announce success after changing CSV", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: id.startsWith("copy-"), files: [], handlers: {},
+      focus() { this.focused = true; },
+      select() { this.selected = true; },
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  let completeCopy;
+  const context = {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: { clipboard: { writeText: () => new Promise(resolve => {
+      completeCopy = resolve;
+    }) } }
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
+  element("sample").handlers.click();
+  await element("run").handlers.click();
+  const pendingCopy = element("copy-clean").handlers.click();
+  element("source").files = [{ name: "next.csv", size: 0 }];
+  element("source").handlers.change();
+  const expectedFeedback = element("copy-feedback").textContent;
+  completeCopy();
+  await pendingCopy;
+  assert.equal(element("copy-feedback").textContent, expectedFeedback);
+  assert.doesNotMatch(element("copy-feedback").textContent, /copied to clipboard/i);
+  assert.equal(element("copy-clean").disabled, true);
+  assert.equal(element("result").hidden, true);
+});
