@@ -11,6 +11,12 @@ const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const work = html.match(/<section\b[^>]*\bid="work"(?=[\s>])[^>]*>[\s\S]*?<\/section>/i)?.[0];
 
+// Only actual href attributes count; data-href is not a navigable destination.
+function linkDestinations(markup) {
+  return [...markup.matchAll(/<a\b[^>]*?\s+href\s*=\s*(?:"([^"]*)"|'([^']*)')/gi)]
+    .map(match => match[1] ?? match[2]);
+}
+
 test('the primary portfolio has exactly eight numbered cards in reading order', () => {
   assert.ok(work, 'missing #work section');
   const cards = [...work.matchAll(/<article\s+class="card[^"]*"[^>]*>[\s\S]*?<\/article>/gi)].map(m => m[0]);
@@ -29,7 +35,7 @@ test('every card offers a truthful destination, with no dead relative links', ()
   const cards = [...work.matchAll(/<article\s+class="card[^"]*"[^>]*>[\s\S]*?<\/article>/gi)].map(m => m[0]);
   for (const card of cards) {
     const title = card.match(/<h3>([^<]+)<\/h3>/)?.[1] || 'unknown';
-    const hrefs = [...card.matchAll(/<a\b[^>]*\bhref="([^"]+)"/gi)].map(m => m[1]);
+    const hrefs = linkDestinations(card);
     assert.ok(hrefs.length, title + ' needs at least one action');
     for (const href of hrefs) {
       assert.ok(!/^(?:javascript:|data:)/i.test(href), title + ': unsafe link scheme');
@@ -80,17 +86,17 @@ test('in-page navigation resolves to real, unique targets', () => {
   const ids = [...html.matchAll(/\bid="([A-Za-z][\w:-]*)"/g)].map(match => match[1]);
   assert.equal(new Set(ids).size, ids.length, 'duplicate id attributes break anchor navigation');
   const known = new Set(ids);
-  const anchors = [...html.matchAll(/<a\b[^>]*\bhref="#([A-Za-z][\w:-]*)"/gi)]
-    .map(match => match[1]);
+  const anchors = linkDestinations(html)
+    .map(href => href.slice(1));
   assert.ok(anchors.length > 0, 'expected at least one in-page navigation link');
   for (const target of anchors) {
     assert.ok(known.has(target), 'broken in-page navigation target: #' + target);
   }
 });
 
-// Regression: links remain auditable when accessibility/class attributes precede href.
-test('card link extraction handles attributes before href', () => {
-  const fixture = '<a class="action" aria-label="Open" href="missing.html">Broken</a>';
-  const hrefs = [...fixture.matchAll(/<a\b[^>]*\bhref="([^"]+)"/gi)].map(match => match[1]);
-  assert.deepEqual(hrefs, ['missing.html']);
+test('href extraction handles single quotes and ignores data-href decoys', () => {
+  const fixture = '<a data-href="missing.html" aria-label="Open" href=\'demo.html#results\'>Open</a>';
+  assert.deepEqual(linkDestinations(fixture), ['demo.html#results']);
+  assert.deepEqual(linkDestinations('<a data-href="fake.html">No destination</a>'), []);
+  assert.deepEqual(linkDestinations('<a class="action" href="real.html">Open</a>'), ['real.html']);
 });
