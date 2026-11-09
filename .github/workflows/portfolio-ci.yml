@@ -12,6 +12,9 @@ on:
       - '07-data-quality-auditor/**'
       - '08-site-change-monitor/**'
       - '.github/workflows/portfolio-ci.yml'
+      - 'index.html'
+      - 'README.md'
+      - 'tests/test_eight_main_showcase.py'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -47,6 +50,9 @@ jobs:
       - name: API Bridge
         working-directory: 03-api-bridge
         run: python -m unittest discover -v
+
+      - name: Eight-project main showcase links and status
+        run: python -m unittest discover -s tests -p 'test_eight_main_showcase.py' -v
 
       - name: CRM Lead Intelligence
         working-directory: 04-crm-lead-intelligence

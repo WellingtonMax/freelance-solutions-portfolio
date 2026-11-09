@@ -19,6 +19,11 @@ Yes. Every completed demonstration aims to include:
 | Messy spreadsheets, duplicate contacts, inconsistent dates | [Excel Rescue](01-excel-rescue/CASE_STUDY.md) | Cleaned CSV, error log, reusable script and tests |
 | You have sales exports but no clear monthly metrics | [Sales Intelligence](02-sales-intelligence/CASE_STUDY.md) | Reproducible summary, browser-viewable report, source code |
 | You copy data from a JSON API into spreadsheets manually | [API Bridge](03-api-bridge/CASE_STUDY.md) | Configurable API export, tests, security notes and instructions |
+| You need a review-only fictional sales lead queue | [CRM Lead Intelligence](04-crm-lead-intelligence/README.md) | Bounded CSV triage, company suppression and review findings; no outreach |
+| You need an offline small-business page | [Landing Page Studio](05-landing-page-studio/index.html) | Responsive page with local-only validation; no live form submission |
+| You need repeatable quotation output | [Document Factory](06-document-factory/README.md) | JSON-to-HTML quotation, synthetic sample and tests |
+| You need to audit inconsistent CSV records | [Data Quality Auditor](07-data-quality-auditor/README.md) | Schema checks, deduplication/anomaly findings and audit trail |
+| You need to compare permitted local HTML snapshots | [Site Change Monitor](08-site-change-monitor/README.md) | Offline text-only change comparison; no crawling or notifications |
 
 ## A predictable project workflow
 
@@ -39,6 +44,6 @@ This portfolio was developed with AI assistance and human review. AI tools can h
 ## Current limits
 
 - This repository is a **portfolio-in-progress**.
-- Three projects have source, sample data and automated test files; passing CI/test results must be verified independently before claiming success.
-- Planned projects are not represented as finished.
+- Eight numbered projects are now integrated in main with source, synthetic examples and tests; project 04–08 workflows are **prototypes**, not client-ready products. Passing CI/test results must be verified for the exact commit before claiming success.
+- No prototype is represented as a completed customer contract or production deployment.
 - No paid-client references, fabricated testimonials or invented performance metrics are used.
