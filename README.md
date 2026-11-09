@@ -14,6 +14,25 @@
 | [02 Sales Intelligence](02-sales-intelligence/) | Sales KPIs in JSON and a portable HTML report | Python standard library | Implemented; verify CI |
 | [03 API Bridge](03-api-bridge/) | Controlled JSON-to-CSV API export with retries | Python standard library | Implemented; verify CI |
 
+## Client-ready walkthroughs (fictional demonstrations)
+
+Each case study explains a hypothetical business request, deliverables, a reproducible local verification procedure, and the limits of the demonstration. These are **not client contracts or testimonials**. Development is **AI-assisted** and requires **human review** before client delivery.
+
+| Business need | Case study | Inspect the evidence | Deployment status |
+|---|---|---|---|
+| Clean unreliable CRM contact exports | [Excel Rescue case study](01-excel-rescue/CASE_STUDY.md) | [Synthetic CSV](01-excel-rescue/sample.csv) · [Offline sample audit](01-excel-rescue/demo.html) · [Tests](01-excel-rescue/test_clean.py) | Offline demonstration; not production-ready |
+| Understand sales from exported transactions | [Sales Intelligence case study](02-sales-intelligence/CASE_STUDY.md) | [Synthetic sales CSV](02-sales-intelligence/sample_sales.csv) · [Tests](02-sales-intelligence/test_report.py) | Offline demonstration; not production-ready |
+| Export permitted API data to CSV | [API Bridge case study](03-api-bridge/CASE_STUDY.md) | [Exporter](03-api-bridge/bridge.py) · [Mocked transport tests](03-api-bridge/test_bridge.py) | Integration prototype; not production-ready |
+
+**How to evaluate:** open a case study, run its documented commands locally, inspect generated outputs, and review [security controls and residual risks](SECURITY.md). GitHub Actions status must be checked against the relevant commit; a configured workflow alone is not proof of passing tests. The API example may require network access; its automated tests use a simulated transport. No real customer data or credentials are included.
+
+
+## Veterinary membership & rewards — independent concept demo
+
+**[PawLedger: interactive veterinary loyalty dashboard](demos/vet-loyalty/index.html)** · [Source, technical boundaries and production plan](demos/vet-loyalty/README.md) · [Rewards engine tests](demos/vet-loyalty/test_engine.mjs)
+
+Responsive two-hospital concept with fictional members, enrollment, percentage rewards, buy-X-get-one vouchers, simulated purchases and redemptions, searchable records and safe synthetic CSV export. Pure JavaScript rewards engine tests include idempotency, integer cents and tenant-scoping checks. **In-memory portfolio demo only:** no persistence, authentication, live Stripe or real client association.
+
 ## Product lab: critical mineral procurement intelligence
 
 **[StrataSignal](https://github.com/WellingtonMax/stratasignal)** is maintained in its own product repository. It provides local sourcing concentration, stock scenarios, metadata triage, experimental delay estimates and reporting-period comparisons. See the [product scope](https://github.com/WellingtonMax/stratasignal/blob/main/README.md), [market research](https://github.com/WellingtonMax/stratasignal/blob/main/docs/MARKET_RESEARCH_PT.md) and [synthetic monthly demonstration](https://github.com/WellingtonMax/stratasignal/blob/main/demo/monthly/report.html) (download to open locally). The portfolio keeps the showcase and links; implementation, tests and product development belong in the standalone repository. Commercial validation remains pending.
