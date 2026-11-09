@@ -41,6 +41,15 @@ test('every card offers a truthful destination, with no dead relative links', ()
         const target = path.resolve(root, decodeURIComponent(href.split('#')[0]));
         assert.ok(target.startsWith(root + path.sep), title + ': path escapes repository');
         assert.ok(fs.existsSync(target), title + ': missing target ' + href);
+        const fragment = href.split('#')[1];
+        if (fragment) {
+          assert.ok(/\\.html?$/i.test(target), title + ': fragment requires an HTML file');
+          const decoded = decodeURIComponent(fragment);
+          assert.match(decoded, /^[A-Za-z][\\w:-]*$/, title + ': invalid fragment identifier');
+          const targetHtml = fs.readFileSync(target, 'utf8');
+          const ids = [...targetHtml.matchAll(/\\bid="([^"]+)"/g)].map(match => match[1]);
+          assert.ok(ids.includes(decoded), title + ': missing fragment target #' + decoded);
+        }
       }
     }
   }
