@@ -9,7 +9,7 @@ const path = require('node:path');
 
 const root = path.resolve(__dirname, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const work = html.match(/<section\s+id="work"\b[\s\S]*?<\/section>/i)?.[0];
+const work = html.match(/<section\b[^>]*\bid="work"(?=[\s>])[^>]*>[\s\S]*?<\/section>/i)?.[0];
 
 test('the primary portfolio has exactly eight numbered cards in reading order', () => {
   assert.ok(work, 'missing #work section');
