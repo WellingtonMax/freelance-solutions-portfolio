@@ -468,3 +468,16 @@ test('rejects invisible and bidirectional spoofing across all enquiry fields', (
   }
   assert.deepEqual(validateEnquiryAllFields(good), {});
 });
+
+
+test('rejects invisible formatting at trimmed field boundaries', () => {
+  const {validateEnquiryAllFields} = require('./site.js');
+  const good = {name:'Fictional Person',email:'sample@example.com',message:'A fictional project request'};
+  for (const key of ['name', 'email', 'message']) {
+    for (const hidden of ['\\uFEFF', '\\u000B', '\\u000C']) {
+      const actual = JSON.parse('"' + hidden + '"');
+      assert.ok(validateEnquiryAllFields({...good,[key]:actual + good[key]})[key], key + ' leading ' + hidden);
+      assert.ok(validateEnquiryAllFields({...good,[key]:good[key] + actual})[key], key + ' trailing ' + hidden);
+    }
+  }
+});
