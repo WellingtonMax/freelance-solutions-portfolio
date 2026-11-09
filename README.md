@@ -6,7 +6,7 @@
 
 **Approach:** security-aware scope and threat modeling → implementation → negative/security tests → documentation → human review. AI-assisted development is disclosed; outcomes are verified before delivery. All sample organizations and data are fictional.
 
-## Implemented demonstrations (unit tests and adversarial checks configured in GitHub Actions; check current CI status)
+## Implemented demonstrations 01–03 (unit tests and adversarial checks configured in GitHub Actions; check current CI status)
 
 | Project | What a client receives | Tech | Status |
 |---|---|---|---|
@@ -41,22 +41,26 @@ Responsive two-hospital concept with fictional members, enrollment, percentage r
 
 **[Document Flow — Word + PandaDoc-style variable template](demos/document-flow/)** · [Interactive preview](demos/document-flow/index.html) — merge a simulated Word revision into a variable-ready source, edit 12 fictional fields, preview the result, export CSV field mapping and a sample API JSON payload, and generate four sample Word files with automated tests. **Offline demonstration only:** no real PandaDoc API call, signing integration, or commercial customer data.
 
-## Planned portfolio expansion (not implemented yet)
+## Integrated prototype demos 04–08 (fictional, AI-assisted, human review required)
 
-4. **CRM Workflow:** lead normalization, rules engine, follow-up queues.
-5. **Landing Page Studio:** accessible, responsive site with validated contact form.
-6. **Document Factory:** batch generation of reports and PDF documents.
-7. **Data Quality Auditor:** schema checks, anomaly reports, data lineage.
-8. **Web Monitor:** permitted website status/change alerts without bypassing access restrictions.
-9. **Bug Fix Laboratory:** documented regression cases, patches and automated tests.
-10. **Business Operations API:** documented CRUD API, permissions and integration tests.
+These five sources and synthetic fixtures were integrated via [PR #54](https://github.com/WellingtonMax/freelance-solutions-portfolio/pull/54). The corresponding CI and CodeQL workflows succeeded for the **PR head**; check current main-branch checks separately. These are not paid client projects, production services, or verified commercial deployments.
+
+| Project | Demonstration | Evidence and boundaries |
+|---|---|---|
+| [04 CRM Lead Intelligence](04-crm-lead-intelligence/) | CSV-based, review-only lead prioritization with company-wide suppression | [README](04-crm-lead-intelligence/README.md) · [Synthetic CSV](04-crm-lead-intelligence/sample.csv) · [Tests](04-crm-lead-intelligence/test_triage.py); no outreach |
+| [05 Landing Page Studio](05-landing-page-studio/) | Responsive offline page and local enquiry validation | [Open HTML demo](05-landing-page-studio/index.html) · [README](05-landing-page-studio/README.md) · [Tests](05-landing-page-studio/test_site.cjs); no submission |
+| [06 Document Factory](06-document-factory/) | HTML quotation generation from bounded fictional JSON | [README](06-document-factory/README.md) · [Sample](06-document-factory/sample.json) · [Tests](06-document-factory/test_factory.py); no signing or PDF claim |
+| [07 Data Quality Auditor](07-data-quality-auditor/) | Offline CSV rule checks, anomaly findings, input hash | [README](07-data-quality-auditor/README.md) · [Synthetic CSV](07-data-quality-auditor/sample.csv) · [Tests](07-data-quality-auditor/test_audit.py) |
+| [08 Site Change Monitor](08-site-change-monitor/) | Offline comparison of authorized HTML snapshots | [README](08-site-change-monitor/README.md) · [Sample before](08-site-change-monitor/before.html) / [after](08-site-change-monitor/after.html) · [Tests](08-site-change-monitor/test_compare.py); no live scraping |
+
+**Readiness:** all five are integrated prototypes with tested code paths, **not yet commercially viable**. Desktop/mobile hands-on walkthroughs, browser/accessibility validation (where relevant), release-specific security reviews and complete client-facing case studies remain open.
 
 ## Quality and ethical boundaries
 
 - Never present these demos as completed paid contracts or customer testimonials.
 - No client data, credentials, private repositories or proprietary material in these examples.
 - Automated tests cover demonstrated behavior; further security and environment-specific testing is needed for deployment.
-- Dependencies are deliberately minimized: projects 1–3 run with Python 3.11+ and the standard library.
+- Dependencies are deliberately minimized: Python-based demo scripts use the standard library; the Landing Page Studio tests use Node.js.
 - Each project README includes reproducible commands.
 
 **Maintainer:** WellingtonMax. **Workflow:** AI-assisted development with responsible human review.
