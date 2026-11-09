@@ -36,7 +36,7 @@ source.addEventListener("change", () => {
   resetPreview();
   const file = selectedFile();
   feedback.textContent = file
-    ? "Selected: " + file.name + ". Ready to process locally."
+    ? "CSV file selected. Ready to process locally."
     : "Choose a fictional CSV file to preview locally.";
 });
 sampleButton.addEventListener("click", () => {
