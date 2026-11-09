@@ -48,6 +48,16 @@ class AccessibleAuditFilterContract(unittest.TestCase):
         self.assertEqual(parser.statuses[0].get("role"), "status")
         self.assertEqual(parser.statuses[0].get("aria-live"), "polite")
 
+    def test_wide_audit_table_can_receive_keyboard_focus(self):
+        parser = FilterMarkup()
+        markup = (ROOT / "demo.html").read_text(encoding="utf-8")
+        parser.feed(markup)
+        self.assertIn('class="scroll" role="region"', markup)
+        self.assertIn('aria-label="Audit table', markup)
+        self.assertIn('tabindex="0"><table>', markup)
+        css = (ROOT / "demo.css").read_text(encoding="utf-8")
+        self.assertIn(".scroll:focus-visible{outline:", css)
+
     def test_filter_logic_updates_pressed_state_rows_and_announcement(self):
         script = (ROOT / "demo.js").read_text(encoding="utf-8")
         self.assertIn('item.setAttribute("aria-pressed"', script)
