@@ -125,6 +125,27 @@ class BridgeTests(unittest.TestCase):
                         export_rows([{"id": 1}], fields, output)
                     self.assertFalse(output.exists())
 
+    def test_serialization_failure_leaves_no_partial_csv(self):
+        class BrokenValue:
+            def __str__(self):
+                raise RuntimeError("synthetic serialization failure")
+
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            with self.assertRaisesRegex(RuntimeError, "serialization failure"):
+                export_rows([{"id": 1}, {"id": BrokenValue()}], ["id"], output)
+            self.assertFalse(output.exists())
+            self.assertEqual(list(Path(temp).iterdir()), [])
+
+    def test_existing_export_survives_publish_collision(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            output.write_text("original", encoding="utf-8")
+            with self.assertRaises(FileExistsError):
+                export_rows([{"id": 2}], ["id"], output)
+            self.assertEqual(output.read_text(encoding="utf-8"), "original")
+            self.assertEqual(list(Path(temp).iterdir()), [output])
+
     def test_block_csv_column_formula_and_overwrite(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "out.csv"
