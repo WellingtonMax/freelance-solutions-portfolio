@@ -54,12 +54,8 @@ def analyze_bytes(data):
                     raise ValueError("invalid number of columns")
                 company = safe_text(row["company"])
                 role = safe_text(row["role"])
-                email = row["email"].strip()
-                if len(email) > 254 or not EMAIL.fullmatch(email):
-                    raise ValueError("email syntax invalid (not verification)")
-                openings = int(row["openings"])
-                if not 0 <= openings <= 1000:
-                    raise ValueError("openings out of range")
+                # Suppression is a company-level safety decision. Do not allow an
+                # invalid email or openings count to bypass a valid opt-out.
                 agency = yes_no(row["agency"])
                 opted_out = yes_no(row["opt_out"])
                 key = company.casefold()
@@ -73,6 +69,12 @@ def analyze_bytes(data):
                 if key in suppressed:
                     rejected.append({"row": number, "reason": "company suppressed by another row"})
                     continue
+                email = row["email"].strip()
+                if len(email) > 254 or not EMAIL.fullmatch(email):
+                    raise ValueError("email syntax invalid (not verification)")
+                openings = int(row["openings"])
+                if not 0 <= openings <= 1000:
+                    raise ValueError("openings out of range")
                 score = min(openings * 10, 60) + (15 if any(
                     word in role.casefold() for word in ("engineer", "developer", "security")
                 ) else 0)
