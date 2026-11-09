@@ -79,3 +79,29 @@ test("stale file read cannot unlock a newer validation", async () => {
   assert.equal(element("result").hidden, false);
   assert.match(element("totals").textContent, /4 input rows/);
 });
+
+
+test("file read failures show actionable feedback without exposing exception details", async () => {
+  const elements = new Map();
+  const element = id => {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result", disabled: false,
+      files: [], handlers: {}, focus() {}, select() {},
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: {}
+  });
+  element("source").files = [{ size: 10, text: async () => { throw new Error("private/path/customer.csv"); } }];
+  element("source").handlers.change();
+  await element("run").handlers.click();
+  assert.match(element("feedback").textContent, /Check UTF-8 encoding and required headers/);
+  assert.doesNotMatch(element("feedback").textContent, /private\\/path|customer\\.csv/);
+  assert.equal(element("result").hidden, true);
+  assert.equal(element("run").disabled, false);
+});
