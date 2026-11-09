@@ -43,11 +43,11 @@ test('every card offers a truthful destination, with no dead relative links', ()
         assert.ok(fs.existsSync(target), title + ': missing target ' + href);
         const fragment = href.split('#')[1];
         if (fragment) {
-          assert.ok(/\\.html?$/i.test(target), title + ': fragment requires an HTML file');
+          assert.ok(/\.html?$/i.test(target), title + ': fragment requires an HTML file');
           const decoded = decodeURIComponent(fragment);
-          assert.match(decoded, /^[A-Za-z][\\w:-]*$/, title + ': invalid fragment identifier');
+          assert.match(decoded, /^[A-Za-z][\w:-]*$/, title + ': invalid fragment identifier');
           const targetHtml = fs.readFileSync(target, 'utf8');
-          const ids = [...targetHtml.matchAll(/\\bid="([^"]+)"/g)].map(match => match[1]);
+          const ids = [...targetHtml.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
           assert.ok(ids.includes(decoded), title + ': missing fragment target #' + decoded);
         }
       }
