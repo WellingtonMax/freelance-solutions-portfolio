@@ -1,0 +1,7 @@
+record_id,category,amount,updated_at
+STK-001,Components,24.00,2026-11-05
+STK-002,Components,26.00,2026-11-05
+STK-003,Logistics,30.00,2026-11-05
+STK-004,Components,25.00,2026-11-05
+STK-005,Logistics,990.00,2026-11-05
+STK-002,Components,INVALID,2026-02-31
