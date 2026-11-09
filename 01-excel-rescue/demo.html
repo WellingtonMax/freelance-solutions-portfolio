@@ -23,7 +23,7 @@
 <div class="workspace">
 <section class="panel audit" aria-labelledby="audit-title"><div class="panel-head"><div><h2 id="audit-title" tabindex="-1">Record validation audit</h2><p>Inspect the decisions made on a fixed, fictional CSV sample.</p></div><span class="sample-pill">sample.csv</span></div>
 <div class="toolbar"><div class="controls" role="group" aria-label="Filter audit rows"><button type="button" data-view="all" aria-pressed="true">All records (4)</button><button type="button" data-view="accepted" aria-pressed="false">Accepted (1)</button><button type="button" data-view="rejected" aria-pressed="false">Rejected (3)</button></div><span class="quiet">Audit trail · 4 sample records</span></div>
-<div class="scroll"><table><caption>Expected audit of the versioned synthetic sample</caption><thead><tr><th scope="col">CSV line</th><th scope="col">Name</th><th scope="col">Normalized email</th><th scope="col">Outcome</th><th scope="col">Reason</th></tr></thead><tbody id="audit">
+<div class="scroll" role="region" aria-label="Audit table — scroll horizontally to view all columns" tabindex="0"><table><caption>Expected audit of the versioned synthetic sample</caption><thead><tr><th scope="col">CSV line</th><th scope="col">Name</th><th scope="col">Normalized email</th><th scope="col">Outcome</th><th scope="col">Reason</th></tr></thead><tbody id="audit">
 <tr data-status="rejected"><td>2</td><td>Alice Silva</td><td>alice@example.com</td><td>Rejected</td><td>Duplicate email</td></tr>
 <tr data-status="accepted"><td>3</td><td>Bob Lima</td><td>bob@example.com</td><td>Accepted</td><td>Valid; date 2026-11-02</td></tr>
 <tr data-status="rejected"><td>4</td><td>Alice duplicate</td><td>alice@example.com</td><td>Rejected</td><td>Duplicate email</td></tr>
