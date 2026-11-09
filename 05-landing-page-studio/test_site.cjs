@@ -442,3 +442,15 @@ test('multi-field summary states the remaining error count after each correction
   inputs.message.listeners.input();
   assert.match(feedback.textContent, /All highlighted errors are resolved/);
 });
+
+
+test('single-error API and field-level feedback stay consistent for hostile inputs', () => {
+  const {validateEnquiry, validateEnquiryFields} = require('./site.js');
+  const good = {name:'Fictional Person', email:'fictional@example.com', message:'A fictional project request'};
+  const cases = [good, {...good,name:''}, {...good,name:'A\u0001B'},
+    {...good,email:'invalid'}, {...good,email:'a\u200bb@example.com'},
+    {...good,message:'short'}, {...good,message:42}, null];
+  for (const fields of cases) {
+    assert.equal(validateEnquiry(fields), validateEnquiryFields(fields).error);
+  }
+});
