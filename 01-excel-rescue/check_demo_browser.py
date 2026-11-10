@@ -5,8 +5,12 @@ Run from the repository root after installing Playwright and Chromium:
     python -m playwright install chromium
     python 01-excel-rescue/check_demo_browser.py
 
+For a preinstalled system Chromium, set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH
+(e.g. /usr/bin/chromium). The default uses Playwright's managed Chromium.
+
 This is an opt-in browser check, not a screen-reader certification.
 """
+import os
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 
@@ -54,7 +58,12 @@ def check(browser, width):
 
 if __name__ == "__main__":
     with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(headless=True)
+        executable = os.environ.get("PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH")
+        if executable and not Path(executable).is_file():
+            raise FileNotFoundError(f"Chromium executable not found: {executable}")
+        browser = playwright.chromium.launch(
+            headless=True, **({"executable_path": executable} if executable else {})
+        )
         try:
             for width in (320, 375):
                 check(browser, width)
