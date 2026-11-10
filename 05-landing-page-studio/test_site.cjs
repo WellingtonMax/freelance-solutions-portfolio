@@ -508,3 +508,15 @@ test('rejects ambiguous local-part dots and lengths above 64 characters', () => 
   assert.equal(validateEnquiry({...good,email:'a'.repeat(64)+'@example.com'}),null);
   assert.equal(validateEnquiry({...good,email:'first.last@example.com'}),null);
 });
+
+test('multiline fictional summaries work without permitting hostile control characters', () => {
+  const {validateEnquiryAllFields} = require('./site.js');
+  const good = {name:'Fictional Person', email:'fictional@example.com', message:'Plan the workspace\nReview the budget\nConfirm the layout'};
+  assert.deepEqual(validateEnquiryAllFields(good), {});
+  assert.deepEqual(validateEnquiryAllFields({...good, message:good.message.replaceAll('\n','\r\n')}), {});
+  for (const marker of ['\u0000','\u0001','\u000b','\u001b','\u007f','\u200b','\u202e']) {
+    assert.ok(validateEnquiryAllFields({...good,message:good.message + marker}).message);
+  }
+  assert.ok(validateEnquiryAllFields({...good,name:'Fictional\nPerson'}).name);
+  assert.ok(validateEnquiryAllFields({...good,email:'fictional\n@example.com'}).email);
+});
