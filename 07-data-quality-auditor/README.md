@@ -20,7 +20,7 @@ python -m unittest discover -v
 - Negative tests for malformed CSV, formula-like IDs, duplicates and invalid dates.
 
 ## Security & limits
-Untrusted CSV enters a local, read-only Python tool and is converted to JSON; no network requests or credential handling. The anomaly heuristic may miss fraud or flag legitimate purchases, and is not machine learning. Row-number location assumes conventional line-oriented CSV; embedded newlines may make physical line references imprecise. A production pipeline needs approved schemas, retention policy, source authentication and access controls.
+Untrusted CSV enters a local, read-only Python tool and is converted to JSON; no network requests or credential handling. The CLI now reads at most 1 MB plus one byte from an opened regular-file descriptor and rejects final symlinks where `O_NOFOLLOW` exists. Parent-directory symlinks, path races before opening, platform differences, and filesystem permission policy remain outside this control. The anomaly heuristic may miss fraud or flag legitimate purchases, and is not machine learning. Row-number location assumes conventional line-oriented CSV; embedded newlines may make physical line references imprecise. A production pipeline needs approved schemas, retention policy, source authentication and access controls.
 
 **Status:** tested locally only when recorded by an actual run; **prototype, not production-ready. Fictional demonstration / AI-assisted development / human review required.**
 

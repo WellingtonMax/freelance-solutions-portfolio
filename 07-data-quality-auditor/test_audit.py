@@ -1,10 +1,40 @@
 import unittest
+import os
+import tempfile
+from pathlib import Path
+from audit import read_input
 from audit import audit, MAX_BYTES
 
 HEADER = "record_id,category,amount,updated_at\n"
 
 
 class AuditTests(unittest.TestCase):
+    def test_bounded_regular_file_read(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "sample.csv"
+            payload = (HEADER + "A001,Parts,10.00,2026-11-05\\n").encode()
+            path.write_bytes(payload)
+            self.assertEqual(read_input(path), payload)
+            path.write_bytes(b"x" * (MAX_BYTES + 1))
+            with self.assertRaisesRegex(ValueError, "1 MB"):
+                read_input(path)
+
+    def test_reject_directory_and_final_symlink(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with self.assertRaisesRegex(ValueError, "regular file"):
+                read_input(root)
+            target = root / "target.csv"
+            target.write_bytes(HEADER.encode())
+            link = root / "link.csv"
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("symlink creation unavailable")
+            if hasattr(os, "O_NOFOLLOW"):
+                with self.assertRaises(OSError):
+                    read_input(link)
+
     def test_clean_data(self):
         data = HEADER + "A001,Hardware,120.00,2026-11-05\n"
         result = audit(data.encode())

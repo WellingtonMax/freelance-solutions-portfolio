@@ -3,6 +3,8 @@ import argparse
 import csv
 import hashlib
 import io
+import os
+import stat
 import json
 import re
 from datetime import date
@@ -82,13 +84,33 @@ def audit(data):
             "issue_count": len(issues)}
 
 
+def read_input(path):
+    """Bound untrusted local reads; reject non-regular files and final symlinks where supported."""
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("input must be a regular file")
+        with os.fdopen(fd, "rb") as stream:
+            fd = -1
+            data = stream.read(MAX_BYTES + 1)
+    finally:
+        if fd != -1:
+            os.close(fd)
+    if len(data) > MAX_BYTES:
+        raise ValueError("CSV exceeds 1 MB")
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(description="Offline CSV schema and quality checks")
     parser.add_argument("input_csv", type=Path)
     args = parser.parse_args()
-    if args.input_csv.stat().st_size > MAX_BYTES:
-        parser.error("CSV exceeds 1 MB")
-    print(json.dumps(audit(args.input_csv.read_bytes()), indent=2))
+    try:
+        result = audit(read_input(args.input_csv))
+    except (OSError, ValueError) as exc:
+        parser.error(str(exc))
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
