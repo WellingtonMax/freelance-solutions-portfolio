@@ -43,7 +43,9 @@ jobs:
         run: python -m unittest discover -v
       - name: Browser CSV preview (Node.js built-in test runner)
         working-directory: 01-excel-rescue
-        run: node --test test_try.cjs
+        run: |
+          node --test test_try.cjs
+          node try-ui.test.cjs
       - name: Sales Intelligence
         working-directory: 02-sales-intelligence
         run: python -m unittest discover -v
