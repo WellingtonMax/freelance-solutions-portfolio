@@ -21,7 +21,9 @@ def main():
                 page.on("request", lambda request: requests.append(request.url)
                         if not request.url.startswith("file:") else None)
                 page.goto(PAGE)
-                page.locator("#enquiry button").click()
+                # Keyboard-only submission must move focus to the first invalid field.
+                page.locator("#enquiry button").focus()
+                page.keyboard.press("Enter")
                 assert page.locator("#full-name").get_attribute("aria-invalid") == "true"
                 assert page.locator("#full-name").evaluate("(el) => document.activeElement === el")
                 assert "Nothing was sent" in page.locator("#feedback").inner_text()
