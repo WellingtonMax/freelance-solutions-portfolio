@@ -41,7 +41,7 @@ test('feedback is associated with fields and remains local', () => {
     assert.match(html,new RegExp('aria-describedby="'+key+'-error"'));
   }
   assert.ok(js.includes('inputs[invalidFields[0]].focus()'));
-  assert.ok(js.includes('setAttribute("aria-invalid","true")'));
+  assert.match(js, /setAttribute\(\s*["']aria-invalid["']\s*,\s*["']true["']\s*\)/);
   assert.match(html,/Nothing has been checked yet/);
 });
 
