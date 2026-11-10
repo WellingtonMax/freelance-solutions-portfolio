@@ -2,6 +2,8 @@
 import argparse
 import html
 import json
+import os
+import stat
 import re
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
@@ -95,14 +97,33 @@ def render(doc):
             " Not an invoice or payment request.</footer></main></body></html>\n")
 
 
+def read_document(path):
+    """Read a bounded regular file from an open descriptor, not a pre-read stat."""
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("input must be a regular file")
+        with os.fdopen(fd, "rb") as stream:
+            fd = -1
+            raw = stream.read(MAX_BYTES + 1)
+    finally:
+        if fd != -1:
+            os.close(fd)
+    if len(raw) > MAX_BYTES:
+        raise ValueError("JSON exceeds 150 KB")
+    return raw
+
+
 def main():
     parser = argparse.ArgumentParser(description="Offline document generation (HTML only)")
     parser.add_argument("input_json", type=Path)
     parser.add_argument("output_html", type=Path)
     args = parser.parse_args()
-    if args.input_json.stat().st_size > MAX_BYTES:
-        parser.error("JSON exceeds 150 KB")
-    doc = parse_document(args.input_json.read_bytes())
+    try:
+        doc = parse_document(read_document(args.input_json))
+    except (OSError, ValueError) as exc:
+        parser.error(str(exc))
     # Exclusive create; refuses overwrites and existing symlinks.
     with args.output_html.open("x", encoding="utf-8") as handle:
         handle.write(render(doc))
