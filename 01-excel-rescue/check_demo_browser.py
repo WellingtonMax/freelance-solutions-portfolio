@@ -34,7 +34,7 @@ def check(browser, width):
             assert button.get_attribute("aria-pressed") == "true"
             assert page.locator("#audit tr:visible").count() == count
             assert page.locator("#audit tr[hidden]").count() == 4 - count
-            assert buttons.locator('[aria-pressed="true"]').count() == 1
+            assert page.locator('button[data-view][aria-pressed="true"]').count() == 1
             assert str(count) in page.locator("#filter-status").inner_text()
             assert button.evaluate("(el) => el.getBoundingClientRect().height") >= 44
         region = page.locator(".scroll")
