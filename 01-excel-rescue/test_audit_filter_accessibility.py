@@ -93,6 +93,12 @@ class AccessibleAuditFilterContract(unittest.TestCase):
         self.assertIn(".bar-card{grid-column:1/-1}", narrow)
         self.assertIn(".metric>span{display:block;overflow-wrap:anywhere}", narrow)
 
+    def test_filter_touch_targets_have_minimum_height(self):
+        """Guard the CSS touch-target contract; rendered sizes still need browser review."""
+        css = (ROOT / "demo.css").read_text(encoding="utf-8")
+        self.assertIn(".controls button{min-height:44px;", css)
+        self.assertIn(".controls button{flex:1 1 110px;min-width:0}", css)
+
     def test_filter_logic_updates_pressed_state_rows_and_announcement(self):
         script = (ROOT / "demo.js").read_text(encoding="utf-8")
         self.assertIn('item.setAttribute("aria-pressed"', script)
