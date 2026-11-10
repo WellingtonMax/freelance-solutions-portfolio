@@ -69,6 +69,35 @@ class LeadTriageTests(unittest.TestCase):
         self.assertFalse(result["leads"])
         self.assertIn("opted out", [entry["reason"] for entry in result["rejected"]])
 
+    def test_ambiguous_opt_out_suppresses_company_in_any_order(self):
+        rows = [
+            "Acme,Engineer,4,no,valid@acme.example,no",
+            "Acme,Engineer,1,no,other@acme.example,unknown",
+            "Acme,Engineer,8,no,later@acme.example,no",
+        ]
+        for ordering in (rows, list(reversed(rows))):
+            result = analyze_bytes((HEADER + "\n".join(ordering) + "\n").encode())
+            self.assertEqual(result["leads"], [])
+            self.assertTrue(any("ambiguous suppression" in r["reason"] for r in result["rejected"]))
+
+    def test_ambiguous_agency_and_explicit_opt_out_fail_closed(self):
+        rows = (
+            "Acme,Engineer,4,no,valid@acme.example,no\n"
+            "Acme,Engineer,1,unknown,other@acme.example,yes\n"
+        )
+        result = analyze_bytes((HEADER + rows).encode())
+        self.assertEqual(result["leads"], [])
+        self.assertIn("opted out", [r["reason"] for r in result["rejected"]])
+
+    def test_unknown_agency_suppresses_company(self):
+        rows = (
+            "Acme,Engineer,4,no,valid@acme.example,no\n"
+            "Acme,Engineer,1,maybe,other@acme.example,no\n"
+        )
+        result = analyze_bytes((HEADER + rows).encode())
+        self.assertEqual(result["leads"], [])
+        self.assertTrue(any("ambiguous suppression" in r["reason"] for r in result["rejected"]))
+
     def test_agency_conflict_suppresses_company(self):
         csv_data = HEADER + (
             "Agency Co,Developer,3,no,one@agency.example,no\n"
