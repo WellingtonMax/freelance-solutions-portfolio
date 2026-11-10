@@ -28,7 +28,7 @@ function validateEnquiryAllFields(fields) {
     const email = fields.email.trim();
     if (unsafeText.test(fields.email)) errors.email = "Provide a valid email format.";
     else 
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 254
+    if (!/^[^\s@<>]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+$/.test(email) || email.length > 254
         || unsafeText.test(email))
       errors.email = "Provide a valid email format.";
   }
