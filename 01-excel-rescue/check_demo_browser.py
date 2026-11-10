@@ -22,17 +22,19 @@ def check(browser, width):
         page.keyboard.press("Tab")
         skip = page.locator(".skip-link")
         assert skip.evaluate("(el) => el === document.activeElement"), "Skip link is not first focus target"
-        assert skip.evaluate("(el) => getComputedStyle(el).transform") == "matrix(1, 0, 0, 1, 0, 0)", "Skip link not revealed"
+        assert skip.evaluate("(el) => { const r = el.getBoundingClientRect(); return r.width > 0 && r.height > 0 && r.top >= 0 && r.left >= 0; }"), "Skip link not visibly revealed"
         page.keyboard.press("Enter")
         assert page.locator("#audit-title").evaluate("(el) => el === document.activeElement"), "Skip destination not focused"
         buttons = page.locator("button[data-view]")
         assert buttons.count() == 3
-        for index, count in [(1, 1), (2, 3), (0, 4)]:
+        for index, count, key in [(1, 1, "Enter"), (2, 3, "Space"), (0, 4, "Enter")]:
             button = buttons.nth(index)
             button.focus()
-            page.keyboard.press("Enter")
+            page.keyboard.press(key)
             assert button.get_attribute("aria-pressed") == "true"
             assert page.locator("#audit tr:visible").count() == count
+            assert page.locator("#audit tr[hidden]").count() == 4 - count
+            assert buttons.locator('[aria-pressed="true"]').count() == 1
             assert str(count) in page.locator("#filter-status").inner_text()
             assert button.evaluate("(el) => el.getBoundingClientRect().height") >= 44
         region = page.locator(".scroll")
