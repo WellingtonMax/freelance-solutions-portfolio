@@ -1,10 +1,42 @@
+import os
+from pathlib import Path
+import tempfile
 import unittest
-from triage import analyze_bytes, MAX_BYTES
+from triage import analyze_bytes, read_input, MAX_BYTES
 
 HEADER = "company,role,openings,agency,email,opt_out\n"
 
 
 class LeadTriageTests(unittest.TestCase):
+    def test_bounded_reader_accepts_regular_synthetic_csv(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "input.csv"
+            data = (HEADER + "Acme,Engineer,1,no,a@acme.example,no\\n").encode()
+            path.write_bytes(data)
+            self.assertEqual(read_input(path), data)
+
+    def test_bounded_reader_rejects_oversized_file_even_if_stat_is_stale(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "input.csv"
+            path.write_bytes(b"x" * (MAX_BYTES + 1))
+            with self.assertRaisesRegex(ValueError, "1 MB"):
+                read_input(path)
+
+    @unittest.skipUnless(hasattr(os, "O_NOFOLLOW"), "requires O_NOFOLLOW")
+    def test_bounded_reader_rejects_symlink(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "input.csv"
+            path.write_bytes(HEADER.encode())
+            link = Path(folder) / "link.csv"
+            link.symlink_to(path)
+            with self.assertRaises(OSError):
+                read_input(link)
+
+    def test_bounded_reader_rejects_directory(self):
+        with tempfile.TemporaryDirectory() as folder:
+            with self.assertRaises((ValueError, OSError)):
+                read_input(Path(folder))
+
     def test_scoring_and_rejections(self):
         csv_data = HEADER + (
             "Acme Metals,Security Engineer,3,no,hiring@acme.example,no\n"
