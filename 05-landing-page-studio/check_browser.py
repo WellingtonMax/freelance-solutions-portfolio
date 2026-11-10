@@ -1,0 +1,47 @@
+"""Optional local Chromium acceptance checks for the fictional, offline enquiry demo.
+
+Requires: pip install playwright && python -m playwright install chromium
+Run: python check_browser.py
+This is not part of the dependency-free CI suite.
+"""
+from pathlib import Path
+from playwright.sync_api import sync_playwright
+
+PAGE = (Path(__file__).resolve().parent / "index.html").as_uri()
+
+def main():
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch()
+        try:
+            for width in (320, 375, 768, 1280):
+                page = browser.new_page(viewport={"width": width, "height": 800})
+                requests = []
+                page.on("request", lambda request: requests.append(request.url)
+                        if not request.url.startswith("file:") else None)
+                page.goto(PAGE)
+                page.locator("#enquiry button").click()
+                assert page.locator("#full-name").get_attribute("aria-invalid") == "true"
+                assert page.locator("#full-name").evaluate("(el) => document.activeElement === el")
+                assert "Nothing was sent" in page.locator("#feedback").inner_text()
+                page.locator("#full-name").fill("Fictional Person")
+                page.locator("#email").fill("fictional@example.com")
+                page.locator("#message").fill("A fictional project request")
+                page.locator("#enquiry button").click()
+                assert "Fields look valid" in page.locator("#feedback").inner_text()
+                page.locator("#email").fill("bad@example..com")
+                page.locator("#enquiry button").click()
+                assert page.locator("#email").get_attribute("aria-invalid") == "true"
+                assert not requests, f"Unexpected network requests: {requests}"
+                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
+                page.close()
+            page = browser.new_page(viewport={"width": 640, "height": 800})
+            page.goto(PAGE)
+            page.evaluate("document.body.style.zoom = '200%'")
+            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), "Overflow at 200% zoom"
+            page.close()
+        finally:
+            browser.close()
+    print("Browser smoke checks passed at 320/375/768/1280px and 200% zoom.")
+
+if __name__ == "__main__":
+    main()
