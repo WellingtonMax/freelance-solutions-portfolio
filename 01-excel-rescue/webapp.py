@@ -213,16 +213,36 @@ class WebServer(ThreadingHTTPServer):
         self.store = store
         self.attempts = {}
         self.attempt_lock = threading.Lock()
+        self.last_attempt_sweep = time.monotonic()
 
     def rate_check(self, ip, username, failed=False):
+        # Limit both per-account guesses and username-rotation attempts.
+        # The global bucket also bounds in-memory tracking of arbitrary names.
         key = (ip, username)
+        global_key = (ip, None)  # Distinct from every user-supplied string
         with self.attempt_lock:
             current = time.monotonic()
-            recent = [t for t in self.attempts.get(key, []) if current - t < 900]
+            # Sweep all expired identifiers periodically, including usernames
+            # that will never be queried again. Keep the sweep under the lock.
+            if current - self.last_attempt_sweep >= 60:
+                for bucket, timestamps in list(self.attempts.items()):
+                    recent = [t for t in timestamps if current - t < 900]
+                    if recent:
+                        self.attempts[bucket] = recent
+                    else:
+                        self.attempts.pop(bucket, None)
+                self.last_attempt_sweep = current
+            for bucket in (key, global_key):
+                recent = [t for t in self.attempts.get(bucket, ()) if current - t < 900]
+                if recent:
+                    self.attempts[bucket] = recent
+                else:
+                    self.attempts.pop(bucket, None)
             if failed:
-                recent.append(current)
-            self.attempts[key] = recent
-            return len(recent) >= 5
+                self.attempts.setdefault(key, []).append(current)
+                self.attempts.setdefault(global_key, []).append(current)
+            return (len(self.attempts.get(key, ())) >= 5 or
+                    len(self.attempts.get(global_key, ())) >= 20)
 
     def rate_clear(self, ip, username):
         with self.attempt_lock:

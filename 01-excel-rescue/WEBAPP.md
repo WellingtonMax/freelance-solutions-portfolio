@@ -33,7 +33,7 @@ Both commands must use the same data directory. The default is ~/.excel-rescue (
 ## Implemented
 - Administrator-created accounts; salted scrypt password hashes, no self-registration.
 - Random opaque HttpOnly, SameSite=Strict session cookies; eight-hour server-side expiry, SHA-256 token digests in SQLite; sign-out revokes the server session.
-- CSRF tokens and Origin/Host validation for writes; login throttling after five failures per username and IP for fifteen minutes (in memory).
+- CSRF tokens and Origin/Host validation for writes; login throttling after five failures per username/IP or twenty failures across usernames from one IP within fifteen minutes (in memory).
 - SQLite users, sessions and jobs; ownership checks for each download and deletion.
 - Uploaded source CSV used only in a private temporary folder, then removed. Accepted and rejected outputs, counts and source-file SHA-256 are stored in SQLite until deleted.
 - File limit 5,000,000 bytes, row limit 20,000, at most 100 stored jobs per user.
@@ -52,7 +52,7 @@ Includes original cleaner regressions plus web login, CSRF, account isolation, p
 
 1. **Local access only.** Server binds exclusively to 127.0.0.1 and uses ordinary HTTP intended for loopback on one computer. Never expose this service directly via a public internet interface, port forwarding, tunnels, corporate network or public reverse proxy. Secure cookies and TLS are needed for a redesigned remote deployment.
 2. **Output data are not encrypted at rest.** SQLite stores job CSV content as BLOBs. File access control and local disk encryption are deployment responsibilities. POSIX folder/database modes are restricted; Windows folder ACLs require explicit review.
-3. Login throttling is process-memory-only, not a durable/distributed anti-abuse mechanism. MFA, account recovery, managed identity, granular roles and administrative audit logs are absent.
+3. Login throttling is process-memory-only and shared by all accounts using the same loopback IP; twenty failed guesses across different usernames temporarily block even valid logins. It is not a durable/distributed anti-abuse mechanism. MFA, account recovery, managed identity, granular roles and administrative audit logs are absent.
 4. Logical deletion of a job does not guarantee erasure of SQLite WAL pages, backups, snapshots or physical storage. Define and enforce a retention/deletion policy.
 5. Local SHA-256 records the bytes processed; it does not prove provenance or authenticity. Rejected duplicates require manual reconciliation with independently trusted data.
 6. This is not a hosted service, enterprise multi-tenancy, native XLSX parser, CRM integration, background queue, managed backup facility or audit-certified software.
