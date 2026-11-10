@@ -11,6 +11,7 @@ import argparse
 import csv
 import http.client
 import ipaddress
+import io
 import json
 import os
 from pathlib import Path
@@ -26,6 +27,8 @@ from urllib.request import Request
 
 MAX_BYTES = 2_000_000
 MAX_RECORDS = 20_000
+MAX_CELL_CHARS = 8192
+MAX_EXPORT_BYTES = 10_000_000
 RETRY_CODES = {429, 500, 502, 503, 504}
 SAFE_FIELD = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
 SAFE_HOST = re.compile(r"^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
@@ -173,6 +176,8 @@ def safe_csv(value) -> str:
     if isinstance(value, (dict, list)):
         value = json.dumps(value, ensure_ascii=False)
     text = str(value).replace("\r", " ").replace("\n", " ").strip()
+    if len(text) > MAX_CELL_CHARS:
+        raise ValueError("CSV cell exceeds 8192 characters")
     if resembles_spreadsheet_formula(text):
         return "'" + text
     return text
@@ -200,10 +205,23 @@ def export_rows(records: list[dict], fields: list[str], destination: Path) -> in
             prefix=".api-bridge-", suffix=".tmp", delete=False,
         ) as stream:
             staged = Path(stream.name)
-            writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
-            writer.writeheader()
+            # Bound serialized UTF-8 bytes before writing each row to the staging file.
+            # The destination is published only after the entire export succeeds.
+            total_bytes = 0
+            def write_bounded(row):
+                nonlocal total_bytes
+                buffer = io.StringIO(newline="")
+                writer = csv.writer(buffer)
+                writer.writerow(row)
+                encoded = buffer.getvalue().encode("utf-8")
+                if total_bytes + len(encoded) > MAX_EXPORT_BYTES:
+                    raise ValueError("CSV export exceeds 10 MB limit")
+                stream.write(encoded.decode("utf-8"))
+                total_bytes += len(encoded)
+
+            write_bounded(fields)
             for record in records:
-                writer.writerow({field: safe_csv(record.get(field)) for field in fields})
+                write_bounded([safe_csv(record.get(field)) for field in fields])
             stream.flush()
             os.fsync(stream.fileno())
         os.link(staged, destination, follow_symlinks=False)
