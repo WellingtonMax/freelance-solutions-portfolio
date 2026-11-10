@@ -50,6 +50,13 @@ def check(browser, width):
         page.keyboard.press("ArrowRight")
         page.wait_for_timeout(150)
         assert region.evaluate("(el) => el.scrollLeft > 0"), "Focused audit table cannot be scrolled with ArrowRight"
+        # At 200% browser-equivalent CSS zoom, content must remain reachable without
+        # introducing document-level horizontal overflow; the audit table may scroll.
+        page.evaluate("document.documentElement.style.zoom = '2'")
+        assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"), "Page overflows horizontally at 200% zoom"
+        assert region.is_visible(), "Audit region disappears at 200% zoom"
+        assert buttons.nth(0).is_visible(), "Filter controls disappear at 200% zoom"
+        page.evaluate("document.documentElement.style.zoom = ''")
         assert not errors, f"JavaScript errors: {errors}"
         print(f"PASS viewport={width}px; keyboard skip, filters, touch targets, scroll focus")
     finally:
