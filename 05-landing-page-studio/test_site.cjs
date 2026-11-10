@@ -498,3 +498,13 @@ test('rejects DNS labels longer than 63 characters without network access', () =
   assert.match(validateEnquiry({...good,email:'test@' + 'a'.repeat(64) + '.example'}),/email format/);
   assert.match(validateEnquiry({...good,email:'test@example.' + 'a'.repeat(64)}),/email format/);
 });
+
+
+test('rejects ambiguous local-part dots and lengths above 64 characters', () => {
+  const good = {name:'Fictional Person',email:'person@example.com',message:'A fictional project request'};
+  for (const email of ['.person@example.com', 'person.@example.com', 'per..son@example.com', 'a'.repeat(65)+'@example.com']) {
+    assert.equal(require('./site.js').validateEnquiryFields({...good,email}).field,'email',email);
+  }
+  assert.equal(validateEnquiry({...good,email:'a'.repeat(64)+'@example.com'}),null);
+  assert.equal(validateEnquiry({...good,email:'first.last@example.com'}),null);
+});
