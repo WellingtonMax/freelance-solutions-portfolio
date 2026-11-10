@@ -5,6 +5,8 @@ function validateEnquiry(fields) {
 }
 // Reject invisible formatting and bidirectional overrides that can mislead a reviewer.
 const unsafeText = /[\u0000-\u001f\u007f\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/u;
+// A multi-line project summary is legitimate; reject other control and invisible characters.
+const unsafeMessageText = /[\u0000-\u0009\u000b-\u000c\u000e-\u001f\u007f\u200B-\u200F\u202A-\u202E\u2060\u2066-\u2069\uFEFF]/u;
 function validateEnquiryAllFields(fields) {
   const errors = {};
   const keys = ["name", "email", "message"];
@@ -39,11 +41,11 @@ function validateEnquiryAllFields(fields) {
   }
   if (errors.message === undefined) {
     const message = fields.message.trim();
-    if (unsafeText.test(fields.message)) errors.message = "Remove invisible or control characters.";
+    if (unsafeMessageText.test(fields.message)) errors.message = "Remove invisible or control characters.";
     else 
     if (message.length < 10 || message.length > 1000)
       errors.message = "Provide a project summary (10–1000 characters).";
-    else if (unsafeText.test(message)) errors.message = "Remove invisible or control characters.";
+    else if (unsafeMessageText.test(message)) errors.message = "Remove invisible or control characters.";
   }
   return errors;
 }
