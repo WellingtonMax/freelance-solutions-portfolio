@@ -56,15 +56,25 @@ def analyze_bytes(data):
                     raise ValueError("invalid number of columns")
                 company = safe_text(row["company"])
                 # Suppress first: malformed contacts must not bypass an opt-out.
-                agency = yes_no(row["agency"])
-                opted_out = yes_no(row["opt_out"])
                 key = company.casefold()
-                # Conservative company-level suppression: a later opted-out or agency
-                # record must invalidate earlier candidates, regardless of CSV order.
-                if agency or opted_out:
+                # Unknown suppression flags are not evidence of permission to contact.
+                # Evaluate both flags independently: a malformed agency flag must not
+                # obscure an explicit opt-out (or vice versa).
+                try:
+                    agency = yes_no(row["agency"])
+                except (ValueError, AttributeError):
+                    agency = None
+                try:
+                    opted_out = yes_no(row["opt_out"])
+                except (ValueError, AttributeError):
+                    opted_out = None
+                if agency is not False or opted_out is not False:
                     suppressed.add(key)
                     selected.pop(key, None)
-                    rejected.append({"row": number, "reason": "opted out" if opted_out else "agency excluded"})
+                    reason = ("opted out" if opted_out is True else
+                              "agency excluded" if agency is True else
+                              "ambiguous suppression flag; human review required")
+                    rejected.append({"row": number, "reason": reason})
                     continue
                 if key in suppressed:
                     rejected.append({"row": number, "reason": "company suppressed by another row"})
