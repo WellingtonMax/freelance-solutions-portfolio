@@ -481,3 +481,12 @@ test('rejects invisible formatting at trimmed field boundaries', () => {
     }
   }
 });
+
+
+test('local enquiry rejects malformed domains and HTML-like email input', () => {
+  const valid = {name:'Fictional Person', email:'person@example.com', message:'A fictional project request'};
+  assert.equal(validateEnquiry(valid), null);
+  for (const email of ['person@example..com', 'person@-example.com', 'person@example-.com', 'person@exa_mple.com', '<script>@example.com', 'person@example.com<']) {
+    assert.equal(require('./site.js').validateEnquiryFields({...valid, email}).field, 'email', email);
+  }
+});
