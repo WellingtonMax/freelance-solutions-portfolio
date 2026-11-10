@@ -30,7 +30,7 @@ function validateEnquiryAllFields(fields) {
     const email = fields.email.trim();
     if (unsafeText.test(fields.email)) errors.email = "Provide a valid email format.";
     else 
-    if (!/^[^\s@<>]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+$/.test(email) || email.length > 254
+    if (!/^[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[A-Za-z0-9!#$%&'*+/=?^_`{|}~-]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+$/.test(email) || email.length > 254
         || email.slice(0, email.lastIndexOf("@")).length > 64
         || email.slice(0, email.lastIndexOf("@")).startsWith(".")
         || email.slice(0, email.lastIndexOf("@")).endsWith(".")
