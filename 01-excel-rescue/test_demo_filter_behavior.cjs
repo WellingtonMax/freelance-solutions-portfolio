@@ -19,7 +19,10 @@ function fixture() {
   const rows = ["rejected", "accepted", "rejected", "rejected"].map(status => ({
     dataset: { status }, hidden: false,
   }));
-  const status = { textContent: "Showing all 4 records." };
+  const markup = readFileSync(join(__dirname, "demo.html"), "utf8");
+  const initialStatus = markup.match(/<span id="filter-status" role="status" aria-live="polite">([^<]+)<\/span>/);
+  assert.ok(initialStatus, "initial accessible status must exist in demo.html");
+  const status = { textContent: initialStatus[1] };
   const document = {
     querySelectorAll(selector) {
       if (selector === "button[data-view]") return buttons;
@@ -38,6 +41,7 @@ function fixture() {
 
 test("all, accepted, rejected and back to all update rows, selection and status", () => {
   const { buttons, rows, status } = fixture();
+  assert.equal(status.textContent, "Showing 4 sample records.");
   const expectations = [
     { index: 1, visible: [1], text: "Showing 1 accepted record." },
     { index: 2, visible: [0, 2, 3], text: "Showing 3 rejected records." },
