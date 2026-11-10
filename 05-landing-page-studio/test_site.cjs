@@ -490,3 +490,11 @@ test('local enquiry rejects malformed domains and HTML-like email input', () => 
     assert.equal(require('./site.js').validateEnquiryFields({...valid, email}).field, 'email', email);
   }
 });
+
+
+test('rejects DNS labels longer than 63 characters without network access', () => {
+  const good = {name:'Fictional Person',email:'test@example.com',message:'A fictional project request'};
+  assert.equal(validateEnquiry({...good,email:'test@' + 'a'.repeat(63) + '.example'}),null);
+  assert.match(validateEnquiry({...good,email:'test@' + 'a'.repeat(64) + '.example'}),/email format/);
+  assert.match(validateEnquiry({...good,email:'test@example.' + 'a'.repeat(64)}),/email format/);
+});
