@@ -50,6 +50,13 @@ def main():
                 assert "resolved" in page.locator("#feedback").inner_text()
                 page.locator("#enquiry button").click()
                 assert "Fields look valid" in page.locator("#feedback").inner_text()
+                # Hostile-looking text must never become executable markup or a network request.
+                payload = "<img src=https://invalid.example.test/pixel onerror=alert(1)>"
+                page.locator("#full-name").fill(payload)
+                page.locator("#enquiry button").click()
+                assert "Fields look valid" in page.locator("#feedback").inner_text()
+                assert page.locator("#enquiry img").count() == 0, "User text became HTML"
+                assert page.locator("#full-name").input_value() == payload
                 assert not requests, f"Unexpected network requests: {requests}"
                 assert not script_errors, f"Browser JavaScript errors at {width}px: {script_errors}"
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
