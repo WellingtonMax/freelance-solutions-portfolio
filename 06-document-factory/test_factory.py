@@ -2,7 +2,8 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from factory import parse_document, render, MAX_BYTES
+import os
+from factory import parse_document, render, read_document, MAX_BYTES
 
 SAMPLE = {"quote_id": "Q-001", "customer": "Demo & Sons", "date": "2026-11-06",
           "items": [{"description": "Workshop table", "quantity": 2, "unit_price": "125.50"}]}
@@ -54,6 +55,30 @@ class DocumentFactoryTests(unittest.TestCase):
             with self.subTest(raw=raw):
                 with self.assertRaisesRegex(ValueError, "duplicate JSON key"):
                     parse_document(raw)
+
+    def test_bounded_file_read_rejects_oversize_without_consuming_entire_file(self):
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "oversize.json"
+            path.write_bytes(b"x" * (MAX_BYTES + 100))
+            with self.assertRaisesRegex(ValueError, "150 KB"):
+                read_document(path)
+
+    def test_input_reader_rejects_directory_and_final_symlink(self):
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            with self.assertRaisesRegex(ValueError, "regular file"):
+                read_document(root)
+            target = root / "sample.json"
+            target.write_bytes(json.dumps(SAMPLE).encode())
+            self.assertEqual(parse_document(read_document(target))["total"], "251.00")
+            if hasattr(os, "O_NOFOLLOW"):
+                link = root / "link.json"
+                try:
+                    link.symlink_to(target)
+                except (OSError, NotImplementedError):
+                    self.skipTest("symlink unavailable")
+                with self.assertRaises(OSError):
+                    read_document(link)
 
     def test_existing_file_never_overwritten(self):
         with tempfile.TemporaryDirectory() as td:
