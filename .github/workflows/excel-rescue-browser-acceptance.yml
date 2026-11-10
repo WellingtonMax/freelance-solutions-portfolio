@@ -1,0 +1,32 @@
+name: Excel Rescue - browser UX acceptance
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - '01-excel-rescue/demo.html'
+      - '01-excel-rescue/demo.css'
+      - '01-excel-rescue/demo.js'
+      - '01-excel-rescue/check_demo_browser.py'
+      - '.github/workflows/excel-rescue-browser-acceptance.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium-ux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      - name: Install pinned Playwright and Chromium
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Verify keyboard and mobile audit flow at 320px and 375px
+        run: python 01-excel-rescue/check_demo_browser.py
