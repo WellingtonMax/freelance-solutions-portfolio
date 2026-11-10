@@ -24,10 +24,16 @@ def main():
                 # Keyboard-only submission must move focus to the first invalid field.
                 page.locator("#enquiry button").focus()
                 page.keyboard.press("Enter")
-                assert page.locator("#full-name").get_attribute("aria-invalid") == "true"
+                # All three empty fields must be identified, not just the first one.
+                for field in ("#full-name", "#email", "#message"):
+                    assert page.locator(field).get_attribute("aria-invalid") == "true", (width, field)
                 assert page.locator("#full-name").evaluate("(el) => document.activeElement === el")
                 assert "Nothing was sent" in page.locator("#feedback").inner_text()
+                # Correcting one field must not silently erase other field errors.
                 page.locator("#full-name").fill("Fictional Person")
+                assert page.locator("#full-name").get_attribute("aria-invalid") is None
+                for field in ("#email", "#message"):
+                    assert page.locator(field).get_attribute("aria-invalid") == "true", (width, field)
                 page.locator("#email").fill("fictional@example.com")
                 page.locator("#message").fill("A fictional project request\nWith a second paragraph.")
                 page.locator("#enquiry button").click()
