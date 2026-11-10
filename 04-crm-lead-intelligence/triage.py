@@ -4,6 +4,8 @@ import csv
 import hashlib
 import io
 import json
+import os
+import stat
 import re
 import unicodedata
 from pathlib import Path
@@ -96,13 +98,34 @@ def analyze_bytes(data):
         raise ValueError("malformed CSV input") from exc
 
 
+def read_input(path):
+    """Bound local input before allocating; reject symlinks and non-regular files."""
+    flags = os.O_RDONLY | getattr(os, "O_NONBLOCK", 0) | getattr(os, "O_NOFOLLOW", 0)
+    fd = os.open(path, flags)
+    try:
+        if not stat.S_ISREG(os.fstat(fd).st_mode):
+            raise ValueError("input must be a regular file")
+        with os.fdopen(fd, "rb") as stream:
+            fd = -1
+            data = stream.read(MAX_BYTES + 1)
+    finally:
+        if fd != -1:
+            os.close(fd)
+    if len(data) > MAX_BYTES:
+        raise ValueError("input exceeds 1 MB")
+    return data
+
+
 def main():
     parser = argparse.ArgumentParser(description="Offline lead triage; no external calls")
     parser.add_argument("csv_file", type=Path)
     args = parser.parse_args()
-    if args.csv_file.stat().st_size > MAX_BYTES:
-        parser.error("input exceeds 1 MB")
-    print(json.dumps(analyze_bytes(args.csv_file.read_bytes()), indent=2))
+    try:
+        data = read_input(args.csv_file)
+        result = analyze_bytes(data)
+    except (OSError, ValueError) as exc:
+        parser.error(str(exc))
+    print(json.dumps(result, indent=2))
 
 
 if __name__ == "__main__":
