@@ -192,6 +192,23 @@ class ReportTests(unittest.TestCase):
             # Best-effort rollback cannot guarantee removal if the filesystem denies it.
             self.assertTrue(output_json.exists())
 
+    def test_duplicate_header_fails_without_creating_reports(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            source = root / "source.csv"
+            source.write_text(SAMPLE.replace("order_id,date", "order_id,order_id"), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "duplicate CSV header"):
+                process(source, root / "out.json", root / "out.html")
+            self.assertFalse((root / "out.json").exists())
+            self.assertFalse((root / "out.html").exists())
+
+    def test_untrusted_category_markup_is_escaped(self):
+        rows = self.rows()
+        rows[0]["category"] = "<svg onload=alert(1)>"
+        html_text = render_html(analyze(rows))
+        self.assertIn("&lt;svg", html_text)
+        self.assertNotIn("<svg onload", html_text)
+
     def test_pipeline(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
