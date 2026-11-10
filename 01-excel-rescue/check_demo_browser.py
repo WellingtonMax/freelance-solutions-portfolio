@@ -38,6 +38,12 @@ def check(browser, width):
         region = page.locator(".scroll")
         region.focus()
         assert region.evaluate("(el) => el === document.activeElement")
+        assert page.evaluate("document.documentElement.scrollWidth <= document.documentElement.clientWidth"), "Unexpected page-level horizontal overflow"
+        assert region.evaluate("(el) => el.scrollWidth > el.clientWidth"), "Audit table should scroll inside its labeled region on narrow screens"
+        region.evaluate("(el) => { el.scrollLeft = 0; }")
+        page.keyboard.press("ArrowRight")
+        page.wait_for_timeout(150)
+        assert region.evaluate("(el) => el.scrollLeft > 0"), "Focused audit table cannot be scrolled with ArrowRight"
         assert not errors, f"JavaScript errors: {errors}"
         print(f"PASS viewport={width}px; keyboard skip, filters, touch targets, scroll focus")
     finally:
