@@ -16,6 +16,8 @@ def main():
             for width in (320, 375, 768, 1280):
                 page = browser.new_page(viewport={"width": width, "height": 800})
                 requests = []
+                script_errors = []
+                page.on("pageerror", lambda error: script_errors.append(str(error)))
                 page.on("request", lambda request: requests.append(request.url)
                         if not request.url.startswith("file:") else None)
                 page.goto(PAGE)
@@ -41,6 +43,7 @@ def main():
                 page.locator("#enquiry button").click()
                 assert "Fields look valid" in page.locator("#feedback").inner_text()
                 assert not requests, f"Unexpected network requests: {requests}"
+                assert not script_errors, f"Browser JavaScript errors at {width}px: {script_errors}"
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
                 page.close()
             page = browser.new_page(viewport={"width": 640, "height": 800})
@@ -50,7 +53,7 @@ def main():
             page.close()
         finally:
             browser.close()
-    print("Browser smoke checks passed at 320/375/768/1280px and 200% zoom.")
+    print("Browser smoke checks passed at 320/375/768/1280px and simulated CSS zoom (not native browser zoom).")
 
 if __name__ == "__main__":
     main()
