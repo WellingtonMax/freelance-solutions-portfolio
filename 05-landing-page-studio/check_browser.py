@@ -55,7 +55,8 @@ def main():
                 page.locator("#full-name").fill(payload)
                 page.locator("#enquiry button").click()
                 assert "Fields look valid" in page.locator("#feedback").inner_text()
-                assert page.locator("#enquiry img").count() == 0, "User text became HTML"
+                # Inspect the entire document: unsafe rendering could occur outside the form.
+                assert page.locator("img[src*='invalid.example.test']").count() == 0, "User text became an image element"
                 assert page.locator("#full-name").input_value() == payload
                 assert not requests, f"Unexpected network requests: {requests}"
                 assert not script_errors, f"Browser JavaScript errors at {width}px: {script_errors}"
