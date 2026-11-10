@@ -25,12 +25,21 @@ def main():
                 assert "Nothing was sent" in page.locator("#feedback").inner_text()
                 page.locator("#full-name").fill("Fictional Person")
                 page.locator("#email").fill("fictional@example.com")
-                page.locator("#message").fill("A fictional project request")
+                page.locator("#message").fill("A fictional project request\nWith a second paragraph.")
                 page.locator("#enquiry button").click()
                 assert "Fields look valid" in page.locator("#feedback").inner_text()
+                assert page.locator("#full-name").get_attribute("aria-invalid") is None
+                assert page.locator("#email").get_attribute("aria-invalid") is None
+                assert page.locator("#message").get_attribute("aria-invalid") is None
                 page.locator("#email").fill("bad@example..com")
                 page.locator("#enquiry button").click()
                 assert page.locator("#email").get_attribute("aria-invalid") == "true"
+                assert page.locator("#email").evaluate("(el) => document.activeElement === el")
+                page.locator("#email").fill("corrected@example.com")
+                assert page.locator("#email").get_attribute("aria-invalid") is None
+                assert "resolved" in page.locator("#feedback").inner_text()
+                page.locator("#enquiry button").click()
+                assert "Fields look valid" in page.locator("#feedback").inner_text()
                 assert not requests, f"Unexpected network requests: {requests}"
                 assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
                 page.close()
