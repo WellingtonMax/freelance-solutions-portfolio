@@ -520,3 +520,14 @@ test('multiline fictional summaries work without permitting hostile control char
   assert.ok(validateEnquiryAllFields({...good,name:'Fictional\nPerson'}).name);
   assert.ok(validateEnquiryAllFields({...good,email:'fictional\n@example.com'}).email);
 });
+
+
+test('unquoted email local part rejects delimiters but allows dot-atom symbols', () => {
+  const good = {name:'Fictional Person', email:'person@example.com', message:'A fictional project request'};
+  for (const email of ['a,b@example.com','a;b@example.com','a"b@example.com','a(b)@example.com','a\\b@example.com','a:b@example.com']) {
+    assert.equal(require('./site.js').validateEnquiryFields({...good,email}).field, 'email', email);
+  }
+  for (const email of ['first.last@example.com','name+tag@example.com',"o'brien@example.com",'a_b@example.com']) {
+    assert.equal(validateEnquiry({...good,email}), null, email);
+  }
+});
