@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Data Quality Auditor | Findings review</title><link rel="stylesheet" href="findings.css"></head>
+<body><main class="shell">
+<a href="README.md">← Auditor instructions</a>
+<p class="eyebrow">07 / Data Quality Auditor · Fictional sample · Offline prototype</p>
+<h1>Review data quality findings</h1><p>Find validation issues before importing a CSV. This page reads a fixed synthetic audit result; it does not upload files, run the Python auditor, or certify data.</p>
+<section class="metrics" aria-label="Audit summary">
+<div><strong id="records">—</strong><span>Records checked</span></div><div><strong id="findings">—</strong><span>Findings</span></div><div><strong id="affected">—</strong><span>Record positions with findings</span></div></section>
+<section aria-labelledby="review-title"><h2 id="review-title">Review findings</h2>
+<label for="filter">Finding type</label><select id="filter"><option value="ALL">All findings</option></select>
+<p id="status" role="status" aria-live="polite"></p>
+<div class="table-wrap" role="region" aria-label="Scrollable findings table" tabindex="0">
+<table><caption>Findings from the fictional sample.csv audit result</caption><thead><tr><th scope="col">Record position</th><th scope="col">Finding</th><th scope="col">Suggested next check</th></tr></thead><tbody id="rows"></tbody></table></div>
+<button id="reset" type="button">Show all findings</button></section>
+<section class="next"><h2>What to do next</h2><p>Correct the source CSV, then rerun <code>python audit.py sample.csv</code> locally. A record position is an ordinal, not necessarily a physical CSV line when quoted values contain line breaks.</p>
+<details><summary>Input fingerprint (SHA-256)</summary><code id="fingerprint"></code><p>A fingerprint helps compare files. It does not authenticate who supplied them.</p></details>
+<p>The unusually high amount flag uses a median-based heuristic; it is not proof of fraud. Findings do not establish compliance or data authenticity.</p></section>
+<footer>Fictional demonstration · AI-assisted development · Human review required before deployment.</footer>
+</main><script src="findings.js" defer></script></body></html>

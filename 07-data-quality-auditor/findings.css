@@ -1,0 +1,17 @@
+:root{color-scheme:dark;--bg:#0c1526;--panel:#182840;--edge:#3a516a;--ink:#f3f7ff;--muted:#bdcddd;--accent:#8fe6c9}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,sans-serif}
+.shell{max-width:1080px;margin:auto;padding:28px 22px 60px}a{color:var(--accent)}.eyebrow{font-size:.83rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:700}
+h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.12;margin:.4em 0}h2{margin-top:2rem}p{color:var(--muted);max-width:72ch}
+.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:32px 0}
+.metrics div{background:var(--panel);border:1px solid var(--edge);border-radius:14px;padding:20px;display:flex;flex-direction:column}
+.metrics strong{font-size:2rem;font-variant-numeric:tabular-nums}.metrics span{color:var(--muted)}
+label{display:block;font-weight:700;margin-bottom:8px}select,button{font:inherit;border:1px solid var(--edge);border-radius:8px;padding:11px 14px;background:var(--panel);color:var(--ink)}
+select{max-width:100%;min-width:min(100%,280px)}button{margin-top:14px;cursor:pointer}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.table-wrap{max-width:100%;overflow-x:auto;border:1px solid var(--edge);border-radius:12px}
+table{border-collapse:collapse;width:100%;min-width:620px;text-align:left}caption{text-align:left;padding:12px;color:var(--muted)}th,td{padding:13px 15px;border-bottom:1px solid var(--edge);vertical-align:top}th{background:var(--panel)}td:first-child{font-variant-numeric:tabular-nums;white-space:nowrap}
+.next{padding-top:12px}details{padding:15px;border:1px solid var(--edge);border-radius:10px}details code{display:block;overflow-wrap:anywhere;margin-top:12px}
+footer{border-top:1px solid var(--edge);margin-top:36px;padding-top:20px;color:var(--muted);font-size:.85rem}
+@media(max-width:700px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:430px){.metrics{grid-template-columns:1fr}.shell{padding:20px 15px 44px}select{width:100%}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important}}
