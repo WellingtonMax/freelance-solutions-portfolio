@@ -101,5 +101,29 @@ class CleanerTests(unittest.TestCase):
                 self.assertEqual(list(csv.DictReader(stream))[0]["email"], "a@test.com")
 
 
+    def test_second_output_failure_rolls_back_first_output(self):
+        """A failure opening the reject report must not leave cleaned.csv behind."""
+        from unittest.mock import patch
+
+        with tempfile.TemporaryDirectory() as temp:
+            base = Path(temp)
+            source = base / "input.csv"
+            destination = base / "cleaned.csv"
+            rejects = base / "rejected.csv"
+            source.write_text("name,email,signup_date,city\\nA,a@example.com,,City\\n".replace("\\n", "\n"), encoding="utf-8")
+            original_open = Path.open
+
+            def fail_reject_open(path, *args, **kwargs):
+                if path == rejects and args and args[0] == "x":
+                    raise OSError("simulated reject output failure")
+                return original_open(path, *args, **kwargs)
+
+            with patch.object(Path, "open", autospec=True, side_effect=fail_reject_open):
+                with self.assertRaisesRegex(OSError, "simulated reject"):
+                    process(source, destination, rejects)
+            self.assertFalse(destination.exists())
+            self.assertFalse(rejects.exists())
+
+
 if __name__ == "__main__":
     unittest.main()
