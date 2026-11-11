@@ -23,6 +23,20 @@ def exercise(browser, width):
         page.goto(PAGE.as_uri())
         assert page.get_by_text("Fictional demonstration").count() >= 1
         assert not page.locator("#result").is_visible()
+        # The design PR adds this link. Exercise its actual keyboard path when
+        # present; the existing main UI has no skip link yet.
+        skip = page.get_by_role("link", name="Skip to CSV preview")
+        if skip.count():
+            page.keyboard.press("Tab")
+            assert skip.evaluate("(e) => e === document.activeElement"), "Skip link must be first Tab stop"
+            page.keyboard.press("Enter")
+            heading = page.locator("#preview-heading")
+            assert heading.evaluate("(e) => e === document.activeElement"), "Skip link must move focus"
+            assert heading.evaluate("(e) => parseFloat(getComputedStyle(e).outlineWidth) >= 3"), "Focused heading needs visible outline"
+            page.keyboard.press("Tab")
+            assert not skip.evaluate("(e) => e === document.activeElement"), "Tab must advance after skip"
+        elif os.environ.get("REQUIRE_SKIP_LINK") == "1":
+            raise AssertionError("Expected the design skip link on the integrated UI")
         page.locator("#run").click()
         assert "Choose a CSV file" in page.locator("#feedback").inner_text()
         assert page.locator("#source").evaluate("(e) => e === document.activeElement")
