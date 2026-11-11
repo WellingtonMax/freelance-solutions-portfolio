@@ -13,6 +13,19 @@ cd 05-landing-page-studio
 node --test test_site.cjs
 ```
 
+## Browser acceptance (optional locally; automated in PR CI)
+
+The browser acceptance script runs against the local `file://` page using synthetic form values. It checks keyboard submission, focus/error recovery, four viewport widths (320/375/768/1280 px), hostile-looking text, unexpected network requests, JavaScript exceptions, and horizontal overflow. Install the free test dependencies in a disposable environment:
+
+```bash
+python -m pip install playwright==1.56.0
+python -m playwright install chromium
+cd 05-landing-page-studio
+python check_browser.py
+```
+
+The repository workflow [Landing Page Studio - Chromium acceptance](../.github/workflows/landing-browser.yml) runs this check for applicable pull requests targeting `main`. Check the workflow run for the **exact commit SHA**; a configured workflow is not proof of a passing run. The script's CSS `zoom` check is **not** native browser zoom. Keyboard behavior is exercised automatically, but manual screen-reader, native 200% zoom, and cross-browser acceptance remain outstanding. No enquiry is submitted or stored.
+
 ## Acceptance criteria
 - Responsive at narrow widths; keyboard accessible labels and focus indicators.
 - Valid form values show a local-only confirmation; invalid values show useful errors.
