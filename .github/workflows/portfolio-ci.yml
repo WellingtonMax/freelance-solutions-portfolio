@@ -6,7 +6,15 @@ on:
       - '01-excel-rescue/**'
       - '02-sales-intelligence/**'
       - '03-api-bridge/**'
+      - '04-crm-lead-intelligence/**'
+      - '05-landing-page-studio/**'
+      - '06-document-factory/**'
+      - '07-data-quality-auditor/**'
+      - '08-site-change-monitor/**'
       - '.github/workflows/portfolio-ci.yml'
+      - 'index.html'
+      - 'README.md'
+      - 'tests/test_eight_main_showcase.py'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -19,19 +27,47 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+      - name: Verify Node.js runtime
+        run: node --version
       - name: Excel Rescue
         working-directory: 01-excel-rescue
         run: python -m unittest discover -v
       - name: Browser CSV preview (Node.js built-in test runner)
         working-directory: 01-excel-rescue
-        run: node --test test_try.cjs
+        run: |
+          node --test test_try.cjs
+          node try-ui.test.cjs
       - name: Sales Intelligence
         working-directory: 02-sales-intelligence
         run: python -m unittest discover -v
       - name: API Bridge
         working-directory: 03-api-bridge
+        run: python -m unittest discover -v
+
+      - name: Eight-project main showcase links and status
+        run: python -m unittest discover -s tests -p 'test_eight_main_showcase.py' -v
+
+      - name: CRM Lead Intelligence
+        working-directory: 04-crm-lead-intelligence
+        run: python -m unittest discover -v
+      - name: Landing Page Studio
+        working-directory: 05-landing-page-studio
+        run: node --test test_site.cjs
+      - name: Document Factory
+        working-directory: 06-document-factory
+        run: python -m unittest discover -v
+      - name: Data Quality Auditor
+        working-directory: 07-data-quality-auditor
+        run: python -m unittest discover -v
+      - name: Site Change Monitor
+        working-directory: 08-site-change-monitor
         run: python -m unittest discover -v

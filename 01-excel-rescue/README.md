@@ -37,6 +37,8 @@ python -m unittest test_clean.py -v
 
 **Security controls:** source input is limited to 5 MB / 20,000 rows and 2,048 characters per cell. Output files will not overwrite existing paths or follow pre-existing symlink targets. Use optional `--expected-sha256 HASH` supplied from a **trusted independent channel** to detect source modification. Input authenticity is **not** guaranteed by checksums supplied by the same untrusted party.
 
+**Cross-engine verification:** `python -m unittest test_differential.py -v` invokes the real Node.js browser processor and Python cleaner on the same synthetic CSV fixtures, then compares accepted records and rejection reports. It checks quoted fields, reordered headers, duplicate case-folded emails, invalid dates, Unicode formula prefixes and UTF-8 BOM. Two deliberate policy differences remain: the browser fails closed on malformed row widths and unclosed quotes, while Python may reject a row or tolerate an unclosed quote. These differences are explicitly asserted; this is not a claim of full behavioral equivalence. Node.js is required for this additional test.
+
 **Failure recovery:** if an output write fails, the cleaner attempts to delete files created during that invocation, leaving existing files untouched. This is **best-effort rollback, not atomic multi-file publication**: concurrent readers may see a partial result before cleanup, and untrusted directories or filesystem races are out of scope. Only run with operator-controlled output paths.
 
 **Scope limitation:** This is a standalone CSV transformation, not an authenticated CRM integration. It has not been tested against proprietary Excel workbook features, hostile filesystem races, concurrent writers or customer data.

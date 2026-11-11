@@ -22,6 +22,7 @@ function resetPreview() {
   copyClean.disabled = true;
   copyReject.disabled = true;
   copyFeedback.textContent = "Copy an output to use it locally. If copying is unavailable, select the CSV text manually.";
+  feedback.setAttribute("aria-busy", "false");
   result.hidden = true;
   clean.value = "";
   reject.value = "";
@@ -61,6 +62,7 @@ run.addEventListener("click", async () => {
     return;
   }
   run.disabled = true;
+  feedback.setAttribute("aria-busy", "true");
   const processingVersion = previewVersion;
   feedback.textContent = "Processing in this browser tab…";
   try {
@@ -92,7 +94,10 @@ run.addEventListener("click", async () => {
     }
   } finally {
     // An older read must not unlock a newer processing operation.
-    if (processingVersion === previewVersion) run.disabled = false;
+    if (processingVersion === previewVersion) {
+      feedback.setAttribute("aria-busy", "false");
+      run.disabled = false;
+    }
   }
 });
 

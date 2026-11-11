@@ -7,7 +7,7 @@
 <title>Excel Rescue · Python CSV Audit Showcase</title>
 <link rel="stylesheet" href="demo.css">
 </head>
-<body><main>
+<body><a class="skip-link" href="#audit-title">Skip to record validation audit</a><main>
 <header class="topbar"><a class="brand" href="../index.html">EXCEL <span>RESCUE</span></a><span class="top-tag">OFFLINE DEMONSTRATION · SYNTHETIC DATA</span></header>
 <section class="hero">
 <div><p class="eyebrow">PYTHON AUTOMATION / DATA CLEANING / CASE STUDY 01</p><h1>Clean data. <em>Clear decisions.</em></h1>
@@ -21,14 +21,14 @@
 <div class="metric bar-card"><span>Sample validation outcome</span><strong>25% <small>accepted</small></strong><div class="progress" role="img" aria-label="25 percent accepted, 75 percent rejected"><i></i><b></b></div><p><span class="dot green"></span>Accepted: 1 <span class="dot pink"></span>Requires review: 3</p></div>
 </section>
 <div class="workspace">
-<section class="panel audit" aria-labelledby="audit-title"><div class="panel-head"><div><h2 id="audit-title">Record validation audit</h2><p>Inspect the decisions made on a fixed, fictional CSV sample.</p></div><span class="sample-pill">sample.csv</span></div>
+<section class="panel audit" aria-labelledby="audit-title"><div class="panel-head"><div><h2 id="audit-title" tabindex="-1">Record validation audit</h2><p>Inspect the decisions made on a fixed, fictional CSV sample. On narrow screens, scroll the table sideways to see all columns.</p></div><span class="sample-pill">sample.csv</span></div>
 <div class="toolbar"><div class="controls" role="group" aria-label="Filter audit rows"><button type="button" data-view="all" aria-pressed="true">All records (4)</button><button type="button" data-view="accepted" aria-pressed="false">Accepted (1)</button><button type="button" data-view="rejected" aria-pressed="false">Rejected (3)</button></div><span class="quiet">Audit trail · 4 sample records</span></div>
-<div class="scroll"><table><caption>Expected audit of the versioned synthetic sample</caption><thead><tr><th scope="col">CSV line</th><th scope="col">Name</th><th scope="col">Normalized email</th><th scope="col">Outcome</th><th scope="col">Reason</th></tr></thead><tbody id="audit">
+<div class="scroll" role="region" aria-label="Audit table — scroll horizontally to view all columns" tabindex="0"><table><caption>Expected audit of the versioned synthetic sample</caption><thead><tr><th scope="col">CSV line</th><th scope="col">Name</th><th scope="col">Normalized email</th><th scope="col">Outcome</th><th scope="col">Reason</th></tr></thead><tbody id="audit">
 <tr data-status="rejected"><td>2</td><td>Alice Silva</td><td>alice@example.com</td><td>Rejected</td><td>Duplicate email</td></tr>
 <tr data-status="accepted"><td>3</td><td>Bob Lima</td><td>bob@example.com</td><td>Accepted</td><td>Valid; date 2026-11-02</td></tr>
 <tr data-status="rejected"><td>4</td><td>Alice duplicate</td><td>alice@example.com</td><td>Rejected</td><td>Duplicate email</td></tr>
 <tr data-status="rejected"><td>5</td><td>Invalid entry</td><td>no-at-sign</td><td>Rejected</td><td>Invalid email</td></tr>
-</tbody></table></div><div class="audit-footer"><span id="filter-status" role="status" aria-live="polite">Showing all 4 records.</span><span>Source: fictional sample.csv · no customer data</span></div></section>
+</tbody></table></div><div class="audit-footer"><span id="filter-status" role="status" aria-live="polite">Showing 4 sample records.</span><span>Source: fictional sample.csv · no customer data</span></div></section>
 <aside class="sidebar"><section class="panel side-card"><h2>Validation safeguards</h2><p>Designed for traceable data preparation.</p><ul class="checks"><li>Normalize email addresses and date formats</li><li>Flag ambiguous duplicate contacts</li><li>Reject malformed fields with reasons</li><li>Account for spreadsheet-formula risks</li></ul></section>
 <section class="panel side-card"><h2>Included deliverables</h2><p>Reproducible outputs from the Python CLI.</p><div class="deliverable">Cleaned records <b>CSV</b></div><div class="deliverable">Rejected-record audit <b>CSV</b></div><div class="deliverable">Source code &amp; tests <b>PY</b></div></section></aside></div>
 <section class="panel before-after" aria-labelledby="before-after-title"><div class="panel-head"><div><p class="eyebrow">SOURCE → VERIFIED OUTPUT</p><h2 id="before-after-title">Before / After: what the cleaner does</h2><p>Examples from the same fictional sample — not a customer outcome or an estimate of savings.</p></div></div>

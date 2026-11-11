@@ -14,7 +14,7 @@ test("fictional sample click renders actual accepted/rejected CSV outputs", asyn
         disabled: id === "copy-clean" || id === "copy-reject",
         files: [], handlers: {}, focus() { this.focused = true; },
         select() { this.selected = true; },
-        addEventListener(name, fn) { this.handlers[name] = fn; }
+        setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
       });
     }
     return elements.get(id);
@@ -44,7 +44,7 @@ test("stale file read cannot unlock a newer validation", async () => {
     if (!elements.has(id)) elements.set(id, {
       value: "", textContent: "", hidden: id === "result", disabled: false,
       files: [], handlers: {}, focus() {}, select() {},
-      addEventListener(name, fn) { this.handlers[name] = fn; }
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   };
@@ -87,7 +87,7 @@ test("file read failures show actionable feedback without exposing exception det
     if (!elements.has(id)) elements.set(id, {
       value: "", textContent: "", hidden: id === "result", disabled: false,
       files: [], handlers: {}, focus() {}, select() {},
-      addEventListener(name, fn) { this.handlers[name] = fn; }
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   };
@@ -114,7 +114,7 @@ test("clipboard denial offers manual copy without leaking errors or claiming suc
       disabled: id.startsWith("copy-"), files: [], handlers: {},
       focus() { this.focused = true; },
       select() { this.selected = true; },
-      addEventListener(name, fn) { this.handlers[name] = fn; }
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   }
@@ -149,7 +149,7 @@ test("late clipboard completion cannot announce success after changing CSV", asy
       disabled: id.startsWith("copy-"), files: [], handlers: {},
       focus() { this.focused = true; },
       select() { this.selected = true; },
-      addEventListener(name, fn) { this.handlers[name] = fn; }
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   }
@@ -184,7 +184,7 @@ test("hostile local filename is never echoed into visible status", () => {
       value: "", textContent: "", hidden: id === "result",
       disabled: id.startsWith("copy-"), files: [], handlers: {},
       focus() {}, select() {},
-      addEventListener(name, fn) { this.handlers[name] = fn; }
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   }
@@ -209,7 +209,7 @@ test("switching to fictional sample ignores a late failed local read", async () 
       value: "", textContent: "", hidden: id === "result",
       disabled: false, files: [], handlers: {},
       focus() { this.focused = true; }, select() {},
-      addEventListener(name, fn) { this.handlers[name] = fn; }
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   }
@@ -240,7 +240,7 @@ test("pending clipboard write disables repeat clicks and restores action on comp
     if (!elements.has(id)) elements.set(id, {
       value: "", textContent: "", hidden: id === "result",
       disabled: id.startsWith("copy-"), files: [], handlers: {},
-      focus() {}, select() {}, addEventListener(name, fn) { this.handlers[name] = fn; }
+      focus() {}, select() {}, setAttribute(name, value) { (this.attrs ??= {})[name] = value; }, addEventListener(name, fn) { this.handlers[name] = fn; }
     });
     return elements.get(id);
   };
