@@ -1,4 +1,5 @@
 """Security and functional regressions for the local Excel Rescue web workspace."""
+from concurrent.futures import ThreadPoolExecutor
 from http.client import HTTPConnection
 import json
 from pathlib import Path
@@ -7,7 +8,7 @@ import tempfile
 import threading
 import unittest
 
-from webapp import Store, WebServer, verify, derive
+from webapp import Problem, Store, WebServer, verify, derive
 
 SAMPLE = (Path(__file__).parent / "sample.csv").read_bytes()
 
@@ -216,6 +217,32 @@ class WebAppTests(unittest.TestCase):
         response.read()
         connection.close()
         self.assertEqual(self.store.list_jobs(1), [])
+
+    def test_concurrent_uploads_cannot_exceed_owner_job_quota(self):
+        # Two valid concurrent requests at 99/100 must yield one stored job.
+        # Use synthetic records, with no sleeps or dependence on request order.
+        with self.store.db() as db:
+            db.executemany(
+                """INSERT INTO jobs
+                   (id,owner,filename,created_at,source_sha256,accepted,rejected,clean,rejects)
+                   VALUES(?,?,?,?,?,?,?,?,?)""",
+                [(f"{i:032x}", 1, "synthetic.csv", 0, "0" * 64, 0, 0, b"", b"")
+                 for i in range(99)]
+            )
+
+        def upload_one(_):
+            try:
+                self.store.run(1, "synthetic.csv", SAMPLE)
+                return 201
+            except Problem as exc:
+                return exc.status
+
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results = list(pool.map(upload_one, range(2)))
+        self.assertEqual(sorted(results), [201, 409])
+        with self.store.db() as db:
+            count = db.execute("SELECT COUNT(*) FROM jobs WHERE owner=1").fetchone()[0]
+        self.assertEqual(count, 100)
 
     def test_logout_revokes_session(self):
         cookie, csrf = self.login()
