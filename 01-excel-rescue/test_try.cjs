@@ -33,6 +33,16 @@ test("reject impossible calendar date and non-ISO ambiguous format",()=>{
  const x=process("name,email,signup_date,city\nA,a@b.com,2026-02-30,X\nB,b@b.com,11/05/2026,X\nC,c@b.com,05-11-2026,X");
  assert.equal(x.accepted.length,1);assert.equal(x.accepted[0].signup_date,"2026-05-11");assert.equal(x.rejected.length,2);
 });
+test("duplicate identities are rejected regardless of case and surrounding whitespace",()=>{
+ const result=process("name,email,signup_date,city\nA,FOO@EXAMPLE.com,2026-11-05,X\nB, foo@example.com ,2026-11-05,Y");
+ assert.equal(result.accepted.length,0);
+ assert.equal(result.rejected.length,2);
+ assert.ok(result.rejected.every(r=>r.reason.includes("duplicate")));
+});
+test("oversize CSV cell is rejected before processing",()=>{
+ const csv="name,email,signup_date,city\n"+"A".repeat(2049)+",a@b.com,2026-11-05,X";
+ assert.throws(()=>process(csv),/Cell exceeds/);
+});
 test("do not interpret untrusted content as HTML",()=>{
  const x=process('name,email,signup_date,city\n"<img src=x onerror=alert(1)>",a@b.com,2026-11-05,X');
  assert.match(x.cleanCsv,/<img/);
@@ -42,5 +52,36 @@ test("do not interpret untrusted content as HTML",()=>{
  assert.match(ui,/\.value = output\.cleanCsv/);
 });
 
-// Keep the local preview UI regression in the existing GitHub Actions Node command.
-require("./try-ui.test.cjs");
+test("audit filter keyboard navigation updates rows, focus and accessible status",()=>{
+ const vm=require("node:vm");
+ const buttons=["all","accepted","rejected"].map(view=>{
+  const handlers={};
+  return {dataset:{view},handlers,attributes:{},addEventListener(type,fn){handlers[type]=fn;},
+   setAttribute(name,value){this.attributes[name]=value;},focus(){this.focused=true;}};
+ });
+ const rows=["rejected","accepted","rejected","rejected"].map(status=>({dataset:{status},hidden:false}));
+ const status={textContent:"Showing all 4 records."};
+ const document={querySelectorAll(selector){
+  if(selector==="button[data-view]")return buttons;
+  if(selector==="#audit tr")return rows;
+  throw new Error("Unexpected selector");
+ },getElementById(id){assert.equal(id,"filter-status");return status;}};
+ vm.runInNewContext(fs.readFileSync(path.join(__dirname,"demo.js"),"utf8"),{document});
+ function key(index,name){
+  let prevented=false;
+  buttons[index].handlers.keydown({key:name,preventDefault(){prevented=true;}});
+  return prevented;
+ }
+ assert.equal(key(0,"ArrowRight"),true);
+ assert.equal(buttons[1].focused,true);
+ assert.equal(buttons[1].attributes["aria-pressed"],"true");
+ assert.deepEqual(rows.map(row=>row.hidden),[true,false,true,true]);
+ assert.equal(status.textContent,"Showing 1 accepted record.");
+ assert.equal(key(1,"End"),true);
+ assert.equal(status.textContent,"Showing 3 rejected records.");
+ assert.equal(key(2,"ArrowRight"),true);
+ assert.equal(status.textContent,"Showing 4 sample records.");
+ assert.equal(key(0,"Tab"),false);
+ buttons[2].handlers.click();
+ assert.equal(status.textContent,"Showing 3 rejected records.");
+});

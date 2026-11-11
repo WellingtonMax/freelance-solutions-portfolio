@@ -12,6 +12,7 @@ from datetime import date
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from html import escape
 import json
+import os
 from pathlib import Path
 
 REQUIRED = {"order_id", "date", "product", "category", "quantity", "unit_price"}
@@ -83,10 +84,11 @@ def render_html(report):
     categories = report["category_revenue"]
     max_value = max((Decimal(value) for value in categories.values()), default=Decimal("0"))
     bars = "".join(
-        f'<div class="bar-row"><strong>{escape(name)}</strong>'
-        f'<div class="track"><div class="fill" style="width:'
-        f'{(Decimal(value) / max_value * 100) if max_value else 0:.1f}%"></div></div>'
+        f'<div class="bar-row"><div class="bar-heading"><strong>{escape(name)}</strong>'
         f'<span>$ {escape(value)}</span></div>'
+        f'<div class="track" aria-hidden="true"><div class="fill" style="width:'
+        f'{(Decimal(value) / max_value * 100) if max_value else 0:.1f}%"></div></div>'
+        f'</div>'
         for name, value in categories.items()
     )
     rows = "".join(
@@ -98,23 +100,23 @@ def render_html(report):
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Sales Intelligence — Demo Report</title>
 <style>
-body{{font:16px system-ui,sans-serif;background:#f3f6fb;color:#18243a;margin:0;padding:2rem}}
-main{{max-width:850px;margin:auto}}.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem}}
+body{{font:16px/1.5 system-ui,sans-serif;background:#f3f6fb;color:#18243a;margin:0;padding:clamp(1rem,3vw,2rem);overflow-wrap:break-word}}
+main{{max-width:56rem;margin:auto;min-width:0}}.cards{{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,160px),1fr));gap:1rem}}
 .card,section{{background:white;border-radius:14px;padding:1.3rem;margin:1rem 0;box-shadow:0 3px 15px #19315a0a}}
-.card b{{font-size:1.45rem;display:block}}.bar-row{{display:grid;grid-template-columns:130px 1fr 95px;gap:12px;align-items:center;margin:12px 0}}
-.track{{background:#e4eaf6;border-radius:20px;overflow:hidden;height:20px}}.fill{{background:#476ef0;height:100%}}
-table{{border-collapse:collapse;width:100%}}td,th{{text-align:left;padding:12px;border-bottom:1px solid #e5e7eb}}
-small{{color:#5d6b80}}@media(max-width:500px){{.bar-row{{grid-template-columns:1fr}}}}
+ .card b{{font-size:1.45rem;display:block}}.bar-row{{margin:1rem 0;min-width:0}}.bar-heading{{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.25rem 1rem;margin-bottom:.4rem}}.bar-heading strong{{min-width:0;overflow-wrap:anywhere}}.bar-heading span{{white-space:nowrap;font-variant-numeric:tabular-nums}}
+.track{{background:#e4eaf6;border-radius:20px;overflow:hidden;height:16px}}.fill{{background:#476ef0;height:100%}}
+table{{border-collapse:collapse;width:100%;overflow-wrap:anywhere}}td,th{{text-align:left;padding:12px;border-bottom:1px solid #e5e7eb}}
+small{{color:#526078}}.note{{font-size:.9rem;color:#526078}}@media print{{body{{background:white}}.card,section{{box-shadow:none;border:1px solid #ccc}}.track{{border:1px solid #777}}.fill{{background:#555}}}}
 </style></head><body><main><h1>Sales Intelligence</h1>
-<small>Illustrative sales data · generated offline · no personal information</small>
+<p class="note">Fictional CSV sample · generated offline · not live sales data.</p>
 <div class="cards">
-<div class="card">Revenue<b>$ {escape(report["revenue"])}</b></div>
+<div class="card">Total revenue<b>$ {escape(report["revenue"])}</b></div>
 <div class="card">Orders<b>{report["orders"]}</b></div>
 <div class="card">Units sold<b>{report["units_sold"]}</b></div>
 <div class="card">Average order<b>$ {escape(report["average_order_value"])}</b></div>
-</div><section><h2>Revenue by category</h2>{bars or "<p>No records.</p>"}</section>
-<section><h2>Monthly revenue</h2><table><thead><tr><th>Month</th><th>Revenue</th></tr></thead>
-<tbody>{rows}</tbody></table></section></main></body></html>"""
+</div><section><h2>Revenue by category</h2>{bars or "<p>No sales records in this report.</p>"}</section>
+<section><h2>Monthly revenue</h2><table><caption>Revenue by month</caption><thead><tr><th>Month</th><th>Revenue</th></tr></thead>
+<tbody>{rows or '<tr><td colspan="2">No sales records in this report.</td></tr>'}</tbody></table></section><p class="note">Each CSV row is treated as one unique completed sale. Returns, discounts, shipping, taxes and currency conversion are not included.</p></main></body></html>"""
 
 
 def process(source: Path, report_path: Path, html_path: Path,
@@ -163,10 +165,33 @@ def process(source: Path, report_path: Path, html_path: Path,
     report_path.parent.mkdir(parents=True, exist_ok=True)
     html_path.parent.mkdir(parents=True, exist_ok=True)
     # Exclusive creation prevents clobbering prior reports or following symlinks.
-    with report_path.open("x", encoding="utf-8") as stream:
-        stream.write(json.dumps(result, indent=2, ensure_ascii=False))
-    with html_path.open("x", encoding="utf-8") as stream:
-        stream.write(render_html(result))
+    # Prepare both payloads before creating either output. A failed second
+    # write must not leave a misleading half-published report pair.
+    json_payload = json.dumps(result, indent=2, ensure_ascii=False)
+    html_payload = render_html(result)
+    created = []
+    try:
+        with report_path.open("x", encoding="utf-8") as stream:
+            created.append((report_path, os.fstat(stream.fileno())))
+            stream.write(json_payload)
+        with html_path.open("x", encoding="utf-8") as stream:
+            created.append((html_path, os.fstat(stream.fileno())))
+            stream.write(html_payload)
+    except OSError:
+        # Preserve the original I/O failure if cleanup itself fails.
+        # Check inode identity before cleanup: a concurrent replacement must
+        # not be mistaken for our output. This remains best-effort because a
+        # hostile writer could race between stat and unlink; use trusted dirs.
+        for path, original in reversed(created):
+            try:
+                current = path.lstat()
+                if (current.st_dev, current.st_ino) == (original.st_dev, original.st_ino):
+                    path.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError:
+                pass  # Preserve the original failure; manual cleanup may be needed.
+        raise
     return result
 
 

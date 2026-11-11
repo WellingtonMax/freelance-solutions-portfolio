@@ -106,6 +106,73 @@ class BridgeTests(unittest.TestCase):
                        transport=fake_transport)
         self.assertEqual(calls, [])
 
+    def test_invalid_records_do_not_create_partial_export(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            with self.assertRaisesRegex(ValueError, "objects"):
+                export_rows([{"id": 1}, None], ["id"], output)
+            self.assertFalse(output.exists())
+            with self.assertRaisesRegex(ValueError, "invalid records"):
+                export_rows("not-a-list", ["id"], output)
+            self.assertFalse(output.exists())
+
+    def test_invalid_field_types_do_not_create_export(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            for fields in (None, "id", [None], [123], ["id", []], ["id", "id"]):
+                with self.subTest(fields=fields):
+                    with self.assertRaisesRegex(ValueError, "safe column"):
+                        export_rows([{"id": 1}], fields, output)
+                    self.assertFalse(output.exists())
+
+    def test_serialization_failure_leaves_no_partial_csv(self):
+        class BrokenValue:
+            def __str__(self):
+                raise RuntimeError("synthetic serialization failure")
+
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            with self.assertRaisesRegex(RuntimeError, "serialization failure"):
+                export_rows([{"id": 1}, {"id": BrokenValue()}], ["id"], output)
+            self.assertFalse(output.exists())
+            self.assertEqual(list(Path(temp).iterdir()), [])
+
+    def test_existing_export_survives_publish_collision(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            output.write_text("original", encoding="utf-8")
+            with self.assertRaises(FileExistsError):
+                export_rows([{"id": 2}], ["id"], output)
+            self.assertEqual(output.read_text(encoding="utf-8"), "original")
+            self.assertEqual(list(Path(temp).iterdir()), [output])
+
+    def test_oversized_cell_leaves_no_export_or_staging_file(self):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            with self.assertRaisesRegex(ValueError, "8192"):
+                export_rows([{"name": "x" * 8193}], ["name"], output)
+            self.assertEqual(list(Path(temp).iterdir()), [])
+
+    def test_utf8_export_limit_counts_encoded_bytes_and_cleans_up(self):
+        from unittest.mock import patch as mock_patch
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            with mock_patch("bridge.MAX_EXPORT_BYTES", 12):
+                with self.assertRaisesRegex(ValueError, "10 MB"):
+                    export_rows([{"name": "é" * 5}], ["name"], output)
+            self.assertEqual(list(Path(temp).iterdir()), [])
+
+    def test_bounded_export_preserves_existing_output(self):
+        from unittest.mock import patch as mock_patch
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "out.csv"
+            output.write_text("original", encoding="utf-8")
+            with mock_patch("bridge.MAX_EXPORT_BYTES", 8):
+                with self.assertRaisesRegex(ValueError, "10 MB"):
+                    export_rows([{"name": "long-value"}], ["name"], output)
+            self.assertEqual(output.read_text(encoding="utf-8"), "original")
+            self.assertEqual(list(Path(temp).iterdir()), [output])
+
     def test_block_csv_column_formula_and_overwrite(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / "out.csv"

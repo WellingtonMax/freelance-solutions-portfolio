@@ -11,12 +11,15 @@ import argparse
 import csv
 import http.client
 import ipaddress
+import io
 import json
+import os
 from pathlib import Path
 import re
 import socket
 import ssl
 import time
+import tempfile
 import unicodedata
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlsplit
@@ -24,6 +27,8 @@ from urllib.request import Request
 
 MAX_BYTES = 2_000_000
 MAX_RECORDS = 20_000
+MAX_CELL_CHARS = 8192
+MAX_EXPORT_BYTES = 10_000_000
 RETRY_CODES = {429, 500, 502, 503, 504}
 SAFE_FIELD = re.compile(r"^[A-Za-z_][A-Za-z0-9_]{0,63}$")
 SAFE_HOST = re.compile(r"^[a-z0-9](?:[a-z0-9.-]*[a-z0-9])?$")
@@ -171,24 +176,58 @@ def safe_csv(value) -> str:
     if isinstance(value, (dict, list)):
         value = json.dumps(value, ensure_ascii=False)
     text = str(value).replace("\r", " ").replace("\n", " ").strip()
+    if len(text) > MAX_CELL_CHARS:
+        raise ValueError("CSV cell exceeds 8192 characters")
     if resembles_spreadsheet_formula(text):
         return "'" + text
     return text
 
 
 def export_rows(records: list[dict], fields: list[str], destination: Path) -> int:
-    if (not fields or len(fields) > 50 or len(fields) != len(set(fields))
-            or any(not SAFE_FIELD.fullmatch(field) for field in fields)):
+    if (not isinstance(fields, list) or not fields or len(fields) > 50
+            or any(not isinstance(field, str) or not SAFE_FIELD.fullmatch(field)
+                   for field in fields)
+            or len(fields) != len(set(fields))):
         raise ValueError("Provide 1–50 unique safe column names (letters, digits, underscore)")
-    if len(records) > MAX_RECORDS:
-        raise ValueError("API record limit exceeded")
+    if not isinstance(records, list) or len(records) > MAX_RECORDS:
+        raise ValueError("API record limit exceeded or invalid records")
+    # Reject malformed caller-supplied rows before creating any output artifact.
+    # This also protects direct library callers that bypass fetch_json validation.
+    if any(not isinstance(record, dict) for record in records):
+        raise ValueError("API records must be objects")
     destination.parent.mkdir(parents=True, exist_ok=True)
-    # Exclusive create: never follow a pre-existing symlink or overwrite exports.
-    with destination.open("x", encoding="utf-8", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fields, extrasaction="ignore")
-        writer.writeheader()
-        for record in records:
-            writer.writerow({field: safe_csv(record.get(field)) for field in fields})
+    # Stage in the destination directory; never expose a partially written CSV.
+    # os.link is an atomic no-overwrite publish on the same filesystem.
+    staged = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", newline="", dir=destination.parent,
+            prefix=".api-bridge-", suffix=".tmp", delete=False,
+        ) as stream:
+            staged = Path(stream.name)
+            # Bound serialized UTF-8 bytes before writing each row to the staging file.
+            # The destination is published only after the entire export succeeds.
+            total_bytes = 0
+            def write_bounded(row):
+                nonlocal total_bytes
+                buffer = io.StringIO(newline="")
+                writer = csv.writer(buffer)
+                writer.writerow(row)
+                encoded = buffer.getvalue().encode("utf-8")
+                if total_bytes + len(encoded) > MAX_EXPORT_BYTES:
+                    raise ValueError("CSV export exceeds 10 MB limit")
+                stream.write(encoded.decode("utf-8"))
+                total_bytes += len(encoded)
+
+            write_bounded(fields)
+            for record in records:
+                write_bounded([safe_csv(record.get(field)) for field in fields])
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(staged, destination, follow_symlinks=False)
+    finally:
+        if staged is not None:
+            staged.unlink(missing_ok=True)
     return len(records)
 
 

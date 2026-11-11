@@ -1,0 +1,9 @@
+{
+  "quote_id": "SYN-2026-001",
+  "customer": "Fictional Meridian Workshop",
+  "date": "2026-11-06",
+  "items": [
+    {"description": "Workspace design consultation", "quantity": 2, "unit_price": "120.00"},
+    {"description": "Materials review", "quantity": 1, "unit_price": "85.50"}
+  ]
+}

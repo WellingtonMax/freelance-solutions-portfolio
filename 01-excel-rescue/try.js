@@ -46,8 +46,10 @@
     }
     return false;
   }
+  // Match Python str.split() whitespace rules: do not strip Unicode format chars (Cf).
+  const PY_SPACE = /[\u0009-\u000D\u001C-\u001F\u0020\u0085\u00A0\u1680\u2000-\u200A\u2028\u2029\u202F\u205F\u3000]+/gu;
   function safeText(s) {
-    s = s.trim().replace(/\s+/gu, " ");
+    s = s.split(PY_SPACE).filter(Boolean).join(" ");
     return formula(s) ? "'" + s : s;
   }
   function date(s) {
@@ -57,12 +59,12 @@
     if (match) [, y, m, d] = match;
     else {
       match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(s.trim());
-      if (!match) throw Error("Invalid date");
+      if (!match) throw Error("invalid date (requires ISO or DD/MM/YYYY)");
       [, d, m, y] = match;
     }
     const n = [Number(y), Number(m), Number(d)];
     const dt = new Date(Date.UTC(n[0], n[1]-1, n[2]));
-    if (n[0] < 100 || dt.getUTCFullYear() !== n[0] || dt.getUTCMonth()+1 !== n[1] || dt.getUTCDate() !== n[2]) throw Error("Invalid date");
+    if (n[0] < 100 || dt.getUTCFullYear() !== n[0] || dt.getUTCMonth()+1 !== n[1] || dt.getUTCDate() !== n[2]) throw Error("invalid date (requires ISO or DD/MM/YYYY)");
     return [y,m,d].join("-");
   }
   function csvEscape(s) {
@@ -79,7 +81,7 @@
       const input = Object.fromEntries(header.map((h,i) => [h,cells[i]]));
       try {
         const email = input.email.trim().toLowerCase();
-        if (formula(email)) throw Error("unsafe email prefix");
+        if (formula(email)) throw Error("unsafe email prefix for spreadsheet export");
         if (email.length > 320 || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) throw Error("invalid email");
         const name = safeText(input.name);
         if (!name) throw Error("missing name");
