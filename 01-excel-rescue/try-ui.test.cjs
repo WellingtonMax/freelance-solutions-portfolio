@@ -12,9 +12,11 @@ function element(id) {
     focus() { this.focused = true; }
   };
 }
-const nodes = Object.fromEntries(["source", "feedback", "result", "run", "clean", "reject", "totals"].map(id => [id, element(id)]));
+const nodes = Object.fromEntries(["source", "feedback", "result", "run", "clean", "reject", "totals", "sample", "result-heading", "copy-clean", "copy-reject", "copy-feedback"].map(id => [id, element(id)]));
 const sandbox = {
   document: { getElementById(id) { return nodes[id]; } },
+  ExcelRescueSample: require("./sample-data.js"),
+  navigator: {},
   CsvRescuePreview: {
     MAX_BYTES: 1048576,
     process(text) {
@@ -34,7 +36,7 @@ const click = () => handlers["run:click"]();
   const file = (name, text, size = 10) => ({ name, size, text: async () => text });
   nodes.source.files = [file("<img src=x>", "valid")];
   change();
-  assert.match(nodes.feedback.textContent, /<img src=x>/);
+  assert.doesNotMatch(nodes.feedback.textContent, /<img src=x>/);
   assert.equal(nodes.feedback.innerHTML, undefined, "filename must not be inserted as HTML");
   await click();
   assert.equal(nodes.result.hidden, false);
@@ -43,7 +45,7 @@ const click = () => handlers["run:click"]();
   change();
   assert.equal(nodes.result.hidden, true);
   await click();
-  assert.match(nodes.feedback.textContent, /Invalid headers/);
+  assert.match(nodes.feedback.textContent, /Check UTF-8 encoding and required headers/);
   assert.equal(nodes.run.disabled, false);
   nodes.source.files = [file("zero.csv", "empty")];
   change();

@@ -85,3 +85,22 @@ test("audit filter keyboard navigation updates rows, focus and accessible status
  buttons[2].handlers.click();
  assert.equal(status.textContent,"Showing 3 rejected records.");
 });
+
+// Keep bundled sample regression checks in the existing CI entrypoint.
+require("./test_sample.cjs");
+require("./test_sample_ui.cjs");
+
+test("copy actions are separate, disabled until output, and fail safely",()=>{
+ const html=fs.readFileSync(path.join(__dirname,"try.html"),"utf8");
+ const ui=fs.readFileSync(path.join(__dirname,"try-ui.js"),"utf8");
+ for (const id of ["copy-clean","copy-reject"]) assert.match(html,new RegExp(`id="${id}"[^>]*disabled`));
+ assert.match(html,/id="copy-feedback" role="status"/);
+ assert.match(ui,/navigator\.clipboard\.writeText\(value\)/);
+ assert.match(ui,/textarea\.select\(\)/);
+ assert.match(ui,/version !== previewVersion/);
+ assert.match(ui,/copyClean\.disabled = output\.accepted\.length === 0/);
+ assert.match(ui,/copyReject\.disabled = output\.rejected\.length === 0/);
+ assert.match(ui,/No accepted records to copy/);
+ assert.match(ui,/No rejected records to copy/);
+ assert.doesNotMatch(ui,/innerHTML|document\.write|fetch\(/);
+});
