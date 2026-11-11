@@ -2,11 +2,11 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Excel Rescue | Try a local CSV</title><link rel="stylesheet" href="demo.css"></head>
-<body><main><a href="demo.html">← Sample audit</a>
+<body><a class="skip-link" href="#preview-heading">Skip to CSV preview</a><main><a href="demo.html">← Sample audit</a>
 <p class="eyebrow">01 / Offline CSV preview · Fictional demonstration</p>
 <h1>Try the cleaner in your browser.</h1>
 <p>Choose a CSV file with the headers <code>name,email,signup_date,city</code> (any order). Processing happens in this browser tab. No uploads or external connections. Maximum 1 MB, 2,000 rows. Preview logic is independently implemented and is not a substitute for the Python CLI or production data validation.</p>
-<section class="panel"><h2>Local file preview</h2>
+<section class="panel"><h2 id="preview-heading" tabindex="-1">Local file preview</h2>
 <p><button id="sample" type="button">Try fictional sample</button> <span>or choose a local CSV below</span></p>
 <label for="source">Choose local CSV (UTF-8)</label><p><input id="source" aria-describedby="feedback" type="file" accept=".csv,text/csv"></p>
 <button id="run" type="button" aria-controls="result" aria-describedby="feedback">Validate CSV in this browser</button><p id="feedback" role="status" aria-live="polite" aria-atomic="true">No file selected.</p>
