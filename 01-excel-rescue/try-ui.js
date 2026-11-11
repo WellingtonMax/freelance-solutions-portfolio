@@ -36,6 +36,7 @@ run.addEventListener("click", async () => {
     return;
   }
   run.disabled = true;
+  feedback.setAttribute("aria-busy", "true");
   feedback.textContent = "Processing in this browser tab…";
   try {
     const text = await file.text();
@@ -55,6 +56,7 @@ run.addEventListener("click", async () => {
       feedback.textContent = "Unable to process: " + (error && typeof error.message === "string" ? error.message : "invalid input") + ". Your file was not uploaded.";
     }
   } finally {
+    feedback.setAttribute("aria-busy", "false");
     run.disabled = false;
   }
 });

@@ -6,7 +6,8 @@ const path = require("node:path");
 const handlers = {};
 function element(id) {
   return {
-    id, hidden: id === "result", value: "", textContent: "", disabled: false, files: [],
+    id, hidden: id === "result", value: "", textContent: "", disabled: false, files: [], attributes: {},
+    setAttribute(name, value) { this.attributes[name] = value; },
     addEventListener(type, callback) { handlers[id + ":" + type] = callback; },
     focus() { this.focused = true; }
   };
@@ -57,11 +58,14 @@ const click = () => handlers["run:click"]();
   nodes.source.files = [{ name: "old.csv", size: 10, text: () => new Promise(resolve => { resolveRead = resolve; }) }];
   change();
   const pending = click();
+  assert.equal(nodes.feedback.attributes["aria-busy"], "true", "processing status must be busy");
+  assert.equal(nodes.run.disabled, true);
   nodes.source.files = [file("new.csv", "valid")];
   change();
   resolveRead("valid");
   await pending;
   assert.equal(nodes.result.hidden, true, "stale selection must not reveal results");
   assert.equal(nodes.run.disabled, false);
+  assert.equal(nodes.feedback.attributes["aria-busy"], "false", "processing status must clear busy after stale read");
   console.log("Excel Rescue local preview UI states: 7 checks passed");
 })().catch(error => { console.error(error); process.exitCode = 1; });
