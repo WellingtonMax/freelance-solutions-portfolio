@@ -12,9 +12,10 @@ function fixture() {
     attributes: { "aria-pressed": String(view === "all") },
     setAttribute(name, value) { this.attributes[name] = value; },
     addEventListener(name, handler) {
-      assert.equal(name, "click");
-      this.click = handler;
+      assert.ok(["click", "keydown"].includes(name), "Unexpected event: " + name);
+      this[name] = handler;
     },
+    focus() { this.focused = true; },
   }));
   const rows = ["rejected", "accepted", "rejected", "rejected"].map(status => ({
     dataset: { status }, hidden: false,
