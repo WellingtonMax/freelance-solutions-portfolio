@@ -34,7 +34,7 @@ def exercise(browser, width):
             assert heading.evaluate("(e) => e === document.activeElement"), "Skip link must move focus"
             assert heading.evaluate("(e) => parseFloat(getComputedStyle(e).outlineWidth) >= 3"), "Focused heading needs visible outline"
             page.keyboard.press("Tab")
-            assert not skip.evaluate("(e) => e === document.activeElement"), "Tab must advance after skip"
+            assert page.locator("#sample").evaluate("(e) => e === document.activeElement"), "Tab after skip must focus the fictional sample button"
         elif os.environ.get("REQUIRE_SKIP_LINK") == "1":
             raise AssertionError("Expected the design skip link on the integrated UI")
         page.locator("#run").click()
@@ -84,7 +84,7 @@ if __name__ == "__main__":
             headless=True, **({"executable_path": executable} if executable else {})
         )
         try:
-            for width in (320, 375, 1280):
+            for width in (320, 375, 768, 1280):
                 exercise(browser, width)
         finally:
             browser.close()
