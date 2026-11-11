@@ -13,7 +13,7 @@
 
 3. Registrar commit/árvore exatos, comando, código de saída, artefatos do teste e URL do workflow. Uma CI verde isolada em #69 ou #71 não substitui essa execução. Se o teste não existir no checkout, a composição está incorreta: falhar fechado.
 4. Em Chromium com teclado apenas, iniciar no topo da página: primeiro **Tab** torna visível “Skip to CSV preview”; **Enter** transfere o foco ao `h2#preview-heading[tabindex=-1]`, com contorno perceptível; próximo **Tab** deve seguir para “Try fictional sample”, sem perder foco nem cair em controle oculto.
-5. Conferir larguras de viewport **320, 375, 768 e 1280 px**: sem rolagem horizontal do documento, sem texto/controles cortados, link de salto totalmente visível quando focado. Conferir **zoom nativo 200%** separadamente (não equivale a emular viewport).
+5. **Cobertura atual do teste do PR #71:** apenas 320, 375 e 1280 px; ele verifica que o Tab seguinte deixa o link, **mas não** que o foco chega ao botão “Try fictional sample”. Assim, validar adicionalmente o destino do Tab e a largura **768 px**, registrando evidência separada. Conferir larguras de viewport **320, 375, 768 e 1280 px**: sem rolagem horizontal do documento, sem texto/controles cortados, link de salto totalmente visível quando focado. Conferir **zoom nativo 200%** separadamente (não equivale a emular viewport).
 6. Com leitor de tela, conferir anúncio do link e do título de destino, ordem de leitura e ausência de armadilha de foco. **Não marcar aprovado sem teste humano ou automatizado apropriado registrado.**
 7. Regressão: arquivo sintético válido, CSV malformado, seleção vazia, mensagens de status, saída em texto não executável, ausência de requisições externas e nenhuma exposição de dados reais. A política CSP deve permanecer restritiva.
 
@@ -27,9 +27,9 @@
 
 | Campo | Resultado |
 | --- | --- |
-| SHA main / #69 / #71 / árvore combinada | PENDENTE |
-| Chromium estrito e URL | NÃO EXECUTADO NESTE DOCUMENTO |
-| Teclado, 320/375/768/1280 e zoom 200% | PENDENTE |
+| SHA main / #69 / #71 / árvore combinada | Base observada `a3fa19f`; #69 `c5ef639feacb074dacfff22ab21c405a1a27b05f`; #71 `4c1af1aeb8c859c9dccb14057345550f8aaa2b38`; árvore combinada PENDENTE (reconsultar antes de integrar) |
+| Chromium estrito e URL | NÃO EXECUTADO na árvore combinada; Chromium isolado do #71 [sucesso](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43041117570), sem `REQUIRE_SKIP_LINK=1` |
+| Teclado, 320/375/768/1280 e zoom 200% | Código do teste #71 cobre parcialmente teclado e 320/375/1280; destino exato do Tab, 768 e zoom nativo 200% NÃO COMPROVADOS |
 | Leitor de tela | PENDENTE |
 | Regressões, privacidade e CSP | PENDENTE NA ÁRVORE COMBINADA |
 | Próximo responsável | Backend — composição, CI e decisão de integração |
