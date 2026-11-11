@@ -179,6 +179,9 @@ class Store:
             clean, rejects = (base / "clean.csv").read_bytes(), (base / "rejects.csv").read_bytes()
         job_id = uuid.uuid4().hex
         with self.db() as conn:
+            # Serialize quota checks with inserts across simultaneous HTTP requests.
+            # Without this write lock, two readers can both observe 99 jobs.
+            conn.execute("BEGIN IMMEDIATE")
             number = conn.execute("SELECT COUNT(*) FROM jobs WHERE owner=?", (owner,)).fetchone()[0]
             if number >= 100:
                 raise Problem(409, "100 stored jobs maximum; delete older jobs")
