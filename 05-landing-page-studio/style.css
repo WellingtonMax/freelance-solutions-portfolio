@@ -64,3 +64,16 @@ footer{background:#102e3e;color:#d7e5e6}
   .nav nav a { overflow-wrap: anywhere; }
   .logo { overflow-wrap: anywhere; }
 }
+
+/* The decorative MW monogram must not impose its intrinsic text width on
+   the mobile grid track (Chromium acceptance: 320px viewport). */
+@media (max-width:420px) {
+  .illustration {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    letter-spacing: -.09em;
+  }
+  .illustration span { max-width: 100%; overflow-wrap: anywhere; }
+}
