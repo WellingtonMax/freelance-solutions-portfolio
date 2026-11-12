@@ -46,3 +46,44 @@ test("fictional sample processes on one click and announces the result", async (
   assert.equal(elements["copy-reject"].disabled, false);
   assert.equal(elements.source.value, "");
 });
+
+test("changing from a pending local read to the fictional sample cannot show stale results", async () => {
+  const ids = ["source", "sample", "result-heading", "feedback", "result", "run",
+    "clean", "reject", "totals", "copy-clean", "copy-reject", "copy-feedback"];
+  const elements = Object.fromEntries(ids.map(id => [id, {
+    value: "", textContent: "", hidden: id === "result", disabled: false,
+    files: [], listeners: {}, attributes: {},
+    addEventListener(event, handler) { this.listeners[event] = handler; },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    focus() {},
+    click() { return this.listeners.click(); },
+  }]));
+  let resolveRead;
+  const pendingFile = { size: 50, text: () => new Promise(resolve => { resolveRead = resolve; }) };
+  elements.source.files = [pendingFile];
+  const processed = [];
+  const context = {
+    document: { getElementById(id) { return elements[id]; } },
+    navigator: {},
+    ExcelRescueSample: "fictional csv",
+    CsvRescuePreview: {
+      MAX_BYTES: 1048576,
+      process(text) {
+        processed.push(text);
+        return { sourceRows: 1, accepted: [{}], rejected: [],
+          cleanCsv: text, rejectCsv: "line,reason" };
+      },
+    },
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
+  const pending = elements.run.click();
+  assert.equal(elements.feedback.attributes["aria-busy"], "true");
+  await elements.sample.click();
+  assert.equal(elements.clean.value, "fictional csv");
+  resolveRead("stale private CSV");
+  await pending;
+  assert.deepEqual(processed, ["fictional csv"]);
+  assert.equal(elements.clean.value, "fictional csv");
+  assert.equal(elements.feedback.attributes["aria-busy"], "false");
+  assert.equal(elements.run.disabled, false);
+});
