@@ -75,6 +75,16 @@ def exercise(browser, width):
         assert page.locator("#copy-reject").is_disabled()
         assert not page.locator("#run").is_disabled()
         assert page.locator("#feedback").get_attribute("aria-busy") == "false"
+        # Recovery: a rejected large file must not poison the next valid run.
+        page.locator("#sample").click()
+        assert "Fictional sample.csv selected" in page.locator("#feedback").inner_text()
+        page.locator("#run").click()
+        page.locator("#result").wait_for(state="visible")
+        assert "1 accepted" in page.locator("#totals").inner_text()
+        assert "3 rejected" in page.locator("#totals").inner_text()
+        assert not page.locator("#copy-clean").is_disabled()
+        assert not page.locator("#copy-reject").is_disabled()
+        assert page.locator("#feedback").get_attribute("aria-busy") == "false"
         assert not errors, f"JavaScript errors: {errors}"
         assert not external, f"Unexpected network requests: {external}"
         assert page.evaluate(
