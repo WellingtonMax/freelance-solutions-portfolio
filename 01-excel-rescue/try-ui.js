@@ -48,9 +48,9 @@ sampleButton.addEventListener("click", () => {
   feedback.textContent = "Processing fictional sample locally…";
   // The sample is bundled and safe to run immediately: make the primary demo one click.
   // Reuse the normal validation path, including result focus and error handling.
-  run.click();
+  void processSelection();
 });
-run.addEventListener("click", async () => {
+async function processSelection() {
   resetPreview();
   const file = sampleSelected ? null : selectedFile();
   const usingSample = sampleSelected;
@@ -102,7 +102,8 @@ run.addEventListener("click", async () => {
       run.disabled = false;
     }
   }
-});
+}
+run.addEventListener("click", processSelection);
 
 // Clipboard access may be blocked for file:// or insecure origins. Never claim success on failure.
 async function copyOutput(textarea, button, label) {
