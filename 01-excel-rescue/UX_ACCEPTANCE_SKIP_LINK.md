@@ -2,20 +2,20 @@
 
 **Escopo:** correção independente dos PRs #69 (link de salto em `try.html` e contorno em `demo.css`) e #71 (teste Chromium). Não representa `BACKEND_READY`, `UX_READY` ou conclusão de E04. Plano: #67. Não alterar regras de limpeza, API ou fixtures.
 
-## Cenário reproduzível — integração antes de merge
+## Integração realizada — evidência de 12/11/2026
 
-1. Registrar os SHAs atuais de `main`, #69 e #71. Inspecionar diffs e preservar a ordem de dependências; montar árvore temporária combinada **sem** alterar `main` e sem force-push.
-2. Com Python e Playwright/Chromium instalados conforme o README/PR #71, executar **na árvore combinada**:
+O Backend integrou via squash o PR [#74](https://github.com/WellingtonMax/freelance-solutions-portfolio/pull/74) em `main`, commit `401f55d783b3a6b85921b9100b999a55ee1ca71c`. Os PRs #69 (Design) e #71 (Frontend) foram encerrados como substituídos, **não** devem ser aplicados novamente. O comentário de integração do Backend no #74 registra conferência de blobs e logs da árvore combinada, incluindo `REQUIRE_SKIP_LINK=1 python 01-excel-rescue/check_try_browser.py` com PASS em 320, 375, 768 e 1280 px.
 
-   ```sh
-   REQUIRE_SKIP_LINK=1 python 01-excel-rescue/check_try_browser.py
-   ```
+Evidências de CI no head combinado `2fa9a73a9363dd511685942eb020258c046d9740`: [Chromium estrito](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001191), [Chromium UX](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001203), [Python](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001243), [CodeQL](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001176). São evidências do PR integrado, **não** de nova execução nesta correção documental nem certificação de acessibilidade.
 
-3. Registrar commit/árvore exatos, comando, código de saída, artefatos do teste e URL do workflow. Uma CI verde isolada em #69 ou #71 não substitui essa execução. O workflow do #71 executa o script **sem** `REQUIRE_SKIP_LINK=1`; configurar a variável na árvore combinada ou registrar execução estrita separada. Se o teste não existir no checkout, a composição está incorreta: falhar fechado.
-4. Em Chromium com teclado apenas, iniciar no topo da página: primeiro **Tab** torna visível “Skip to CSV preview”; **Enter** transfere o foco ao `h2#preview-heading[tabindex=-1]`, com contorno perceptível; próximo **Tab** deve seguir para “Try fictional sample”, sem perder foco nem cair em controle oculto.
-5. **Cobertura observada no HEAD do PR #71 (`de64a55d`):** o código já verifica que o Tab seguinte alcança exatamente o botão “Try fictional sample” e inclui **320, 375, 768 e 1280 px**. Essa cobertura é **estática, não evidência de execução no novo SHA nem na árvore combinada**. Conferir os resultados efetivos antes de aprovar. Conferir larguras de viewport **320, 375, 768 e 1280 px**: sem rolagem horizontal do documento, sem texto/controles cortados, link de salto totalmente visível quando focado. Conferir **zoom nativo 200%** separadamente (não equivale a emular viewport).
-6. Com leitor de tela, conferir anúncio do link e do título de destino, ordem de leitura e ausência de armadilha de foco. **Não marcar aprovado sem teste humano ou automatizado apropriado registrado.**
-7. Regressão: arquivo sintético válido, CSV malformado, seleção vazia, mensagens de status, saída em texto não executável, ausência de requisições externas e nenhuma exposição de dados reais. A política CSP deve permanecer restritiva.
+**Limitações abertas:** zoom **nativo** 200% e leitor de tela ainda não possuem evidência; ações de workflow referenciadas por versão, não SHA imutável. A integração corrige uma regressão de E01, mas **não** equivale a `BACKEND_READY`, `UX_READY`, E04 concluída ou produto comercialmente pronto.
+
+## Roteiro de regressão reproduzível após integração
+
+1. Em checkout da `main` contendo o squash `401f55d`, instalar dependências Playwright/Chromium descritas no README e executar `REQUIRE_SKIP_LINK=1 python 01-excel-rescue/check_try_browser.py`.
+2. Confirmar primeiro Tab no link de salto, Enter focando `h2#preview-heading` e Tab seguinte no botão “Try fictional sample”. Conferir ausência de rolagem horizontal em 320/375/768/1280 px.
+3. Com zoom **nativo** de 200%, conferir visualmente ordem de leitura, contorno, truncamento e alcance de controles; registrar navegador, SO, captura e resultado. Em leitor de tela, verificar anúncio de link, destino e estados de feedback; registrar tecnologia e resultado. **Não declarar aprovado sem executar.**
+4. Revalidar amostras sintéticas, entrada HTML hostil exibida como texto, erro/limpeza de resultados anteriores, CSP e ausência de chamadas externas inesperadas. Não usar dados reais.
 
 ## Critérios de decisão
 
@@ -23,13 +23,13 @@
 - **Bloquear merge** se teste estrito falhar, CI da árvore combinada não existir, houver conflito, alteração concorrente não reconciliada ou risco alto. `mergeable=true` não basta.
 - **Backend** é o único executor de merge, após revisão de SHA, proteção de branch, dependências e CI. Este documento é um roteiro de aceitação, **não** um relatório de teste executado.
 
-## Registro de evidências (preencher após executar)
+## Registro factual (atualizado após o merge)
 
-| Campo | Resultado |
+| Campo | Evidência / lacuna |
 | --- | --- |
-| SHA main / #69 / #71 / árvore combinada | Base observada `a3fa19f`; #69 `35cf16f2e3067fa3ecdc9c58efca3321ae3fa6d1`; #71 `de64a55d6bf58a9c1e492932f6a0e278daa383b2`; árvore combinada PENDENTE (reconsultar antes de integrar) |
-| Chromium estrito e URL | NÃO EXECUTADO na árvore combinada; Chromium isolado do #71 [sucesso](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43041117570), sem `REQUIRE_SKIP_LINK=1` |
-| Teclado, 320/375/768/1280 e zoom 200% | HEAD #71 inclui asserções de destino exato do Tab e 320/375/768/1280; execução no HEAD e árvore combinada NÃO COMPROVADA; zoom nativo 200% NÃO COBERTO |
-| Leitor de tela | PENDENTE |
-| Regressões, privacidade e CSP | PENDENTE NA ÁRVORE COMBINADA |
-| Próximo responsável | Backend — composição, CI e decisão de integração |
+| Árvore combinada / integração | PR #74 head `2fa9a73a9363dd511685942eb020258c046d9740`; squash na main `401f55d783b3a6b85921b9100b999a55ee1ca71c` |
+| Chromium estrito | [Execução 43138001191](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001191), sucesso; Backend confirmou log com `REQUIRE_SKIP_LINK=1` e PASS 320/375/768/1280 |
+| Outras regressões | [Chromium UX](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001203), [Python](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001243), [CodeQL](https://github.com/WellingtonMax/freelance-solutions-portfolio/actions/runs/43138001176): sucesso no head combinado |
+| Zoom 200% / leitor de tela | **Não verificados**; aceitação manual ainda necessária |
+| Estado da funcionalidade | Correção de regressão E01 **integrada**; sem `BACKEND_READY` / `UX_READY` / certificação comercial |
+| Próximo responsável | Backend: contrato E02 e handoff `BACKEND_READY`; Design/UX: E04 apenas depois do gate, ou regressões independentes |
