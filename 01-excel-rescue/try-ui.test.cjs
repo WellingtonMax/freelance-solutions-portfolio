@@ -1,5 +1,7 @@
 "use strict";
 const assert = require("node:assert/strict");
+// The portfolio CI invokes this entrypoint; include the one-click and stale-read regressions.
+require("./test_sample_one_click.cjs");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
