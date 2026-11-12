@@ -19,8 +19,8 @@ Evidências de CI no head combinado `2fa9a73a9363dd511685942eb020258c046d9740`: 
 
 ## Critérios de decisão
 
-- **Aprovar revisão UX** apenas com evidência positiva dos itens 2–5 e sem regressões do item 7; registrar separadamente o status do leitor de tela e eventuais ressalvas.
-- **Bloquear merge** se teste estrito falhar, CI da árvore combinada não existir, houver conflito, alteração concorrente não reconciliada ou risco alto. `mergeable=true` não basta.
+- **Aprovar revisão UX** apenas após registrar evidência positiva do roteiro de regressão acima (passos 1–4), inclusive foco, larguras, segurança e privacidade; documentar separadamente o resultado do zoom nativo de 200% e do leitor de tela, sem transformar pendências em aprovação.
+- **Bloquear merge de alterações futuras** se o teste estrito falhar, a CI do SHA proposto não existir, houver conflito, alteração concorrente não reconciliada ou risco alto. `mergeable=true` não basta; a integração histórica do #74 não autoriza merges subsequentes.
 - **Backend** é o único executor de merge, após revisão de SHA, proteção de branch, dependências e CI. Este documento é um roteiro de aceitação, **não** um relatório de teste executado.
 
 ## Registro factual (atualizado após o merge)
