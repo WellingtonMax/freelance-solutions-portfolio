@@ -1,6 +1,6 @@
 # P01-F01 · E01 — aceitação de acessibilidade da prévia CSV (Design/UX)
 
-**Escopo:** correção independente dos PRs #69 (link de salto em `try.html` e contorno em `demo.css`) e #71 (teste Chromium). Não representa `BACKEND_READY`, `UX_READY` ou conclusão de E04. Plano: #67. Não alterar regras de limpeza, API ou fixtures.
+**Escopo:** registro de aceitação pós-integração da correção E01 (PR #74, que substituiu #69 e #71). Este documento não introduz nova funcionalidade nem representa `BACKEND_READY`, `UX_READY` ou conclusão de E04. Plano: #67. Não alterar regras de limpeza, API ou fixtures.
 
 ## Integração realizada — evidência de 12/11/2026
 
