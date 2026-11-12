@@ -8,7 +8,7 @@
 <p>Choose a CSV file with the headers <code>name,email,signup_date,city</code> (any order). Processing happens in this browser tab. No uploads or external connections. Maximum 1 MB, 2,000 rows. Preview logic is independently implemented and is not a substitute for the Python CLI or production data validation.</p>
 <section class="panel"><h2 id="preview-heading" tabindex="-1">Local file preview</h2>
 <p><button id="sample" type="button">Try fictional sample</button> <span>or choose a local CSV below</span></p>
-<label for="source">Choose local CSV (UTF-8)</label><p><input id="source" aria-describedby="feedback" type="file" accept=".csv,text/csv"></p>
+<label for="source">Choose local CSV (UTF-8)</label><p id="source-help" class="small">Required columns: name, email, signup_date, city (any order). Up to 1 MB and 2,000 rows. Use fictional records only.</p><p><input id="source" aria-describedby="source-help feedback" type="file" accept=".csv,text/csv"></p>
 <button id="run" type="button" aria-controls="result" aria-describedby="feedback">Validate CSV in this browser</button><p id="feedback" role="status" aria-live="polite" aria-atomic="true">No file selected.</p>
 <div id="result" hidden><h3 id="result-heading" tabindex="-1">Review the records before using either output</h3><p id="totals"></p>
 <label for="clean">Accepted records — copyable CSV</label><button type="button" id="copy-clean" aria-describedby="copy-feedback" disabled>Copy accepted CSV</button><textarea id="clean" readonly rows="7"></textarea>
