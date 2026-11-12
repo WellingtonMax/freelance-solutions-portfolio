@@ -27,8 +27,8 @@ test("fictional sample click renders actual accepted/rejected CSV outputs", asyn
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
   element("sample").handlers.click();
-  assert.match(element("feedback").textContent, /Fictional sample/);
-  await element("run").handlers.click();
+  await Promise.resolve();
+  assert.match(element("feedback").textContent, /Preview complete/);
   assert.equal(element("result").hidden, false);
   assert.equal(element("totals").textContent, "4 input rows · 1 accepted · 3 rejected");
   assert.match(element("clean").value, /bob@example.com/);
