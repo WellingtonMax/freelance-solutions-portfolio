@@ -6,6 +6,10 @@ from pathlib import Path
 import re
 import unittest
 
+# CI invokes this module explicitly; import the separate preview regression suite
+# so its assertions actually run in the existing showcase CI step.
+from test_showcase_preview_links import ShowcasePreviewTests  # noqa: F401
+
 ROOT = Path(__file__).resolve().parents[1]
 EXPECTED = {
     "01": ("Excel Rescue", "01-excel-rescue/demo.html"),
