@@ -45,3 +45,12 @@ footer{background:#102e3e;color:#d7e5e6}
 @media(max-width:720px){header{position:relative}.hero{min-height:auto;padding-top:54px;padding-bottom:60px}.illustration{max-height:340px;aspect-ratio:1.5}.services{padding-bottom:65px}.contact{padding-top:65px;padding-bottom:75px}.contact form{padding:24px}.cards{gap:14px}}
 @media(max-width:420px){.hero h1{font-size:2.7rem}.nav{min-height:72px}.nav nav{gap:14px}.logo{font-size:1.18rem}.illustration{min-height:230px}.contact form{padding:18px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
+/* Keep grid tracks and their children shrinkable at narrow mobile widths. */
+.hero > *, .contact > *, .cards > * { min-width: 0; }
+@media (max-width:720px) {
+  .hero, .contact, .cards { grid-template-columns: minmax(0, 1fr); }
+  .hero h1, .services h2, .contact h2 { overflow-wrap: anywhere; }
+  .contact form { min-width: 0; }
+  .contact input, .contact textarea { min-width: 0; max-width: 100%; }
+}
