@@ -8,20 +8,18 @@
 
 ## The eight core projects
 
-**Interfaces dos oito projetos:** a coluna “What you can inspect” contém agora um link direto ao arquivo HTML de cada prévia. **Importante:** no visualizador de arquivos do GitHub, HTML é exibido como código, não executado como aplicação. Estes links **não são URLs de demonstrações publicadas**. Para abrir com um toque e interagir no navegador, será necessária uma hospedagem estática aprovada (por exemplo, GitHub Pages) e a validação de cada interface; não há autorização de deploy nesta alteração. Os links também aparecem nesta lista vertical, pois a tabela abaixo exige rolagem horizontal em telas estreitas. As interfaces de prévia não substituem os fluxos Python locais nem provam integração ponta a ponta.
+**Quick access on mobile — eight HTML previews (source files, not hosted apps):**
 
+1. [Excel Rescue — CSV preview](01-excel-rescue/try.html)
+2. [Sales Intelligence — preview](02-sales-intelligence/demo-ui.html)
+3. [API Bridge — preview](03-api-bridge/demo-ui.html)
+4. [CRM Lead Intelligence — preview](04-crm-lead-intelligence/demo-ui.html)
+5. [Landing Page Studio — preview](05-landing-page-studio/index.html)
+6. [Document Factory — preview](06-document-factory/demo-ui.html)
+7. [Data Quality Auditor — preview](07-data-quality-auditor/demo-ui.html)
+8. [Site Change Monitor — preview](08-site-change-monitor/demo-ui.html)
 
-
-**Acesso rápido às interfaces (arquivos HTML, não aplicações publicadas):**
-
-01. [Excel Rescue — prévia CSV](01-excel-rescue/try.html)
-02. [Sales Intelligence — prévia](02-sales-intelligence/demo-ui.html)
-03. [API Bridge — prévia](03-api-bridge/demo-ui.html)
-04. [CRM Lead Intelligence — prévia](04-crm-lead-intelligence/demo-ui.html)
-05. [Landing Page Studio — prévia](05-landing-page-studio/index.html)
-06. [Document Factory — prévia](06-document-factory/demo-ui.html)
-07. [Data Quality Auditor — prévia](07-data-quality-auditor/demo-ui.html)
-08. [Site Change Monitor — prévia](08-site-change-monitor/demo-ui.html)
+> **Preview limitation:** GitHub displays linked HTML as source code, not as a running interface. These are **not hosted demo URLs**. Interactive one-tap access requires separately authorized static hosting and browser validation. The previews do not establish that the local Python workflows run in the browser.
 
 All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. Some offer browser previews; others are **local command-line tools**, not live web applications. Open each README for exact commands and limitations.
 
