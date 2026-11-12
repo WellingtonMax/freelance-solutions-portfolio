@@ -60,7 +60,20 @@ def main():
                 assert page.locator("#full-name").input_value() == payload
                 assert not requests, f"Unexpected network requests: {requests}"
                 assert not script_errors, f"Browser JavaScript errors at {width}px: {script_errors}"
-                assert page.evaluate("document.documentElement.scrollWidth <= innerWidth"), f"Overflow at {width}px"
+                overflow = page.evaluate("""() => ({
+                    viewport: innerWidth,
+                    document: document.documentElement.scrollWidth,
+                    offenders: [...document.querySelectorAll('body *')]
+                        .map(el => ({tag: el.tagName.toLowerCase(), id: el.id,
+                            className: typeof el.className === 'string' ? el.className : '',
+                            text: (el.textContent || '').trim().slice(0, 60),
+                            left: Math.round(el.getBoundingClientRect().left),
+                            right: Math.round(el.getBoundingClientRect().right),
+                            scrollWidth: el.scrollWidth}))
+                        .filter(el => el.right > innerWidth + 1 || el.left < -1)
+                        .slice(0, 20)
+                })""")
+                assert overflow["document"] <= overflow["viewport"], f"Overflow at {width}px: {overflow}"
                 page.close()
             page = browser.new_page(viewport={"width": 640, "height": 800})
             page.goto(PAGE)
