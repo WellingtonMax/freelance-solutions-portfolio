@@ -54,3 +54,13 @@ footer{background:#102e3e;color:#d7e5e6}
   .contact form { min-width: 0; }
   .contact input, .contact textarea { min-width: 0; max-width: 100%; }
 }
+
+/* At 320px, keep the navigation inside its containing block instead of
+   allowing the logo/link group to dictate the viewport's minimum width. */
+@media (max-width:420px) {
+  .nav { gap: 8px; }
+  .nav > *, .nav nav { min-width: 0; max-width: 100%; }
+  .nav nav { flex-wrap: wrap; column-gap: 12px; row-gap: 0; }
+  .nav nav a { overflow-wrap: anywhere; }
+  .logo { overflow-wrap: anywhere; }
+}
