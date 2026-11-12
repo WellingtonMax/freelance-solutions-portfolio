@@ -45,7 +45,10 @@ sampleButton.addEventListener("click", () => {
   sampleSelected = true;
   source.value = "";
   resetPreview();
-  feedback.textContent = "Fictional sample.csv selected. Select Validate CSV in this browser to continue.";
+  feedback.textContent = "Processing fictional sample locally…";
+  // The sample is bundled and safe to run immediately: make the primary demo one click.
+  // Reuse the normal validation path, including result focus and error handling.
+  run.click();
 });
 run.addEventListener("click", async () => {
   resetPreview();
