@@ -8,9 +8,20 @@
 
 ## The eight core projects
 
-**Interfaces dos oito projetos:** a coluna “What you can inspect” contém agora um link direto ao arquivo HTML de cada prévia. **Importante:** no visualizador de arquivos do GitHub, HTML é exibido como código, não executado como aplicação. Estes links **não são URLs de demonstrações publicadas**. Para abrir com um toque e interagir no navegador, será necessária uma hospedagem estática aprovada (por exemplo, GitHub Pages) e a validação de cada interface; não há autorização de deploy nesta alteração. As interfaces de prévia não substituem os fluxos Python locais nem provam integração ponta a ponta.
+**Interfaces dos oito projetos:** a coluna “What you can inspect” contém agora um link direto ao arquivo HTML de cada prévia. **Importante:** no visualizador de arquivos do GitHub, HTML é exibido como código, não executado como aplicação. Estes links **não são URLs de demonstrações publicadas**. Para abrir com um toque e interagir no navegador, será necessária uma hospedagem estática aprovada (por exemplo, GitHub Pages) e a validação de cada interface; não há autorização de deploy nesta alteração. Os links também aparecem nesta lista vertical, pois a tabela abaixo exige rolagem horizontal em telas estreitas. As interfaces de prévia não substituem os fluxos Python locais nem provam integração ponta a ponta.
 
 
+
+**Acesso rápido às interfaces (arquivos HTML, não aplicações publicadas):**
+
+01. [Excel Rescue — prévia CSV](01-excel-rescue/try.html)
+02. [Sales Intelligence — prévia](02-sales-intelligence/demo-ui.html)
+03. [API Bridge — prévia](03-api-bridge/demo-ui.html)
+04. [CRM Lead Intelligence — prévia](04-crm-lead-intelligence/demo-ui.html)
+05. [Landing Page Studio — prévia](05-landing-page-studio/index.html)
+06. [Document Factory — prévia](06-document-factory/demo-ui.html)
+07. [Data Quality Auditor — prévia](07-data-quality-auditor/demo-ui.html)
+08. [Site Change Monitor — prévia](08-site-change-monitor/demo-ui.html)
 
 All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. Some offer browser previews; others are **local command-line tools**, not live web applications. Open each README for exact commands and limitations.
 
