@@ -62,6 +62,19 @@ def exercise(browser, width):
         page.locator("#result").wait_for(state="visible")
         assert page.locator("img").count() == 0, "CSV data must not become HTML"
         assert "<img" in page.locator("#clean").input_value()
+        # Oversized files must be rejected locally, clearing previous outputs.
+        page.locator("#source").set_input_files({
+            "name": "oversized.csv", "mimeType": "text/csv",
+            "buffer": b"x" * (1024 * 1024 + 1),
+        })
+        assert not page.locator("#result").is_visible()
+        page.locator("#run").click()
+        assert "exceeds the 1 MB" in page.locator("#feedback").inner_text()
+        assert not page.locator("#result").is_visible()
+        assert page.locator("#copy-clean").is_disabled()
+        assert page.locator("#copy-reject").is_disabled()
+        assert not page.locator("#run").is_disabled()
+        assert page.locator("#feedback").get_attribute("aria-busy") == "false"
         assert not errors, f"JavaScript errors: {errors}"
         assert not external, f"Unexpected network requests: {external}"
         assert page.evaluate(
