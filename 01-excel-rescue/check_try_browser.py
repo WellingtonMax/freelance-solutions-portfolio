@@ -39,9 +39,8 @@ def exercise(browser, width):
         assert page.locator("#source").evaluate("(e) => e === document.activeElement")
 
         page.locator("#sample").click()
-        assert "Fictional sample.csv selected" in page.locator("#feedback").inner_text()
-        page.locator("#run").click()
         page.locator("#result").wait_for(state="visible")
+        assert "Preview complete" in page.locator("#feedback").inner_text()
         assert "1 accepted" in page.locator("#totals").inner_text()
         assert "3 rejected" in page.locator("#totals").inner_text()
         assert page.locator("#result-heading").evaluate("(e) => e === document.activeElement")
@@ -77,9 +76,8 @@ def exercise(browser, width):
         assert page.locator("#feedback").get_attribute("aria-busy") == "false"
         # Recovery: a rejected large file must not poison the next valid run.
         page.locator("#sample").click()
-        assert "Fictional sample.csv selected" in page.locator("#feedback").inner_text()
-        page.locator("#run").click()
         page.locator("#result").wait_for(state="visible")
+        assert "Preview complete" in page.locator("#feedback").inner_text()
         assert "1 accepted" in page.locator("#totals").inner_text()
         assert "3 rejected" in page.locator("#totals").inner_text()
         assert not page.locator("#copy-clean").is_disabled()
