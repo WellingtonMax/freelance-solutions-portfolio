@@ -1,0 +1,32 @@
+name: Excel Rescue preview browser acceptance
+
+on:
+  pull_request:
+    paths:
+      - '01-excel-rescue/try.html'
+      - '01-excel-rescue/try.js'
+      - '01-excel-rescue/try-ui.js'
+      - '01-excel-rescue/sample-data.js'
+      - '01-excel-rescue/demo.css'
+      - '01-excel-rescue/check_try_browser.py'
+      - '.github/workflows/excel-preview-browser.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install browser tooling
+        run: |
+          python -m pip install playwright==1.56.0
+          python -m playwright install --with-deps chromium
+      - name: Test offline CSV preview
+        run: REQUIRE_SKIP_LINK=1 python 01-excel-rescue/check_try_browser.py
