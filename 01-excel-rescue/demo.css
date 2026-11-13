@@ -53,6 +53,16 @@ body.csv-preview main input[type="file"] {
 }
 body.csv-preview main button {
   max-width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #438f81;
+  border-radius: 8px;
+  background: #174b43;
+  color: var(--text);
+  font: 650 14px/1.4 system-ui, sans-serif;
+  cursor: pointer;
   white-space: normal;
   overflow-wrap: anywhere;
 }
+body.csv-preview main button:hover:not(:disabled) { background: #24665a; }
+body.csv-preview main button:disabled { opacity: .6; cursor: not-allowed; }
