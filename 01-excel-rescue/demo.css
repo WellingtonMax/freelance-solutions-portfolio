@@ -26,3 +26,20 @@ main:has(#preview-heading) > .panel { padding: 20px 24px; }
 @media (max-width: 420px) {
   main:has(#preview-heading) > .panel { padding: 16px 14px; }
 }
+
+/* Keep copyable CSV outputs within the narrow preview panel at mobile widths.
+   Preserve raw CSV formatting and keyboard focus without affecting the dashboard. */
+main:has(#preview-heading) textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 8px 0 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d1727;
+  color: var(--text);
+  font: 13px/1.5 ui-monospace, Consolas, monospace;
+  resize: vertical;
+}
