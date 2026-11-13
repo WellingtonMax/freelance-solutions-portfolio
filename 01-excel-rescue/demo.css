@@ -43,3 +43,16 @@ body.csv-preview main textarea {
   font: 13px/1.5 ui-monospace, Consolas, monospace;
   resize: vertical;
 }
+
+/* The native file picker and long control labels must reflow at 320px/400% zoom. */
+body.csv-preview main input[type="file"] {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body.csv-preview main button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
