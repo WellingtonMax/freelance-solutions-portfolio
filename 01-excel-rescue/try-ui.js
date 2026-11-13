@@ -71,7 +71,7 @@ async function processSelection() {
   try {
     const text = usingSample ? ExcelRescueSample : await file.text();
     // Selection can change while the file is being read: never show stale output.
-    if (version !== selectionVersion) return;
+    if (version !== selectionVersion || processingVersion !== previewVersion) return;
     const output = CsvRescuePreview.process(text);
     if (!usingSample && selectedFile() !== file) return;
     clean.value = output.cleanCsv;
@@ -92,7 +92,7 @@ async function processSelection() {
       ? "Preview complete: no records accepted. Review rejection reasons."
       : "Preview complete: " + output.accepted.length + " accepted, " + output.rejected.length + " rejected. No data was transmitted.";
   } catch (error) {
-    if (version === selectionVersion) {
+    if (version === selectionVersion && processingVersion === previewVersion) {
       feedback.textContent = "Unable to read or validate this CSV. Check UTF-8 encoding and required headers, then try again. Your file was not uploaded.";
     }
   } finally {
