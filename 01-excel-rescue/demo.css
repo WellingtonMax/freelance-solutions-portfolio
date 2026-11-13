@@ -22,14 +22,14 @@ footer{padding:22px 3px 4px;color:var(--muted);font-size:12px}footer strong{colo
 
 /* Local CSV preview only: keep form controls and trust copy clear of panel borders.
    The audit dashboard uses the same .panel class and must retain its own layout. */
-main:has(#preview-heading) > .panel { padding: 20px 24px; }
+body.csv-preview main > .panel { padding: 20px 24px; }
 @media (max-width: 420px) {
-  main:has(#preview-heading) > .panel { padding: 16px 14px; }
+  body.csv-preview main > .panel { padding: 16px 14px; }
 }
 
 /* Keep copyable CSV outputs within the narrow preview panel at mobile widths.
    Preserve raw CSV formatting and keyboard focus without affecting the dashboard. */
-main:has(#preview-heading) textarea {
+body.csv-preview main textarea {
   display: block;
   width: 100%;
   max-width: 100%;
