@@ -87,3 +87,45 @@ test("changing from a pending local read to the fictional sample cannot show sta
   assert.equal(elements.feedback.attributes["aria-busy"], "false");
   assert.equal(elements.run.disabled, false);
 });
+
+test("an obsolete rejected file read cannot replace a newer successful preview", async () => {
+  const ids = ["source", "sample", "result-heading", "feedback", "result", "run",
+    "clean", "reject", "totals", "copy-clean", "copy-reject", "copy-feedback"];
+  const elements = Object.fromEntries(ids.map(id => [id, {
+    value: "", textContent: "", hidden: id === "result", disabled: false,
+    files: [], attributes: {}, listeners: {},
+    addEventListener(event, handler) { this.listeners[event] = handler; },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    focus() {},
+    click() { return this.listeners.click(); },
+  }]));
+  let rejectOldRead;
+  elements.source.files = [{
+    size: 32,
+    text: () => new Promise((_resolve, reject) => { rejectOldRead = reject; }),
+  }];
+  const context = {
+    document: { getElementById(id) { return elements[id]; } },
+    navigator: {},
+    ExcelRescueSample: "fictional csv",
+    CsvRescuePreview: {
+      MAX_BYTES: 1048576,
+      process(text) {
+        return { sourceRows: 1, accepted: [{}], rejected: [],
+          cleanCsv: text, rejectCsv: "" };
+      },
+    },
+  };
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
+  const oldRun = elements.run.click();
+  await elements.sample.click();
+  const successfulStatus = elements.feedback.textContent;
+  rejectOldRead(new Error("obsolete read failed"));
+  await oldRun;
+  assert.equal(elements.clean.value, "fictional csv");
+  assert.equal(elements.result.hidden, false);
+  assert.equal(elements.feedback.textContent, successfulStatus);
+  assert.match(successfulStatus, /Preview complete/);
+  assert.equal(elements.feedback.attributes["aria-busy"], "false");
+  assert.equal(elements.run.disabled, false);
+});
