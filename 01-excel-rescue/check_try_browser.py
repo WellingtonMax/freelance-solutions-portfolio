@@ -38,7 +38,10 @@ def exercise(browser, width):
         assert "Choose a CSV file" in page.locator("#feedback").inner_text()
         assert page.locator("#source").evaluate("(e) => e === document.activeElement")
 
-        page.locator("#sample").click()
+        # Exercise the primary one-click demo using keyboard activation, not a mouse.
+        page.locator("#sample").focus()
+        assert page.locator("#sample").evaluate("(e) => e === document.activeElement")
+        page.keyboard.press("Enter")
         page.locator("#result").wait_for(state="visible")
         assert "Preview complete" in page.locator("#feedback").inner_text()
         assert "1 accepted" in page.locator("#totals").inner_text()
