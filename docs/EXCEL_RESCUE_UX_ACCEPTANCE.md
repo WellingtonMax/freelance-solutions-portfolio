@@ -13,7 +13,7 @@ Status: **verification checklist, not executed evidence**. Applies to `01-excel-
 |---|---|---|
 | Narrow mobile | Set viewport to 320 and 375 CSS px; repeat at 768 and 1280 | No clipped controls, overlapping text or horizontal scrolling caused by layout |
 | Keyboard | Starting at page top, use Tab/Shift+Tab and Enter/Space through sample, file, validate and copy actions | Visible focus, logical order, no keyboard trap; skip link reaches preview |
-| Zoom | Set browser zoom to 200% at desktop width; repeat keyboard flow | All content and actions remain available without loss of meaning |
+| Zoom and reflow | At a 1280 CSS-px desktop viewport, set browser zoom to 200% and 400%; at 400%, repeat the sample, file, validate and copy flow using keyboard only | At an effective 320 CSS-px layout width, page content and controls reflow without two-dimensional page scrolling, clipping or loss of function; horizontal scrolling within CSV output textareas is permitted where essential to preserve CSV text |
 | Screen reader | Navigate headings, form labels and status updates with a screen reader | Inputs and outputs have understandable names; errors and completion announced once; focus movement is understandable |
 | Empty state | Load page with no file chosen; activate Validate | Helpful feedback, no stale success or invented output |
 | Invalid input | Use a *synthetic* CSV with missing required header; then an oversized local synthetic file | Clear rejection, bounded processing, no accepted-data claim |
