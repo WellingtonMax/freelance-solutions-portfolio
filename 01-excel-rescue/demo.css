@@ -66,3 +66,17 @@ body.csv-preview main button {
 }
 body.csv-preview main button:hover:not(:disabled) { background: #24665a; }
 body.csv-preview main button:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Distinguish review outcomes without relying on color alone: the adjacent labels
+   remain the primary status text, while these accents aid rapid scanning. */
+body.csv-preview main label[for="clean"],
+body.csv-preview main label[for="reject"] {
+  display: block;
+  margin-top: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+body.csv-preview main label[for="clean"] { color: var(--mint); }
+body.csv-preview main label[for="reject"] { color: var(--pink); }
+body.csv-preview main #totals { font-weight: 700; color: var(--text); }
+
