@@ -18,6 +18,9 @@ Status: **verification checklist, not executed evidence**. Applies to `01-excel-
 | Empty state | Load page with no file chosen; activate Validate | Helpful feedback, no stale success or invented output |
 | Invalid input | Use a *synthetic* CSV with missing required header; then an oversized local synthetic file | Clear rejection, bounded processing, no accepted-data claim |
 | Recovery | After invalid input, run fictional sample again | Feedback clears or updates correctly; outputs reflect the latest run |
+| Copy permission denied | Deny clipboard permission or open where clipboard APIs are unavailable; click both copy actions | No false “copied” success; manual text-selection fallback remains available |
+| Hostile CSV displayed as text | Supply only a synthetic CSV containing `<img src=x onerror=alert(1)>` in a text field and a formula-leading field such as `=1+1` | No script execution or HTML interpretation; warnings/rejections follow documented browser rules, without claiming universal spreadsheet safety |
+| Repeated actions | Start validation and promptly choose a different synthetic file or rerun the sample | Final totals and outputs correspond to the latest selection; no stale success announcement |
 | Data disclosure | Inspect page copy and browser network activity | Fictional data identified; no claim of server-side processing or production readiness |
 
 Record browser/version, operating system, viewport, commit SHA, result (PASS/FAIL/NOT RUN), screenshots or recording, and issue/PR for every defect. Do not record personal data. No pass is implied by this checklist.
@@ -29,3 +32,11 @@ Record browser/version, operating system, viewport, commit SHA, result (PASS/FAI
 - **Blocked:** do not mark UX_READY, PORTFOLIO_READY or COMMERCIALLY_DEMONSTRABLE until actual browser evidence exists and the required upstream contract gate is documented.
 
 Scope: existing eight-project portfolio only; no public deployment or external service authorized.
+
+## Execution record (fill only after real testing)
+
+| Commit SHA | Browser / OS | Width / zoom | Scenario | Result | Evidence URL | Defect |
+|---|---|---|---|---|---|---|
+| Not run | Not run | Not run | Clipboard-denied, hostile text, repeated actions | NOT RUN | None | Unassessed |
+
+This record is a blank evidence template, **not** proof that these scenarios passed. Avoid attaching CSVs with real contact information or screenshots containing personal data.
