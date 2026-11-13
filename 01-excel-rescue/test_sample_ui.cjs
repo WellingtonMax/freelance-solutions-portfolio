@@ -266,3 +266,49 @@ test("pending clipboard write disables repeat clicks and restores action on comp
   assert.equal(element("copy-clean").disabled, false);
   assert.match(element("copy-feedback").textContent, /copied to clipboard/);
 });
+
+
+test("superseded validation on the same selected file cannot overwrite newer output", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result", disabled: false,
+      files: [], handlers: {}, focus() {}, select() {},
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; },
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  const pending = [];
+  const file = {
+    size: 100,
+    text: () => new Promise(resolve => pending.push(resolve))
+  };
+  const processed = [];
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: {
+      MAX_BYTES: 1048576,
+      process(text) {
+        processed.push(text);
+        return { cleanCsv: text, rejectCsv: "", sourceRows: 1, accepted: [{}], rejected: [] };
+      }
+    },
+    ExcelRescueSample: "fictional csv",
+    navigator: {}
+  });
+  element("source").files = [file];
+  element("source").handlers.change();
+  const first = element("run").handlers.click();
+  // A second event may be dispatched programmatically even when the button is disabled.
+  const second = element("run").handlers.click();
+  pending[1]("newer result");
+  await second;
+  assert.equal(element("clean").value, "newer result");
+  pending[0]("obsolete result");
+  await first;
+  assert.deepEqual(processed, ["newer result"]);
+  assert.equal(element("clean").value, "newer result");
+  assert.equal(element("run").disabled, false);
+  assert.equal(element("feedback").attrs["aria-busy"], "false");
+});
