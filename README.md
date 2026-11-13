@@ -19,7 +19,15 @@
 7. [Data Quality Auditor — preview](07-data-quality-auditor/demo-ui.html)
 8. [Site Change Monitor — preview](08-site-change-monitor/demo-ui.html)
 
-> **Preview limitation:** GitHub displays linked HTML as source code, not as a running interface. These are **not hosted demo URLs**. Interactive one-tap access requires separately authorized static hosting and browser validation. The previews do not establish that the local Python workflows run in the browser.
+> **Preview limitation:** GitHub displays linked HTML as source code, not as a running interface. These are **not hosted demo URLs**. The local browser previews are separate from the Python CLI workflows; no public deployment or production readiness is implied.
+
+**Run the existing browser previews locally (no hosting account):** clone or download this repository, open a terminal in its root, then start a loopback-only static server:
+
+```sh
+python -m http.server 8000 --bind 127.0.0.1
+```
+
+Open [http://127.0.0.1:8000/index.html](http://127.0.0.1:8000/index.html) **on the same computer** and choose one of the eight entries. To open Excel Rescue directly, visit [http://127.0.0.1:8000/01-excel-rescue/try.html](http://127.0.0.1:8000/01-excel-rescue/try.html). Stop the server with `Ctrl+C`. These addresses work only while the local server is running; they are **not public demo links**. Use fictional input only; this simple static server is for local inspection, not production or network exposure. Browser-based preview behavior must still be tested independently.
 
 All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. Some offer browser previews; others are **local command-line tools**, not live web applications. Open each README for exact commands and limitations.
 
