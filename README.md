@@ -8,7 +8,7 @@
 
 ## The eight core projects
 
-**Quick access on mobile — eight HTML previews (source files, not hosted apps):**
+**Eight HTML source links (GitHub code view, not interactive mobile demos):**
 
 1. [Excel Rescue — CSV preview](01-excel-rescue/try.html)
 2. [Sales Intelligence — preview](02-sales-intelligence/demo-ui.html)
