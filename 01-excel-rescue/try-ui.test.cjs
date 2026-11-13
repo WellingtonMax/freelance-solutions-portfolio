@@ -2,6 +2,8 @@
 const assert = require("node:assert/strict");
 // The portfolio CI invokes this entrypoint; include the one-click and stale-read regressions.
 require("./test_sample_one_click.cjs");
+// Include the existing clipboard, hostile filename, and async UI regression suite in CI.
+require("./test_sample_ui.cjs");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
