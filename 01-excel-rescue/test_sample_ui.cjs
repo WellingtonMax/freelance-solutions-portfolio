@@ -177,6 +177,44 @@ test("late clipboard completion cannot announce success after changing CSV", asy
   assert.equal(element("result").hidden, true);
 });
 
+test("late rejected clipboard write cannot expose an obsolete error after changing CSV", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: id.startsWith("copy-"), files: [], handlers: {},
+      focus() { this.focused = true; },
+      select() { this.selected = true; },
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; },
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  let rejectCopy;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: { clipboard: { writeText: () => new Promise((_resolve, reject) => {
+      rejectCopy = reject;
+    }) } }
+  });
+  element("sample").handlers.click();
+  await element("run").handlers.click();
+  const pending = element("copy-reject").handlers.click();
+  assert.equal(element("copy-reject").disabled, true);
+  element("source").files = [{ name: "replacement.csv", size: 0 }];
+  element("source").handlers.change();
+  const expectedFeedback = element("copy-feedback").textContent;
+  rejectCopy(new Error("private/customer/clipboard.txt"));
+  await pending;
+  assert.equal(element("copy-feedback").textContent, expectedFeedback);
+  assert.doesNotMatch(element("copy-feedback").textContent, /permission denied|private|copied to clipboard/i);
+  assert.equal(element("reject").selected, undefined, "obsolete output must not be selected");
+  assert.equal(element("copy-reject").disabled, true);
+  assert.equal(element("result").hidden, true);
+});
+
 test("hostile local filename is never echoed into visible status", () => {
   const elements = new Map();
   function element(id) {
