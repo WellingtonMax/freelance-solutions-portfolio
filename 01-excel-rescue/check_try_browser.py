@@ -119,6 +119,17 @@ def exercise(browser, width):
         assert not page.locator("#copy-clean").is_disabled()
         assert not page.locator("#copy-reject").is_disabled()
         assert page.locator("#feedback").get_attribute("aria-busy") == "false"
+        # A native button must also support Space, including after error recovery.
+        # This checks the keyboard-only demo path without requiring a mouse.
+        page.locator("#sample").focus()
+        page.keyboard.press("Space")
+        page.locator("#result").wait_for(state="visible")
+        assert "Preview complete" in page.locator("#feedback").inner_text()
+        assert "1 accepted" in page.locator("#totals").inner_text()
+        assert "3 rejected" in page.locator("#totals").inner_text()
+        assert page.locator("#result-heading").evaluate(
+            "(e) => e === document.activeElement"
+        ), "Space activation must move focus to the result heading"
         assert not errors, f"JavaScript errors: {errors}"
         assert not external, f"Unexpected network requests: {external}"
         assert page.evaluate(
