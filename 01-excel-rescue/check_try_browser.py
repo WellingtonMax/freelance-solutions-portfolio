@@ -50,6 +50,21 @@ def exercise(browser, width):
         assert not page.locator("#copy-clean").is_disabled()
         assert not page.locator("#copy-reject").is_disabled()
 
+        # Clipboard APIs can be absent on file:// and restricted browsers.
+        # Verify both buttons offer a truthful, selectable manual fallback.
+        page.evaluate("Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined })")
+        for button_id, textarea_id, label in (
+            ("copy-clean", "clean", "Accepted"),
+            ("copy-reject", "reject", "Rejected"),
+        ):
+            page.locator("#" + button_id).click()
+            assert "Clipboard access is unavailable" in page.locator("#copy-feedback").inner_text()
+            assert label in page.locator("#copy-feedback").inner_text()
+            assert page.locator("#" + textarea_id).evaluate(
+                "(e) => e === document.activeElement && e.selectionStart === 0 && e.selectionEnd === e.value.length"
+            ), "Manual CSV fallback must focus and select the entire output"
+            assert not page.locator("#" + button_id).is_disabled()
+
         hostile = (
             "name,email,signup_date,city\\n"
             "<img src=https://example.invalid/x>,bad@example.com,2026-01-01,Test\\n"
