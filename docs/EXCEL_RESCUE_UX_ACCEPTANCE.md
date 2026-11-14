@@ -25,6 +25,21 @@ Status: **verification checklist, not executed evidence**. Applies to `01-excel-
 
 Record browser/version, operating system, viewport, commit SHA, result (PASS/FAIL/NOT RUN), screenshots or recording, and issue/PR for every defect. Do not record personal data. No pass is implied by this checklist.
 
+## Combined PR #83 + #84 acceptance — integration debt
+
+This section is a **test specification**, not evidence of a run. Test only after assembling both PR heads on an isolated local branch; neither standalone green CI nor disjoint filenames establishes combined behavior. Keep the browser preview distinct from the Python reference implementation.
+
+| Scenario | Reproduction with synthetic inputs | Expected observable result |
+|---|---|---|
+| One-click sample | Reload; select **Try fictional sample** once | Accepted/rejected totals and both copyable outputs appear without activating **Validate CSV**; status reflects the sample, not a pending local file |
+| Pending read superseded | Choose a large but within-limit fictional CSV; before its read settles, activate the fictional sample | The sample remains the final visible result; no stale file completion or error overwrites its totals, outputs or announcement |
+| Stale read rejection | Simulate a failed earlier file read after the sample has completed, using the existing frontend regression harness | Earlier failure cannot replace sample success, reveal stale CSV or cause a misleading error announcement |
+| Recover after rejection | Validate a synthetic CSV with a missing required header, then activate the sample | Error is replaced by current sample feedback; result region and copy controls reflect only the latest operation |
+| Narrow viewport + zoom | Repeat sample, copy and error recovery at 320/375 CSS px and 400% zoom | Controls and long headers remain readable, focus visible, no clipped status or horizontal page overflow; output textarea may scroll horizontally |
+| Clipboard blocked | Deny clipboard permission and attempt both copy buttons after sample completion | No false success; status explains manual selection and output remains selectable |
+
+Capture the **combined commit SHA**, browser/OS, exact fixture, viewport, outcome and screenshot/recording for each case. Run existing JS/Python/Chromium/security checks against the assembled tree, not merely against the individual PR heads. On any failure, report the smallest reproduction in PR #83/#84 and leave both unmerged pending Backend review. Only Backend may perform the final merge.
+
 ## Handoff and release gate
 - **Design/UX:** review evidence, classify navigation, focus, microcopy and accessibility defects; propose isolated corrections.
 - **Frontend:** implement interface fixes and provide browser/E2E evidence without changing business rules.
