@@ -1,6 +1,6 @@
 :root{color-scheme:dark;--bg:#090f1b;--panel:#121d30;--panel2:#17253a;--line:#2a3d56;--text:#f2f6ff;--muted:#a3b9d4;--mint:#61e4c6;--pink:#ff929f}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}
-.skip-link{position:absolute;z-index:100;top:12px;left:12px;padding:12px 16px;border-radius:8px;background:#f2f6ff;color:#090f1b;font-weight:750;text-decoration:none;transform:translateY(-160%)}.skip-link:focus{transform:translateY(0);outline:3px solid var(--mint);outline-offset:3px}#audit-title:focus{outline:3px solid var(--mint);outline-offset:5px}#preview-heading:focus{outline:3px solid var(--mint);outline-offset:5px}
+.skip-link{position:absolute;z-index:100;top:12px;left:12px;padding:12px 16px;border-radius:8px;background:#f2f6ff;color:#090f1b;font-weight:750;text-decoration:none;transform:translateY(-160%)}.skip-link:focus{transform:translateY(0);outline:3px solid var(--mint);outline-offset:3px}#audit-title:focus{outline:3px solid var(--mint);outline-offset:5px}#preview-heading:focus{outline:3px solid var(--mint);outline-offset:5px}#result-heading:focus{outline:3px solid var(--mint);outline-offset:5px}
 main{max-width:1600px;margin:auto;padding:0 24px 28px}a{color:var(--mint)}a:focus-visible,button:focus-visible,input[type="file"]:focus-visible,textarea:focus-visible{outline:3px solid var(--mint);outline-offset:3px}
 h1,h2,p{margin-top:0}h1{font-size:clamp(34px,3.2vw,50px);line-height:1.12;letter-spacing:-.045em;margin-bottom:12px}h1 em{font-style:normal;color:var(--mint)}h2{font-size:19px;line-height:1.25;letter-spacing:-.025em;margin-bottom:7px}
 p{color:var(--muted)}.topbar{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:17px 2px}.brand{font-size:19px;font-weight:850;letter-spacing:.015em;text-decoration:none;color:var(--text)}.brand span{color:var(--mint)}
@@ -19,3 +19,95 @@ footer{padding:22px 3px 4px;color:var(--muted);font-size:12px}footer strong{colo
 @media(max-width:1080px){.workspace{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:repeat(2,1fr)}.metrics{grid-template-columns:repeat(3,1fr)}.bar-card{grid-column:1/-1}.hero{grid-template-columns:minmax(0,1fr) 270px}}
 @media(max-width:720px){.controls{flex-wrap:wrap;width:100%}.controls button{flex:1 1 110px;min-width:0}main{padding:0 13px 24px}.top-tag{display:none}.hero{grid-template-columns:1fr;gap:15px}.metrics{gap:8px}.metric{padding:13px;min-height:95px}.metric>strong{font-size:29px}.sidebar{grid-template-columns:1fr}.panel-head{padding:16px 14px 12px}.toolbar{padding:0 11px 12px}.scroll{padding:0}.audit-footer{padding:12px;flex-wrap:wrap}.comparison{grid-template-columns:1fr;padding:0 14px 16px}.compare-arrow{transform:rotate(90deg)}.code-list>div{flex-wrap:wrap}.sample-pill,.quiet{display:none}}
 @media(max-width:420px){.metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.metric{min-width:0}.bar-card{grid-column:1/-1}.metric>span{display:block;overflow-wrap:anywhere}}
+
+/* Local CSV preview only: keep form controls and trust copy clear of panel borders.
+   The audit dashboard uses the same .panel class and must retain its own layout. */
+body.csv-preview main > .panel { padding: 20px 24px; }
+@media (max-width: 420px) {
+  body.csv-preview main > .panel { padding: 16px 14px; }
+}
+
+/* Keep copyable CSV outputs within the narrow preview panel at mobile widths.
+   Preserve raw CSV formatting and keyboard focus without affecting the dashboard. */
+body.csv-preview main textarea {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 8px 0 18px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0d1727;
+  color: var(--text);
+  font: 13px/1.5 ui-monospace, Consolas, monospace;
+  resize: vertical;
+}
+
+/* The native file picker and long control labels must reflow at 320px/400% zoom. */
+body.csv-preview main input[type="file"] {
+  display: block;
+  max-width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+body.csv-preview main button {
+  max-width: 100%;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid #438f81;
+  border-radius: 8px;
+  background: #174b43;
+  color: var(--text);
+  font: 650 14px/1.4 system-ui, sans-serif;
+  cursor: pointer;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+body.csv-preview main button:hover:not(:disabled) { background: #24665a; }
+body.csv-preview main button:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Distinguish review outcomes without relying on color alone: the adjacent labels
+   remain the primary status text, while these accents aid rapid scanning. */
+body.csv-preview main label[for="clean"],
+body.csv-preview main label[for="reject"] {
+  display: block;
+  margin-top: 14px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+body.csv-preview main label[for="clean"] { color: var(--mint); }
+body.csv-preview main label[for="reject"] { color: var(--pink); }
+body.csv-preview main #totals { font-weight: 700; color: var(--text); }
+
+
+/* Long literal CSV header examples must wrap at 320 CSS px and 400% zoom. */
+body.csv-preview main code { overflow-wrap: anywhere; word-break: normal; }
+
+/* Untrusted local filenames and validation messages may contain unbroken tokens.
+   Keep live status text readable at narrow widths without altering its content. */
+body.csv-preview main #feedback,
+body.csv-preview main #copy-feedback,
+body.csv-preview main #totals {
+  overflow-wrap: anywhere;
+}
+
+/* The fictional sample is the safest first action for portfolio visitors.
+   Keep local-file validation available but visually secondary; both remain
+   keyboard-operable and retain the same visible focus treatment. */
+body.csv-preview main #sample {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: var(--bg);
+  font-weight: 800;
+}
+body.csv-preview main #sample:hover:not(:disabled) {
+  background: #9af3df;
+  border-color: #9af3df;
+}
+body.csv-preview main #run {
+  background: transparent;
+  border-color: #648a91;
+  color: var(--text);
+}
+body.csv-preview main #run:hover:not(:disabled) { background: #213e48; }
