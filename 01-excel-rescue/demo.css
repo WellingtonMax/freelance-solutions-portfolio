@@ -80,3 +80,6 @@ body.csv-preview main label[for="clean"] { color: var(--mint); }
 body.csv-preview main label[for="reject"] { color: var(--pink); }
 body.csv-preview main #totals { font-weight: 700; color: var(--text); }
 
+
+/* Long literal CSV header examples must wrap at 320 CSS px and 400% zoom. */
+body.csv-preview main code { overflow-wrap: anywhere; word-break: normal; }
