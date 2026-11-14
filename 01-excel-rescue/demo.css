@@ -83,3 +83,11 @@ body.csv-preview main #totals { font-weight: 700; color: var(--text); }
 
 /* Long literal CSV header examples must wrap at 320 CSS px and 400% zoom. */
 body.csv-preview main code { overflow-wrap: anywhere; word-break: normal; }
+
+/* Untrusted local filenames and validation messages may contain unbroken tokens.
+   Keep live status text readable at narrow widths without altering its content. */
+body.csv-preview main #feedback,
+body.csv-preview main #copy-feedback,
+body.csv-preview main #totals {
+  overflow-wrap: anywhere;
+}
