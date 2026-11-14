@@ -65,6 +65,24 @@ def exercise(browser, width):
             ), "Manual CSV fallback must focus and select the entire output"
             assert not page.locator("#" + button_id).is_disabled()
 
+        # A clipboard API may exist but reject a permission request.
+        # Neither copy action may claim success or strand the user.
+        page.evaluate("""() => Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: async () => { throw new DOMException('Denied', 'NotAllowedError'); } }
+        })""")
+        for button_id, textarea_id, label in (
+            ("copy-clean", "clean", "Accepted"),
+            ("copy-reject", "reject", "Rejected"),
+        ):
+            page.locator("#" + button_id).click()
+            page.get_by_text("Clipboard permission denied", exact=False).wait_for()
+            assert label in page.locator("#copy-feedback").inner_text()
+            assert page.locator("#" + textarea_id).evaluate(
+                "(e) => e === document.activeElement && e.selectionStart === 0 && e.selectionEnd === e.value.length"
+            ), "Denied clipboard write must select the full CSV for manual copy"
+            assert not page.locator("#" + button_id).is_disabled()
+
         hostile = (
             "name,email,signup_date,city\\n"
             "<img src=https://example.invalid/x>,bad@example.com,2026-01-01,Test\\n"
