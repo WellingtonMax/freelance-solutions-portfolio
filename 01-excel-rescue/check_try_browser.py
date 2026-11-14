@@ -57,7 +57,9 @@ def exercise(browser, width):
             ("copy-clean", "clean", "Accepted"),
             ("copy-reject", "reject", "Rejected"),
         ):
-            page.locator("#" + button_id).click()
+            # Copy controls must work with a keyboard, including file:// fallback.
+            page.locator("#" + button_id).focus()
+            page.keyboard.press("Space")
             assert "Clipboard access is unavailable" in page.locator("#copy-feedback").inner_text()
             assert label in page.locator("#copy-feedback").inner_text()
             assert page.locator("#" + textarea_id).evaluate(
