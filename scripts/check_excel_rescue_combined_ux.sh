@@ -28,11 +28,21 @@ git -c user.name='Disposable UX check' -c user.email='ux-check@example.invalid' 
 printf 'Combined local commit: %s\n' "$(git rev-parse HEAD)"
 cd 01-excel-rescue
 python3 -m unittest discover -v
+# These suites are required for the combined UX/frontend handoff.
+# A missing test must fail the check, not produce a misleading green result.
 for test in try-ui.test.cjs test_sample_ui.cjs test_sample_one_click.cjs; do
-  if [[ -f "$test" ]]; then node --test "$test"; fi
+  if [[ ! -f "$test" ]]; then
+    echo "Required combined-tree test missing: $test" >&2
+    exit 1
+  fi
+  node --test "$test"
 done
 if [[ ${1:-} == '--browser' ]]; then
   echo 'Running Chromium browser regression on the COMBINED tree (not a screen-reader audit).'
+  if [[ ! -f check_try_browser.py ]]; then
+    echo 'Required Chromium acceptance script missing: check_try_browser.py' >&2
+    exit 1
+  fi
   python3 check_try_browser.py
 else
   echo 'Browser regression NOT RUN. Re-run with --browser after installing Playwright and Chromium.'
