@@ -45,9 +45,12 @@ sampleButton.addEventListener("click", () => {
   sampleSelected = true;
   source.value = "";
   resetPreview();
-  feedback.textContent = "Fictional sample.csv selected. Select Validate CSV in this browser to continue.";
+  feedback.textContent = "Processing fictional sample locally…";
+  // The sample is bundled and safe to run immediately: make the primary demo one click.
+  // Reuse the normal validation path, including result focus and error handling.
+  void processSelection();
 });
-run.addEventListener("click", async () => {
+async function processSelection() {
   resetPreview();
   const file = sampleSelected ? null : selectedFile();
   const usingSample = sampleSelected;
@@ -68,7 +71,7 @@ run.addEventListener("click", async () => {
   try {
     const text = usingSample ? ExcelRescueSample : await file.text();
     // Selection can change while the file is being read: never show stale output.
-    if (version !== selectionVersion) return;
+    if (version !== selectionVersion || processingVersion !== previewVersion) return;
     const output = CsvRescuePreview.process(text);
     if (!usingSample && selectedFile() !== file) return;
     clean.value = output.cleanCsv;
@@ -89,7 +92,7 @@ run.addEventListener("click", async () => {
       ? "Preview complete: no records accepted. Review rejection reasons."
       : "Preview complete: " + output.accepted.length + " accepted, " + output.rejected.length + " rejected. No data was transmitted.";
   } catch (error) {
-    if (version === selectionVersion) {
+    if (version === selectionVersion && processingVersion === previewVersion) {
       feedback.textContent = "Unable to read or validate this CSV. Check UTF-8 encoding and required headers, then try again. Your file was not uploaded.";
     }
   } finally {
@@ -99,7 +102,8 @@ run.addEventListener("click", async () => {
       run.disabled = false;
     }
   }
-});
+}
+run.addEventListener("click", processSelection);
 
 // Clipboard access may be blocked for file:// or insecure origins. Never claim success on failure.
 async function copyOutput(textarea, button, label) {

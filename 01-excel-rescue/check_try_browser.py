@@ -38,15 +38,50 @@ def exercise(browser, width):
         assert "Choose a CSV file" in page.locator("#feedback").inner_text()
         assert page.locator("#source").evaluate("(e) => e === document.activeElement")
 
-        page.locator("#sample").click()
-        assert "Fictional sample.csv selected" in page.locator("#feedback").inner_text()
-        page.locator("#run").click()
+        # Exercise the primary one-click demo using keyboard activation, not a mouse.
+        page.locator("#sample").focus()
+        assert page.locator("#sample").evaluate("(e) => e === document.activeElement")
+        page.keyboard.press("Enter")
         page.locator("#result").wait_for(state="visible")
+        assert "Preview complete" in page.locator("#feedback").inner_text()
         assert "1 accepted" in page.locator("#totals").inner_text()
         assert "3 rejected" in page.locator("#totals").inner_text()
         assert page.locator("#result-heading").evaluate("(e) => e === document.activeElement")
         assert not page.locator("#copy-clean").is_disabled()
         assert not page.locator("#copy-reject").is_disabled()
+
+        # Clipboard APIs can be absent on file:// and restricted browsers.
+        # Verify both buttons offer a truthful, selectable manual fallback.
+        page.evaluate("Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined })")
+        for button_id, textarea_id, label in (
+            ("copy-clean", "clean", "Accepted"),
+            ("copy-reject", "reject", "Rejected"),
+        ):
+            page.locator("#" + button_id).click()
+            assert "Clipboard access is unavailable" in page.locator("#copy-feedback").inner_text()
+            assert label in page.locator("#copy-feedback").inner_text()
+            assert page.locator("#" + textarea_id).evaluate(
+                "(e) => e === document.activeElement && e.selectionStart === 0 && e.selectionEnd === e.value.length"
+            ), "Manual CSV fallback must focus and select the entire output"
+            assert not page.locator("#" + button_id).is_disabled()
+
+        # A clipboard API may exist but reject a permission request.
+        # Neither copy action may claim success or strand the user.
+        page.evaluate("""() => Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: async () => { throw new DOMException('Denied', 'NotAllowedError'); } }
+        })""")
+        for button_id, textarea_id, label in (
+            ("copy-clean", "clean", "Accepted"),
+            ("copy-reject", "reject", "Rejected"),
+        ):
+            page.locator("#" + button_id).click()
+            page.get_by_text("Clipboard permission denied", exact=False).wait_for()
+            assert label in page.locator("#copy-feedback").inner_text()
+            assert page.locator("#" + textarea_id).evaluate(
+                "(e) => e === document.activeElement && e.selectionStart === 0 && e.selectionEnd === e.value.length"
+            ), "Denied clipboard write must select the full CSV for manual copy"
+            assert not page.locator("#" + button_id).is_disabled()
 
         hostile = (
             "name,email,signup_date,city\\n"
@@ -77,9 +112,8 @@ def exercise(browser, width):
         assert page.locator("#feedback").get_attribute("aria-busy") == "false"
         # Recovery: a rejected large file must not poison the next valid run.
         page.locator("#sample").click()
-        assert "Fictional sample.csv selected" in page.locator("#feedback").inner_text()
-        page.locator("#run").click()
         page.locator("#result").wait_for(state="visible")
+        assert "Preview complete" in page.locator("#feedback").inner_text()
         assert "1 accepted" in page.locator("#totals").inner_text()
         assert "3 rejected" in page.locator("#totals").inner_text()
         assert not page.locator("#copy-clean").is_disabled()

@@ -27,8 +27,8 @@ test("fictional sample click renders actual accepted/rejected CSV outputs", asyn
   };
   vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), context);
   element("sample").handlers.click();
-  assert.match(element("feedback").textContent, /Fictional sample/);
-  await element("run").handlers.click();
+  await Promise.resolve();
+  assert.match(element("feedback").textContent, /Preview complete/);
   assert.equal(element("result").hidden, false);
   assert.equal(element("totals").textContent, "4 input rows · 1 accepted · 3 rejected");
   assert.match(element("clean").value, /bob@example.com/);
@@ -177,6 +177,44 @@ test("late clipboard completion cannot announce success after changing CSV", asy
   assert.equal(element("result").hidden, true);
 });
 
+test("late rejected clipboard write cannot expose an obsolete error after changing CSV", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result",
+      disabled: id.startsWith("copy-"), files: [], handlers: {},
+      focus() { this.focused = true; },
+      select() { this.selected = true; },
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; },
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  let rejectCopy;
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: require("./try.js"),
+    ExcelRescueSample: require("./sample-data.js"),
+    navigator: { clipboard: { writeText: () => new Promise((_resolve, reject) => {
+      rejectCopy = reject;
+    }) } }
+  });
+  element("sample").handlers.click();
+  await element("run").handlers.click();
+  const pending = element("copy-reject").handlers.click();
+  assert.equal(element("copy-reject").disabled, true);
+  element("source").files = [{ name: "replacement.csv", size: 0 }];
+  element("source").handlers.change();
+  const expectedFeedback = element("copy-feedback").textContent;
+  rejectCopy(new Error("private/customer/clipboard.txt"));
+  await pending;
+  assert.equal(element("copy-feedback").textContent, expectedFeedback);
+  assert.doesNotMatch(element("copy-feedback").textContent, /permission denied|private|copied to clipboard/i);
+  assert.equal(element("reject").selected, undefined, "obsolete output must not be selected");
+  assert.equal(element("copy-reject").disabled, true);
+  assert.equal(element("result").hidden, true);
+});
+
 test("hostile local filename is never echoed into visible status", () => {
   const elements = new Map();
   function element(id) {
@@ -265,4 +303,50 @@ test("pending clipboard write disables repeat clicks and restores action on comp
   await pending;
   assert.equal(element("copy-clean").disabled, false);
   assert.match(element("copy-feedback").textContent, /copied to clipboard/);
+});
+
+
+test("superseded validation on the same selected file cannot overwrite newer output", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      value: "", textContent: "", hidden: id === "result", disabled: false,
+      files: [], handlers: {}, focus() {}, select() {},
+      setAttribute(name, value) { (this.attrs ??= {})[name] = value; },
+      addEventListener(name, fn) { this.handlers[name] = fn; }
+    });
+    return elements.get(id);
+  }
+  const pending = [];
+  const file = {
+    size: 100,
+    text: () => new Promise(resolve => pending.push(resolve))
+  };
+  const processed = [];
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, "try-ui.js"), "utf8"), {
+    document: { getElementById: element },
+    CsvRescuePreview: {
+      MAX_BYTES: 1048576,
+      process(text) {
+        processed.push(text);
+        return { cleanCsv: text, rejectCsv: "", sourceRows: 1, accepted: [{}], rejected: [] };
+      }
+    },
+    ExcelRescueSample: "fictional csv",
+    navigator: {}
+  });
+  element("source").files = [file];
+  element("source").handlers.change();
+  const first = element("run").handlers.click();
+  // A second event may be dispatched programmatically even when the button is disabled.
+  const second = element("run").handlers.click();
+  pending[1]("newer result");
+  await second;
+  assert.equal(element("clean").value, "newer result");
+  pending[0]("obsolete result");
+  await first;
+  assert.deepEqual(processed, ["newer result"]);
+  assert.equal(element("clean").value, "newer result");
+  assert.equal(element("run").disabled, false);
+  assert.equal(element("feedback").attrs["aria-busy"], "false");
 });
