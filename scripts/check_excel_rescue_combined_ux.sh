@@ -1,8 +1,20 @@
 #!/usr/bin/env bash
-# P01-F01: local combined-tree regression check for PR #83 (UX) + #84 (frontend).
-# Disposable clone only; no push, remote merge, deploy, credentials or user files.
+# P01-F01: disposable combined-tree check for PR #83 (UX) and #84 (frontend).
+# No push, remote merge, deploy, credentials or persistent checkout.
 set -Eeuo pipefail
-for cmd in git python3 node; do command -v "$cmd" >/dev/null || { echo "Missing: $cmd" >&2; exit 2; }; done
+if [[ $# -gt 1 || ( $# -eq 1 && "$1" != '--browser' ) ]]; then
+  echo 'Usage: check_excel_rescue_combined_ux.sh [--browser]' >&2
+  exit 2
+fi
+for cmd in git python3 node; do
+  command -v "$cmd" >/dev/null || { echo "Missing: $cmd" >&2; exit 2; }
+done
+if [[ ${1:-} == '--browser' ]]; then
+  python3 -c 'import playwright.sync_api' || {
+    echo 'Browser acceptance requires Python Playwright and installed Chromium; no browser test was run.' >&2
+    exit 2
+  }
+fi
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 git clone --quiet --no-checkout https://github.com/WellingtonMax/freelance-solutions-portfolio.git "$tmp/repo"
@@ -19,4 +31,10 @@ python3 -m unittest discover -v
 for test in try-ui.test.cjs test_sample_ui.cjs test_sample_one_click.cjs; do
   if [[ -f "$test" ]]; then node --test "$test"; fi
 done
-echo 'Local automated checks finished. Browser/CI, keyboard, screen reader, 320/375px and 400% zoom remain separate manual acceptance gates.'
+if [[ ${1:-} == '--browser' ]]; then
+  echo 'Running Chromium browser regression on the COMBINED tree (not a screen-reader audit).'
+  python3 check_try_browser.py
+else
+  echo 'Browser regression NOT RUN. Re-run with --browser after installing Playwright and Chromium.'
+fi
+echo 'Manual acceptance still required: screen reader, 400% zoom, and independent keyboard review. No CI or merge approval implied.'
