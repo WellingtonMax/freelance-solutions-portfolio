@@ -91,3 +91,23 @@ body.csv-preview main #copy-feedback,
 body.csv-preview main #totals {
   overflow-wrap: anywhere;
 }
+
+/* The fictional sample is the safest first action for portfolio visitors.
+   Keep local-file validation available but visually secondary; both remain
+   keyboard-operable and retain the same visible focus treatment. */
+body.csv-preview main #sample {
+  background: var(--mint);
+  border-color: var(--mint);
+  color: var(--bg);
+  font-weight: 800;
+}
+body.csv-preview main #sample:hover:not(:disabled) {
+  background: #9af3df;
+  border-color: #9af3df;
+}
+body.csv-preview main #run {
+  background: transparent;
+  border-color: #648a91;
+  color: var(--text);
+}
+body.csv-preview main #run:hover:not(:disabled) { background: #213e48; }
