@@ -156,6 +156,22 @@ def exercise(browser, width):
         assert page.locator("#result-heading").evaluate(
             "(e) => e === document.activeElement"
         ), "Space activation must move focus to the result heading"
+        # Automated 400% CSS zoom proxy at a 1280px desktop viewport.
+        # This is NOT a manual browser-zoom or screen-reader certification.
+        if width == 1280:
+            page.evaluate("document.documentElement.style.zoom = '4'")
+            assert page.evaluate(
+                "document.documentElement.scrollWidth <= document.documentElement.clientWidth"
+            ), "400% CSS zoom proxy causes horizontal page overflow"
+            assert page.locator("#sample").is_visible(), "Primary demo action must remain visible at zoom"
+            page.locator("#sample").focus()
+            page.keyboard.press("Enter")
+            page.locator("#result").wait_for(state="visible")
+            assert "Preview complete" in page.locator("#feedback").inner_text()
+            assert page.locator("#result-heading").evaluate(
+                "(e) => e === document.activeElement"
+            ), "Zoomed keyboard activation must preserve result focus"
+            page.evaluate("document.documentElement.style.zoom = ''")
         assert not errors, f"JavaScript errors: {errors}"
         assert not external, f"Unexpected network requests: {external}"
         assert page.evaluate(
