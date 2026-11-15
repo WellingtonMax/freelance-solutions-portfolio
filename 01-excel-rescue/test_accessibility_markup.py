@@ -116,6 +116,27 @@ class PreviewAccessibilityMarkupTests(unittest.TestCase):
                     target_tag, _ = self.page.one(attrs["for"])
                     self.assertIn(target_tag, ("input", "textarea", "select", "button", "output"))
 
+    def test_every_form_control_has_accessible_name(self):
+        # A new field can be visually present but invisible to screen-reader
+        # form navigation if its author forgets to associate a label.
+        for tag, attrs in self.page.elements:
+            if tag not in ("input", "textarea", "select"):
+                continue
+            if tag == "input" and attrs.get("type") == "hidden":
+                continue
+            with self.subTest(tag=tag, element_id=attrs.get("id")):
+                element_id = attrs.get("id", "")
+                labels = [a for t, a in self.page.elements
+                          if t == "label" and a.get("for") == element_id] if element_id else []
+                accessible_name = attrs.get("aria-label", "").strip()
+                labelledby = attrs.get("aria-labelledby", "").split()
+                for target in labelledby:
+                    self.page.one(target)
+                self.assertTrue(
+                    len(labels) == 1 or accessible_name or labelledby,
+                    f"{tag}#{element_id}: missing accessible name",
+                )
+
     def test_describedby_targets_exist(self):
         for tag, attrs in self.page.elements:
             if "aria-describedby" in attrs:
