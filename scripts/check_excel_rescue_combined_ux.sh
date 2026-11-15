@@ -40,6 +40,20 @@ printf 'UX PR #83: %s\nFrontend PR #84: %s\n' "$ux" "$front"
 # Exercise the exact integration target as well as both PR heads.
 # Starting from UX alone could pass while current main has conflicting changes.
 base="$(git rev-parse refs/remotes/origin/HEAD)"
+# An optional main pin prevents a successful test on a different integration base.
+# Use the reviewed main SHA; this is independent of the two PR-head pins.
+if [[ -n "${BASE_EXPECTED_SHA:-}" ]]; then
+  if [[ ! "$BASE_EXPECTED_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+    echo 'BASE_EXPECTED_SHA must be a full 40-character lowercase commit SHA.' >&2
+    exit 2
+  fi
+  if [[ "$base" != "$BASE_EXPECTED_SHA" ]]; then
+    printf 'Integration base changed; refusing stale evidence. Expected=%s Actual=%s\n' "$BASE_EXPECTED_SHA" "$base" >&2
+    exit 1
+  fi
+else
+  echo 'UNPINNED BASE: record the remote default-branch SHA before citing integration evidence.' >&2
+fi
 printf 'Integration base (remote default branch): %s\n' "$base"
 git checkout --quiet --detach "$base"
 git -c user.name='Disposable UX check' -c user.email='ux-check@example.invalid' merge --no-ff --no-edit "$ux"
