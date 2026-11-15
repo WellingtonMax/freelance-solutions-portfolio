@@ -75,6 +75,26 @@ class PreviewAccessibilityMarkupTests(unittest.TestCase):
         self.assertIn("source-help", attrs.get("aria-describedby", "").split())
         self.page.one("source-help")
 
+    def test_result_disclosure_and_copy_controls_are_accessible(self):
+        # The validation action must identify its controlled result region.
+        _, run = self.page.one("run")
+        self.assertIn("result", run.get("aria-controls", "").split())
+        result_tag, result = self.page.one("result")
+        self.assertEqual(result_tag, "div")
+        self.assertIn("hidden", result)
+        heading_tag, heading = self.page.one("result-heading")
+        self.assertEqual(heading_tag, "h3")
+        self.assertEqual(heading.get("tabindex"), "-1")
+
+        # Copy actions must start disabled until valid output is available,
+        # and their feedback must be programmatically discoverable.
+        for element_id in ("copy-clean", "copy-reject"):
+            with self.subTest(control=element_id):
+                tag, attrs = self.page.one(element_id)
+                self.assertEqual(tag, "button")
+                self.assertIn("disabled", attrs)
+                self.assertIn("copy-feedback", attrs.get("aria-describedby", "").split())
+
     def test_describedby_targets_exist(self):
         for tag, attrs in self.page.elements:
             if "aria-describedby" in attrs:
