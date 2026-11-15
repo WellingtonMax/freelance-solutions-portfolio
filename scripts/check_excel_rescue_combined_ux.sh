@@ -37,7 +37,12 @@ else
   echo 'UNPINNED CHECK: PR heads may move; record the printed SHAs before citing results.' >&2
 fi
 printf 'UX PR #83: %s\nFrontend PR #84: %s\n' "$ux" "$front"
-git checkout --quiet --detach "$ux"
+# Exercise the exact integration target as well as both PR heads.
+# Starting from UX alone could pass while current main has conflicting changes.
+base="$(git rev-parse refs/remotes/origin/HEAD)"
+printf 'Integration base (remote default branch): %s\n' "$base"
+git checkout --quiet --detach "$base"
+git -c user.name='Disposable UX check' -c user.email='ux-check@example.invalid' merge --no-ff --no-edit "$ux"
 git -c user.name='Disposable UX check' -c user.email='ux-check@example.invalid' merge --no-ff --no-edit "$front"
 printf 'Combined local commit: %s\n' "$(git rev-parse HEAD)"
 cd 01-excel-rescue
