@@ -95,6 +95,17 @@ class PreviewAccessibilityMarkupTests(unittest.TestCase):
                 self.assertIn("disabled", attrs)
                 self.assertIn("copy-feedback", attrs.get("aria-describedby", "").split())
 
+    def test_all_aria_controls_targets_exist(self):
+        # A stale aria-controls ID silently breaks the announced relationship
+        # between an action and the region it changes.
+        for tag, attrs in self.page.elements:
+            if "aria-controls" in attrs:
+                with self.subTest(tag=tag, element_id=attrs.get("id")):
+                    targets = attrs["aria-controls"].split()
+                    self.assertTrue(targets, "aria-controls cannot be empty")
+                    for target in targets:
+                        self.page.one(target)
+
     def test_describedby_targets_exist(self):
         for tag, attrs in self.page.elements:
             if "aria-describedby" in attrs:
