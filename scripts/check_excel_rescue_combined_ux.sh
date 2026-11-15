@@ -22,6 +22,20 @@ cd "$tmp/repo"
 git fetch --quiet origin refs/pull/83/head:refs/remotes/origin/ux83 refs/pull/84/head:refs/remotes/origin/front84
 ux="$(git rev-parse refs/remotes/origin/ux83)"
 front="$(git rev-parse refs/remotes/origin/front84)"
+# Optional SHA pins prevent a moving PR head from silently changing the tested pair.
+# Set both variables to the full SHAs verified in the PR review.
+if [[ -n "${UX_EXPECTED_SHA:-}" || -n "${FRONTEND_EXPECTED_SHA:-}" ]]; then
+  if [[ ! "${UX_EXPECTED_SHA:-}" =~ ^[0-9a-f]{40}$ || ! "${FRONTEND_EXPECTED_SHA:-}" =~ ^[0-9a-f]{40}$ ]]; then
+    echo 'Set BOTH UX_EXPECTED_SHA and FRONTEND_EXPECTED_SHA to full 40-character lowercase SHAs.' >&2
+    exit 2
+  fi
+  if [[ "$ux" != "$UX_EXPECTED_SHA" || "$front" != "$FRONTEND_EXPECTED_SHA" ]]; then
+    printf 'PR heads changed; refusing stale integration evidence. UX=%s Frontend=%s\\n' "$ux" "$front" >&2
+    exit 1
+  fi
+else
+  echo 'UNPINNED CHECK: PR heads may move; record the printed SHAs before citing results.' >&2
+fi
 printf 'UX PR #83: %s\nFrontend PR #84: %s\n' "$ux" "$front"
 git checkout --quiet --detach "$ux"
 git -c user.name='Disposable UX check' -c user.email='ux-check@example.invalid' merge --no-ff --no-edit "$front"
