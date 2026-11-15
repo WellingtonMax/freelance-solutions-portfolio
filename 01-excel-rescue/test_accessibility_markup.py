@@ -52,6 +52,29 @@ class PreviewAccessibilityMarkupTests(unittest.TestCase):
             with self.subTest(element_id=element_id):
                 self.assertEqual(len(matches), 1)
 
+    def test_primary_navigation_and_file_picker_are_accessible(self):
+        # A visible skip link without a real, focusable destination is misleading
+        # for keyboard users, particularly after zoom/reflow.
+        skip_links = [attrs for tag, attrs in self.page.elements
+                      if tag == "a" and "skip-link" in attrs.get("class", "").split()]
+        self.assertEqual(len(skip_links), 1)
+        destination = skip_links[0].get("href", "")
+        self.assertTrue(destination.startswith("#") and len(destination) > 1)
+        tag, attrs = self.page.one(destination[1:])
+        self.assertIn(tag, ("h1", "h2", "h3", "main"))
+        self.assertEqual(attrs.get("tabindex"), "-1")
+
+        # Native file selection must retain a single programmatic label and
+        # explanatory help, even when layout and visual copy are redesigned.
+        tag, attrs = self.page.one("source")
+        self.assertEqual(tag, "input")
+        self.assertEqual(attrs.get("type"), "file")
+        labels = [a for t, a in self.page.elements
+                  if t == "label" and a.get("for") == "source"]
+        self.assertEqual(len(labels), 1)
+        self.assertIn("source-help", attrs.get("aria-describedby", "").split())
+        self.page.one("source-help")
+
     def test_describedby_targets_exist(self):
         for tag, attrs in self.page.elements:
             if "aria-describedby" in attrs:
