@@ -50,6 +50,27 @@ def exercise(browser, width):
         assert not page.locator("#copy-clean").is_disabled()
         assert not page.locator("#copy-reject").is_disabled()
 
+        # Successful clipboard writes must report success for the correct output.
+        # Stub the browser API: no OS clipboard access or external service is used.
+        page.evaluate("""() => {
+            window.__copiedCsv = [];
+            Object.defineProperty(navigator, 'clipboard', {
+                configurable: true,
+                value: { writeText: async (text) => { window.__copiedCsv.push(text); } }
+            });
+        }""")
+        for button_id, textarea_id, label in (
+            ("copy-clean", "clean", "Accepted"),
+            ("copy-reject", "reject", "Rejected"),
+        ):
+            expected = page.locator("#" + textarea_id).input_value()
+            page.locator("#" + button_id).click()
+            page.get_by_text(label + " CSV copied to clipboard.", exact=True).wait_for()
+            assert page.evaluate("window.__copiedCsv.at(-1)") == expected, (
+                "Successful copy must pass the exact selected CSV to clipboard"
+            )
+            assert not page.locator("#" + button_id).is_disabled()
+
         # Clipboard APIs can be absent on file:// and restricted browsers.
         # Verify both buttons offer a truthful, selectable manual fallback.
         page.evaluate("Object.defineProperty(navigator, 'clipboard', { configurable: true, value: undefined })")
