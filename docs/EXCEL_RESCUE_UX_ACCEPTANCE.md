@@ -41,6 +41,21 @@ This section is a **test specification**, not evidence of a run. Both PRs were m
 
 Capture the **tested main commit SHA**, browser/OS, exact fixture, viewport, outcome and screenshot/recording for each case. Run existing JS/Python/Chromium/security checks against the integrated `main`, not historical PR heads. On any failure, open a narrowly scoped regression issue referencing merged PRs #83/#84; do not rewrite or reopen their history. Backend owns subsequent integration decisions.
 
+## B2B evaluation gate — observable value in 60 seconds (15/11/2026)
+
+This is an **acceptance specification for the existing browser preview**, not a new feature contract, UX_READY declaration, test result, or claim that the browser demo is equivalent to the authenticated local web app. It addresses the intermediate B2B presentation requirement without expanding scope before BACKEND_READY.
+
+**Desktop (1280 CSS px) and mobile (375 CSS px) buyer walkthrough:**
+1. **0–10 s — Context and trust:** identify the fictional sample, browser-only/offline operation, required CSV columns and file limits without consulting README. The primary sample action must be discoverable without scrolling through technical prose.
+2. **10–25 s — Do the work:** activate the synthetic sample once and see an actual processing result; a progress/loading indication is required only if processing is asynchronous or perceptibly delayed. Never fabricate a spinner or completion metric.
+3. **25–40 s — Explain the decision:** locate accepted/rejected totals, distinguish valid from rejected rows, and understand that duplicates and invalid fields require manual review. Do not imply the accepted rows are certified safe or imported into a CRM.
+4. **40–55 s — Take an output:** locate and copy the accepted/rejected CSV, or select the text manually when clipboard access is blocked. No invented download/export, persistence, or server action.
+5. **55–60 s — State the boundary:** identify how the browser preview differs from the Python CLI and authenticated localhost application, and where to find their actual documented workflows.
+
+**Observable acceptance (both viewport sizes):** the sample action is keyboard-operable with visible focus; output counts and CSV text reflect the current sample; rejected records are understandable without relying on color alone; text reflows without clipped actions; blocked clipboard reports failure and leaves selectable output; rerunning after invalid synthetic CSV clears stale status; no network request transmits the sample; no screenshot or copy suggests real customers or an operational hosted SaaS. Record PASS/FAIL/NOT RUN for each step, elapsed time measured with a stopwatch, exact main SHA, OS/browser, and screenshot/video evidence. A 60-second claim is permitted **only after a measured run**.
+
+**Future richer grid/diagnosis/before–after/export experience:** treat as a *candidate* P01 increment, not implemented functionality. Backend must first publish the versioned processing contract, before/after semantics, supported output actions, error states and fixtures with a verifiable BACKEND_READY handoff. Design may then specify the responsive table, filters, side-by-side comparison, action hierarchy, tokens and WCAG checks, and only then declare UX_READY for frontend implementation. Do not relabel current textareas as a data grid or promise downloads that are not present.
+
 ## Handoff and release gate
 - **Design/UX:** review evidence, classify navigation, focus, microcopy and accessibility defects; propose isolated corrections.
 - **Frontend:** implement interface fixes and provide browser/E2E evidence without changing business rules.
