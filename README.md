@@ -8,18 +8,39 @@
 
 ## The eight core projects
 
+**Eight HTML source links (GitHub code view, not interactive mobile demos):**
+
+1. [Excel Rescue — CSV preview](01-excel-rescue/try.html)
+2. [Sales Intelligence — preview](02-sales-intelligence/demo-ui.html)
+3. [API Bridge — preview](03-api-bridge/demo-ui.html)
+4. [CRM Lead Intelligence — preview](04-crm-lead-intelligence/demo-ui.html)
+5. [Landing Page Studio — preview](05-landing-page-studio/index.html)
+6. [Document Factory — preview](06-document-factory/demo-ui.html)
+7. [Data Quality Auditor — preview](07-data-quality-auditor/demo-ui.html)
+8. [Site Change Monitor — preview](08-site-change-monitor/demo-ui.html)
+
+> **Preview limitation:** GitHub displays linked HTML as source code, not as a running interface. These are **not hosted demo URLs**. The local browser previews are separate from the Python CLI workflows; no public deployment or production readiness is implied.
+
+**Run the existing browser previews locally (no hosting account):** clone or download this repository, open a terminal in its root, then start a loopback-only static server:
+
+```sh
+python -m http.server 8000 --bind 127.0.0.1
+```
+
+Open [http://127.0.0.1:8000/index.html](http://127.0.0.1:8000/index.html) **on the same computer** and choose one of the eight entries. To open Excel Rescue directly, visit [http://127.0.0.1:8000/01-excel-rescue/try.html](http://127.0.0.1:8000/01-excel-rescue/try.html). Stop the server with `Ctrl+C`. These addresses work only while the local server is running; they are **not public demo links**. Use fictional input only; this simple static server is for local inspection, not production or network exposure. Browser-based preview behavior must still be tested independently.
+
 All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. Some offer browser previews; others are **local command-line tools**, not live web applications. Open each README for exact commands and limitations.
 
 | Project | The problem it demonstrates | What you can inspect | Delivery status |
 |---|---|---|---|
-| **01 · [Excel Rescue](01-excel-rescue/README.md)** | Clean inconsistent CRM CSV exports and explain rejected or duplicate records | [Browser-only CSV preview](01-excel-rescue/try.html) · [Synthetic audit walkthrough](01-excel-rescue/demo.html) · [Case study](01-excel-rescue/CASE_STUDY.md) | Local Python tool and optional localhost web app; **prototype**, not public-hosting ready |
-| **02 · [Sales Intelligence](02-sales-intelligence/README.md)** | Turn transaction CSV files into actionable revenue metrics | JSON KPIs, offline HTML report · [Case study](02-sales-intelligence/CASE_STUDY.md) | Offline reporting demonstration; no live business dashboard |
-| **03 · [API Bridge](03-api-bridge/README.md)** | Export data from an approved JSON API into CSV | Python exporter, mocked-network tests · [Case study](03-api-bridge/CASE_STUDY.md) | Local integration prototype; optional public test API, no enterprise auth |
-| **04 · [CRM Lead Intelligence](04-crm-lead-intelligence/README.md)** | Review and prioritize a fictional B2B lead list without contacting anyone | [Synthetic CSV](04-crm-lead-intelligence/sample.csv), suppression rules, JSON review output and tests | Offline, **review-only** prototype; no outreach, CRM login or contact verification |
-| **05 · [Landing Page Studio](05-landing-page-studio/README.md)** | Demonstrate a responsive small-business landing page and enquiry validation | [Open the HTML page](05-landing-page-studio/index.html), CSS/JavaScript and tests | Browser prototype; form validates **locally** and never submits data |
-| **06 · [Document Factory](06-document-factory/README.md)** | Generate consistent sample quotations from structured information | [Synthetic JSON](06-document-factory/sample.json), Python generator, escaped/printable HTML and tests | Offline prototype; does **not** create PDF files automatically |
-| **07 · [Data Quality Auditor](07-data-quality-auditor/README.md)** | Detect invalid records, duplicates and unusual amounts in CSV exports | [Synthetic CSV](07-data-quality-auditor/sample.csv), rules, JSON findings, source hash and tests | Offline rules-based prototype; no enterprise data lineage or fraud certification |
-| **08 · [Site Change Monitor](08-site-change-monitor/README.md)** | Compare two already-authorized HTML captures | [Before](08-site-change-monitor/before.html) / [after](08-site-change-monitor/after.html) fixtures, visible-text diff and tests | **Offline snapshot comparison**; no crawling, live monitoring or alerts |
+| **01 · [Excel Rescue](01-excel-rescue/README.md)** | Clean inconsistent CRM CSV exports and explain rejected or duplicate records | [View HTML preview source — CSV](01-excel-rescue/try.html) · [Synthetic audit walkthrough](01-excel-rescue/demo.html) · [Case study](01-excel-rescue/CASE_STUDY.md) | Local Python tool and optional localhost web app; **prototype**, not public-hosting ready |
+| **02 · [Sales Intelligence](02-sales-intelligence/README.md)** | Turn transaction CSV files into actionable revenue metrics | [View HTML preview source](02-sales-intelligence/demo-ui.html) · JSON KPIs, offline HTML report · [Case study](02-sales-intelligence/CASE_STUDY.md) | Offline reporting demonstration; no live business dashboard |
+| **03 · [API Bridge](03-api-bridge/README.md)** | Export data from an approved JSON API into CSV | [View HTML preview source](03-api-bridge/demo-ui.html) · Python exporter, mocked-network tests · [Case study](03-api-bridge/CASE_STUDY.md) | Local integration prototype; optional public test API, no enterprise auth |
+| **04 · [CRM Lead Intelligence](04-crm-lead-intelligence/README.md)** | Review and prioritize a fictional B2B lead list without contacting anyone | [View HTML preview source](04-crm-lead-intelligence/demo-ui.html) · [Synthetic CSV](04-crm-lead-intelligence/sample.csv), suppression rules, JSON review output and tests | Offline, **review-only** prototype; no outreach, CRM login or contact verification |
+| **05 · [Landing Page Studio](05-landing-page-studio/README.md)** | Demonstrate a responsive small-business landing page and enquiry validation | [View HTML preview source](05-landing-page-studio/index.html), CSS/JavaScript and tests | Browser prototype; form validates **locally** and never submits data |
+| **06 · [Document Factory](06-document-factory/README.md)** | Generate consistent sample quotations from structured information | [View HTML preview source](06-document-factory/demo-ui.html) · [Synthetic JSON](06-document-factory/sample.json), Python generator, escaped/printable HTML and tests | Offline prototype; does **not** create PDF files automatically |
+| **07 · [Data Quality Auditor](07-data-quality-auditor/README.md)** | Detect invalid records, duplicates and unusual amounts in CSV exports | [View HTML preview source](07-data-quality-auditor/demo-ui.html) · [Synthetic CSV](07-data-quality-auditor/sample.csv), rules, JSON findings, source hash and tests | Offline rules-based prototype; no enterprise data lineage or fraud certification |
+| **08 · [Site Change Monitor](08-site-change-monitor/README.md)** | Compare two already-authorized HTML captures | [View HTML preview source](08-site-change-monitor/demo-ui.html) · [Before](08-site-change-monitor/before.html) / [after](08-site-change-monitor/after.html) fixtures, visible-text diff and tests | **Offline snapshot comparison**; no crawling, live monitoring or alerts |
 
 **Current readiness:** integration into `main` is confirmed, but none of these entries should be represented as a fully deployed or commercially validated service merely because tests exist. Browser/mobile accessibility reviews, environment-specific security checks and end-to-end acceptance evidence remain necessary according to each project's scope.
 
