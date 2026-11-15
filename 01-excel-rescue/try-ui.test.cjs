@@ -4,6 +4,8 @@ const assert = require("node:assert/strict");
 require("./test_sample_one_click.cjs");
 // Include the existing clipboard, hostile filename, and async UI regression suite in CI.
 require("./test_sample_ui.cjs");
+// Keep clipboard-denial and stale-copy regression coverage in the CI entrypoint.
+require("./test_clipboard_fallback.cjs");
 const fs = require("node:fs");
 const vm = require("node:vm");
 const path = require("node:path");
