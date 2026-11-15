@@ -111,7 +111,7 @@ def exercise(browser, width):
             "<img src=https://example.invalid/x>,bad@example.com,2026-01-01,Test\\n"
         ).replace("\\n", "\n")
         page.locator("#source").set_input_files({
-            "name": "hostile.csv", "mimeType": "text/csv",
+            "name": ("untrusted-" + "x" * 180 + ".csv"), "mimeType": "text/csv",
             "buffer": hostile.encode("utf-8"),
         })
         assert not page.locator("#result").is_visible(), "Old output must clear on selection"
@@ -120,6 +120,9 @@ def exercise(browser, width):
         page.locator("#result").wait_for(state="visible")
         assert page.locator("img").count() == 0, "CSV data must not become HTML"
         assert "<img" in page.locator("#clean").input_value()
+        assert page.evaluate(
+            "document.documentElement.scrollWidth <= document.documentElement.clientWidth"
+        ), f"Untrusted long filename causes horizontal overflow at {width}px"
         # Oversized files must be rejected locally, clearing previous outputs.
         page.locator("#source").set_input_files({
             "name": "oversized.csv", "mimeType": "text/csv",
