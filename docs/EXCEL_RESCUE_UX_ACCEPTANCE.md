@@ -1,10 +1,10 @@
 # Excel Rescue — UX acceptance protocol (P0, issue #67)
 
-Status: **verification checklist, not executed evidence**. Applies to `01-excel-rescue/try.html` and the pending one-click sample behavior in PR #84. No backend contract or feature gate is inferred from this document.
+Status: **verification checklist, not executed evidence**. Applies to `01-excel-rescue/try.html` and the one-click sample behavior merged from PR #84. No backend contract or feature gate is inferred from this document.
 
 ## One-minute visitor journey
 1. Open the browser preview. Verify the fictional/offline scope, required CSV headers and 1 MB / 2,000-row limits are visible without opening documentation.
-2. Activate **Try fictional sample**. On the integrated PR #84 version, expect validation and visible accepted/rejected outputs without a second click. On current `main`, record the existing two-click behavior instead of treating it as a failure of a merged feature.
+2. Activate **Try fictional sample**. Expect validation and visible accepted/rejected outputs without a second click on the integrated `main`; record a defect if this fails.
 3. Read accepted/rejected totals and the explicit manual-review warning. Copy either CSV or use the documented manual selection fallback.
 4. Return to the documentation and distinguish the browser-only preview from the Python reference tool.
 
@@ -25,9 +25,9 @@ Status: **verification checklist, not executed evidence**. Applies to `01-excel-
 
 Record browser/version, operating system, viewport, commit SHA, result (PASS/FAIL/NOT RUN), screenshots or recording, and issue/PR for every defect. Do not record personal data. No pass is implied by this checklist.
 
-## Combined PR #83 + #84 acceptance — integration debt
+## Post-merge acceptance of PRs #83 and #84 — still unverified
 
-This section is a **test specification**, not evidence of a run. Test only after assembling both PR heads on an isolated local branch; neither standalone green CI nor disjoint filenames establishes combined behavior. Keep the browser preview distinct from the Python reference implementation.
+This section is a **test specification**, not evidence of a run. Both PRs were merged on 15/11/2026: frontend #84 (`ac2108f0f5871b9abc355ce03dd88a3a9933405b`) and design #83 (`d01e7970a44546b76dcd46ae0e8d2486e8d8aa33`). The observed `main` was `14736abd67adc7ce5141b94fa3dd30bf13eb0177` at this documentation update. **Merge does not establish browser acceptance.** Run these scenarios against a fresh checkout of the current `main`, recording its exact SHA; do not re-merge closed PR heads onto `main`. Keep the browser preview distinct from the Python reference implementation.
 
 | Scenario | Reproduction with synthetic inputs | Expected observable result |
 |---|---|---|
@@ -38,17 +38,19 @@ This section is a **test specification**, not evidence of a run. Test only after
 | Narrow viewport + zoom | Repeat sample, copy and error recovery at 320/375 CSS px and 400% zoom | Controls and long headers remain readable, focus visible, no clipped status or horizontal page overflow; output textarea may scroll horizontally |
 | Clipboard blocked | Deny clipboard permission and attempt both copy buttons after sample completion | No false success; status explains manual selection and output remains selectable |
 
-Capture the **combined commit SHA**, browser/OS, exact fixture, viewport, outcome and screenshot/recording for each case. Run existing JS/Python/Chromium/security checks against the assembled tree, not merely against the individual PR heads. On any failure, report the smallest reproduction in PR #83/#84 and leave both unmerged pending Backend review. Only Backend may perform the final merge.
+Capture the **tested main commit SHA**, browser/OS, exact fixture, viewport, outcome and screenshot/recording for each case. Run existing JS/Python/Chromium/security checks against the integrated `main`, not historical PR heads. On any failure, open a narrowly scoped regression issue referencing merged PRs #83/#84; do not rewrite or reopen their history. Backend owns subsequent integration decisions.
 
 ## Handoff and release gate
 - **Design/UX:** review evidence, classify navigation, focus, microcopy and accessibility defects; propose isolated corrections.
 - **Frontend:** implement interface fixes and provide browser/E2E evidence without changing business rules.
-- **Backend:** verify dependencies, CI and security, then decide merge; only backend executes merges.
-- **Blocked:** do not mark UX_READY, PORTFOLIO_READY or COMMERCIALLY_DEMONSTRABLE until actual browser evidence exists and the required upstream contract gate is documented.
+- **Backend:** verify integrated `main`, CI and security, then decide any corrective PR merge; only backend executes merges.
+- **Blocked:** do not mark PORTFOLIO_READY or COMMERCIALLY_DEMONSTRABLE until actual browser evidence exists and the required upstream contract gate is documented. The merged PRs alone are not evidence of manual accessibility acceptance.
 
 Scope: existing eight-project portfolio only; no public deployment or external service authorized.
 
 ## Execution record (fill only after real testing)
+
+Post-merge verification commands from a fresh checkout of `main` (no external deployment): `python3 -m unittest discover -v` from `01-excel-rescue/`; `node --test try-ui.test.cjs test_sample_ui.cjs test_sample_one_click.cjs` in the same directory; `python3 check_try_browser.py` after installing the repository-documented Playwright/Chromium prerequisites. Record `git rev-parse HEAD`, command exit codes and browser evidence. These commands are **instructions, not executed tests**. The legacy `scripts/check_excel_rescue_combined_ux.sh` targets historical PR refs and must not be used as proof of post-merge acceptance.
 
 | Commit SHA | Browser / OS | Width / zoom | Scenario | Result | Evidence URL | Defect |
 |---|---|---|---|---|---|---|
