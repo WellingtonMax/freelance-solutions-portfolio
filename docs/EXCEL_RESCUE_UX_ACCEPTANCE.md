@@ -51,7 +51,7 @@ Scope: existing eight-project portfolio only; no public deployment or external s
 
 ## Execution record (fill only after real testing)
 
-Post-merge verification commands from a fresh checkout of `main` (no external deployment): `python3 -m unittest discover -v` from `01-excel-rescue/`; `node --test try-ui.test.cjs test_sample_ui.cjs test_sample_one_click.cjs` in the same directory; `python3 check_try_browser.py` after installing the repository-documented Playwright/Chromium prerequisites. Record `git rev-parse HEAD`, command exit codes and browser evidence. These commands are **instructions, not executed tests**. The legacy `scripts/check_excel_rescue_combined_ux.sh` targets historical PR refs and must not be used as proof of post-merge acceptance.
+Post-merge verification commands from a fresh checkout of `main` (no external deployment): `python3 -m unittest discover -v` from `01-excel-rescue/`; `node --test try-ui.test.cjs` (this CI entrypoint already imports `test_sample_ui.cjs` and `test_sample_one_click.cjs`; listing all three would register the same tests more than once) in the same directory; `python3 check_try_browser.py` after installing the repository-documented Playwright/Chromium prerequisites. Record `git rev-parse HEAD`, command exit codes and browser evidence. These commands are **instructions, not executed tests**. The legacy `scripts/check_excel_rescue_combined_ux.sh` targets historical PR refs and must not be used as proof of post-merge acceptance.
 
 | Commit SHA | Browser / OS | Width / zoom | Scenario | Result | Evidence URL | Defect |
 |---|---|---|---|---|---|---|
