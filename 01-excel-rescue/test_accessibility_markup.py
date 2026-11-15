@@ -12,12 +12,26 @@ class Elements(HTMLParser):
         super().__init__()
         self.elements = []
         self.ids = {}
+        self.button_text = {}
+        self.active_button = None
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
         self.elements.append((tag, attrs))
+        if tag == "button":
+            self.active_button = attrs.get("id")
+            if self.active_button:
+                self.button_text[self.active_button] = ""
         if "id" in attrs:
             self.ids.setdefault(attrs["id"], []).append((tag, attrs))
+
+    def handle_data(self, data):
+        if self.active_button is not None:
+            self.button_text[self.active_button] += data
+
+    def handle_endtag(self, tag):
+        if tag == "button":
+            self.active_button = None
 
     def one(self, element_id):
         matches = self.ids.get(element_id, [])
@@ -66,6 +80,12 @@ class PreviewAccessibilityMarkupTests(unittest.TestCase):
                 tag, attrs = self.page.one(element_id)
                 self.assertEqual(tag, "button")
                 self.assertEqual(attrs.get("type"), "button")
+                # A present button element is not necessarily an accessible named control.
+                # Reject accidental empty labels, even when markup/IDs remain valid.
+                self.assertTrue(
+                    self.page.button_text.get(element_id, "").strip() or attrs.get("aria-label", "").strip(),
+                    f"{element_id}: button has no accessible name",
+                )
 
 
 if __name__ == "__main__":
