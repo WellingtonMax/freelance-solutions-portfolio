@@ -106,6 +106,16 @@ class PreviewAccessibilityMarkupTests(unittest.TestCase):
                     for target in targets:
                         self.page.one(target)
 
+    def test_explicit_labels_reference_unique_form_controls(self):
+        # A visible label pointing to a missing or non-form element does not
+        # give the input an accessible name. Guard against copy/layout edits.
+        for tag, attrs in self.page.elements:
+            if tag == "label" and "for" in attrs:
+                with self.subTest(target=attrs["for"]):
+                    self.assertTrue(attrs["for"].strip(), "label target cannot be blank")
+                    target_tag, _ = self.page.one(attrs["for"])
+                    self.assertIn(target_tag, ("input", "textarea", "select", "button", "output"))
+
     def test_describedby_targets_exist(self):
         for tag, attrs in self.page.elements:
             if "aria-describedby" in attrs:
