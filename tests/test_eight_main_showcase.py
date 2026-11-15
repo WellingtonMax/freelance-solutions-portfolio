@@ -55,6 +55,26 @@ class MainShowcaseTests(unittest.TestCase):
         self.assertIn("not production-ready", self.page)
         self.assertIn("human review", self.page.lower())
 
+    def test_public_demo_routes_are_explicit_and_source_remains_available(self):
+        base = "https://wellingtonmax.github.io/freelance-solutions-portfolio/"
+        routes = {
+            "01": "01-excel-rescue/try.html",
+            "02": "02-sales-intelligence/demo-ui.html",
+            "03": "03-api-bridge/demo-ui.html",
+            "04": "04-crm-lead-intelligence/demo-ui.html",
+            "05": "05-landing-page-studio/index.html",
+            "06": "06-document-factory/demo-ui.html",
+            "07": "07-data-quality-auditor/demo-ui.html",
+            "08": "08-site-change-monitor/demo-ui.html",
+        }
+        for number, target in routes.items():
+            with self.subTest(project=number):
+                self.assertIn(f"]({base}{target})", self.readme)
+                self.assertIn(f"]({target})", self.readme)
+                self.assertTrue((ROOT / target).is_file(), target)
+        self.assertIn("Publication not yet confirmed", self.readme)
+        self.assertIn('href="01-excel-rescue/try.html"', self.page)
+
     def test_readme_matches_integrated_tree(self):
         self.assertIn("## The eight core projects", self.readme)
         self.assertNotIn("Planned portfolio expansion", self.readme)
