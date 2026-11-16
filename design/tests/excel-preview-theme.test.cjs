@@ -32,3 +32,17 @@ test("preview theme includes visible focus, disabled and mobile reflow rules", (
   assert.match(css, /min-height:\s*44px/);
   assert.doesNotMatch(css, /@import\b|url\s*\(/i, "no external CSS resources");
 });
+
+test("disabled primary actions cannot inherit enabled blue styles", () => {
+  const css = read("preview-theme.css");
+  assert.match(css, /#sample:disabled\s*,\s*body\.csv-preview main #run:disabled\s*\{/);
+  assert.match(css, /#sample:disabled\s*,\s*body\.csv-preview main #run:disabled\s*\{[^}]*background:\s*#e4eaf1;/s);
+  assert.match(css, /#sample:disabled\s*,\s*body\.csv-preview main #run:disabled\s*\{[^}]*cursor:\s*not-allowed;/s);
+});
+
+test("keyboard skip link has an explicit visible surface and focus ring", () => {
+  const css = read("preview-theme.css");
+  assert.match(css, /body\.csv-preview \.skip-link\s*\{[^}]*background:\s*#142746;[^}]*color:\s*#ffffff;/s);
+  assert.match(css, /body\.csv-preview \.skip-link:focus-visible\s*\{[^}]*outline:\s*3px solid/s);
+  assert.match(css, /@media \(forced-colors:\s*active\)\s*\{[\s\S]*body\.csv-preview \.skip-link:focus-visible/);
+});
