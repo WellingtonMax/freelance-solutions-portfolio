@@ -99,3 +99,24 @@ test("late clipboard rejection cannot replace the status of a newer selection", 
   assert.equal(el["copy-feedback"].textContent, latestStatus);
   assert.equal(el["copy-reject"].disabled, false);
 });
+
+test("file selection during pending copy preserves new selection and suppresses stale success", async () => {
+  let resolveWrite;
+  const el = harness({ writeText: () => new Promise(resolve => { resolveWrite = resolve; }) });
+  await el.sample.click();
+  const pending = el["copy-clean"].click();
+  assert.equal(el["copy-clean"].disabled, true);
+  // Replacing a sample with a local file must hide the old output immediately.
+  el.source.files = [{ name: "fictional.csv", size: 20, text: async () => "name,email" }];
+  el.source.listeners.change();
+  assert.equal(el.result.hidden, true);
+  assert.equal(el.clean.value, "");
+  assert.equal(el["copy-clean"].disabled, true);
+  assert.match(el.feedback.textContent, /CSV file selected/);
+  const latestStatus = el["copy-feedback"].textContent;
+  resolveWrite();
+  await pending;
+  assert.equal(el["copy-feedback"].textContent, latestStatus);
+  assert.doesNotMatch(el["copy-feedback"].textContent, /copied to clipboard/i);
+  assert.equal(el["copy-clean"].disabled, true, "new file has not been processed");
+});
