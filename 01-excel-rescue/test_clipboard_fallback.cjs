@@ -120,3 +120,23 @@ test("file selection during pending copy preserves new selection and suppresses 
   assert.doesNotMatch(el["copy-feedback"].textContent, /copied to clipboard/i);
   assert.equal(el["copy-clean"].disabled, true, "new file has not been processed");
 });
+
+
+test("late clipboard denial after local file replacement cannot reveal stale output", async () => {
+  let rejectWrite;
+  const el = harness({ writeText: () => new Promise((_, reject) => { rejectWrite = reject; }) });
+  await el.sample.click();
+  const pending = el["copy-reject"].click();
+  assert.equal(el["copy-reject"].disabled, true);
+  el.source.files = [{ name: "next-fictional.csv", size: 12, text: async () => "name,email" }];
+  el.source.listeners.change();
+  assert.equal(el.result.hidden, true);
+  assert.equal(el.reject.value, "");
+  const status = el["copy-feedback"].textContent;
+  rejectWrite(new Error("permission denied"));
+  await pending;
+  assert.equal(el["copy-feedback"].textContent, status);
+  assert.equal(el.result.hidden, true);
+  assert.equal(el["copy-reject"].disabled, true);
+  assert.match(el.feedback.textContent, /CSV file selected/);
+});
