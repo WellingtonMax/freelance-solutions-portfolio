@@ -105,3 +105,22 @@ body.csv-preview main button:disabled:hover { background: #e4eaf1; }
     opacity: 1;
   }
 }
+
+/* The primary/secondary ID selectors above outrank the generic :disabled rule.
+   Explicitly style disabled states so an unavailable action cannot look active. */
+body.csv-preview main #sample:disabled,
+body.csv-preview main #run:disabled {
+  opacity: 1;
+  background: #e4eaf1;
+  border-color: #8fa1b8;
+  color: #405572;
+  cursor: not-allowed;
+}
+@media (forced-colors: active) {
+  body.csv-preview main #sample:disabled,
+  body.csv-preview main #run:disabled {
+    background: ButtonFace;
+    border-color: GrayText;
+    color: GrayText;
+  }
+}
