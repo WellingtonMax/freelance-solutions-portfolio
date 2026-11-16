@@ -46,3 +46,13 @@ test("keyboard skip link has an explicit visible surface and focus ring", () => 
   assert.match(css, /body\.csv-preview \.skip-link:focus-visible\s*\{[^}]*outline:\s*3px solid/s);
   assert.match(css, /@media \(forced-colors:\s*active\)\s*\{[\s\S]*body\.csv-preview \.skip-link:focus-visible/);
 });
+
+test("CSV preview clearly labels fictional offline processing and blocks network connections", () => {
+  const html = read("try.html");
+  assert.match(html, /Fictional demonstration/);
+  assert.match(html, /No uploads or external connections/);
+  assert.match(html, /Use fictional records only/);
+  assert.match(html, /connect-src 'none'/);
+  assert.match(html, /form-action 'none'/);
+  assert.match(html, /Maximum 1 MB, 2,000 rows/);
+});
