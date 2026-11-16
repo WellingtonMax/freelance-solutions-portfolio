@@ -46,6 +46,29 @@ def main():
             forced = browser.new_page(forced_colors="active", viewport={"width": 320, "height": 800})
             exercise(forced, 320)
             print("PASS: forced-colors functional flow")
+            # A rejecting clipboard API is different from an absent API: the UI
+            # must not announce a successful copy after a permission failure.
+            denied = browser.new_page(viewport={"width": 375, "height": 800})
+            denied.add_init_script("""
+                Object.defineProperty(navigator, 'clipboard', {
+                    configurable: true,
+                    value: {writeText: () => Promise.reject(new DOMException(
+                        'NotAllowedError', 'NotAllowedError'))}
+                });
+            """)
+            denied.goto(URL, wait_until="load")
+            denied.get_by_role("button", name="Try fictional sample").click()
+            denied.locator("#result").wait_for(state="visible")
+            denied.locator("#copy-reject").click()
+            feedback = denied.locator("#copy-feedback")
+            assert "permission denied" in feedback.inner_text().lower()
+            assert "copied to clipboard" not in feedback.inner_text().lower()
+            assert denied.locator("#reject").evaluate(
+                "el => el.selectionStart === 0 && el.selectionEnd === el.value.length"
+            ), "Rejected CSV must remain manually selectable"
+            assert denied.locator("#copy-reject").is_enabled()
+            print("PASS: rejected clipboard promise never claims success")
+
             # 320px viewport approximates reflow at 400% of 1280px, not actual browser zoom.
             print("NOTE: real 400% zoom and screen-reader acceptance remain manual")
         finally:
