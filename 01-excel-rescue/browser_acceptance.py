@@ -69,6 +69,31 @@ def main():
             assert denied.locator("#copy-reject").is_enabled()
             print("PASS: rejected clipboard promise never claims success")
 
+            # Hostile fictional CSV: spreadsheet formulas must be escaped and
+            # suspicious email prefixes rejected, without rendering markup.
+            hostile = browser.new_page(viewport={"width": 375, "height": 800})
+            hostile.goto(URL, wait_until="load")
+            hostile_csv = (
+                "name,email,signup_date,city\\n"
+                "=2+2,fictional@example.test,2026-01-02,=HYPERLINK(1)\\n"
+                "Unsafe,=cmd@example.test,2026-01-02,Test\\n"
+            )
+            hostile.locator("#source").set_input_files({
+                "name": "synthetic-hostile.csv",
+                "mimeType": "text/csv",
+                "buffer": hostile_csv.encode("utf-8"),
+            })
+            hostile.locator("#run").click()
+            hostile.locator("#result").wait_for(state="visible")
+            accepted = hostile.locator("#clean").input_value()
+            rejected = hostile.locator("#reject").input_value()
+            assert "'=2+2" in accepted and "'=HYPERLINK(1)" in accepted
+            assert "unsafe email prefix" in rejected
+            assert "1 accepted" in hostile.locator("#totals").inner_text()
+            assert "1 rejected" in hostile.locator("#totals").inner_text()
+            assert hostile.locator("#result script").count() == 0
+            print("PASS: hostile synthetic CSV is escaped/rejected in browser output")
+
             # 320px viewport approximates reflow at 400% of 1280px, not actual browser zoom.
             print("NOTE: real 400% zoom and screen-reader acceptance remain manual")
         finally:
