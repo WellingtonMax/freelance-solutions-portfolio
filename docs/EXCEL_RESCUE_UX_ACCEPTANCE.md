@@ -73,3 +73,19 @@ Post-merge verification commands from a fresh checkout of `main` (no external de
 | Not run | Not run | Not run | Clipboard-denied, hostile text, repeated actions | NOT RUN | None | Unassessed |
 
 This record is a blank evidence template, **not** proof that these scenarios passed. Avoid attaching CSVs with real contact information or screenshots containing personal data.
+
+## Approved visual direction vs. executable browser scope (15/11/2026)
+
+**Visual reference approved by the owner; this is not a shipped SaaS UI or a new BACKEND_READY gate.** The desired Excel Rescue identity is an operational B2B data workspace: navy navigation (`#142746`), ice surfaces (`#F3F7FA`), blue primary actions (`#1769E0`), cyan quality highlights (`#13B8C8`) and amber warnings (`#E69A35`). Prioritize legible tabular review over ornamental charts. Desktop should keep the primary CSV action and result review visible; mobile should reflow without shrinking CSV text below readable size. Design references and fictional screenshots must be labeled **concept**, never evidence of the current UI.
+
+**Current browser contract (verified in `01-excel-rescue/try.html` and `try-ui.js`):** offline CSV selection or one-click synthetic sample, validation with explicit 1 MB / 2,000-row limits, accepted/rejected totals, read-only copyable CSV outputs and clipboard-denial fallback. The existing page is English-language; a future Portuguese UI must not be claimed as shipped. The mockup's historical KPIs, XLSX support, persistent history, editable correction grid, before/after cells, saved settings, subscriptions and file uploads to a server are **not evidenced by this browser contract**. Do not add navigation to dead routes, fake counters, unimplemented filters or nonfunctional export buttons merely to imitate the mockup.
+
+**Testable UI acceptance for the existing flow, before visual redesign:**
+
+1. At 1280px desktop and 320/375px mobile, the fictional sample action is immediately discoverable; one activation reveals the real totals and both CSV outputs without navigating away.
+2. Keyboard users can reach the sample, local file input, validate, and enabled copy actions in logical order; focus is always visible, and the result heading receives focus on success.
+3. No-file, malformed CSV, oversized file and denied clipboard each produce truthful, recoverable text feedback. A subsequent successful sample clears stale error/output states. Never echo hostile filenames or exception paths into the page.
+4. At 400% zoom and with forced colors, input boundaries, primary action, disabled actions, result heading and copy fallback remain distinguishable. Capture browser/OS/viewport and screenshots; **NOT RUN** until tested.
+5. Any future diagnostic table or before/after view requires a backend-approved record-level contract and real synthetic fixture; every displayed count must be computed from the same output used by the table, not hardcoded from the concept art.
+
+**Handoff:** Design direction approved, **UX_READY not declared** for a new SaaS feature. Backend owns contract and merges; Frontend may improve existing UI only as an independent, non-conflicting regression/accessibility change until the next BACKEND_READY handoff. This section is a specification, not a test result.
