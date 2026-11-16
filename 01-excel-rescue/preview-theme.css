@@ -69,3 +69,19 @@ body.csv-preview #result-heading:focus {
   body.csv-preview input[type="file"]:focus-visible,
   body.csv-preview textarea:focus-visible { outline-color: Highlight; }
 }
+
+/* P01-F01 mobile task flow: keep each action reachable at 320 CSS px and
+   400% zoom without squeezing labels or creating horizontal page overflow.
+   The CSV textareas retain their own internal scrolling for raw output. */
+@media (max-width: 420px) {
+  body.csv-preview main { padding-inline: 14px; }
+  body.csv-preview main > .panel { padding-inline: 14px; }
+  body.csv-preview main button {
+    display: block;
+    width: 100%;
+    min-height: 44px;
+    margin-block: 8px;
+  }
+  body.csv-preview main input[type="file"] { width: 100%; }
+  body.csv-preview main textarea { font-size: 16px; }
+}
