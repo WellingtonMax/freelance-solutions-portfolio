@@ -85,3 +85,23 @@ body.csv-preview #result-heading:focus {
   body.csv-preview main input[type="file"] { width: 100%; }
   body.csv-preview main textarea { font-size: 16px; }
 }
+
+/* Disabled copy actions must remain legible in the light palette. The shared
+   stylesheet uses opacity:.6, which washes out white text on blue. Preserve
+   a visible disabled state without reducing text contrast or relying on color. */
+body.csv-preview main button:disabled {
+  opacity: 1;
+  background: #e4eaf1;
+  border-color: #8fa1b8;
+  color: #405572;
+  cursor: not-allowed;
+}
+body.csv-preview main button:disabled:hover { background: #e4eaf1; }
+@media (forced-colors: active) {
+  body.csv-preview main button:disabled {
+    background: ButtonFace;
+    border-color: GrayText;
+    color: GrayText;
+    opacity: 1;
+  }
+}
