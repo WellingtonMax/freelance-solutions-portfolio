@@ -56,3 +56,28 @@ test("CSV preview clearly labels fictional offline processing and blocks network
   assert.match(html, /form-action 'none'/);
   assert.match(html, /Maximum 1 MB, 2,000 rows/);
 });
+
+function luminance(hex) {
+  const rgb = hex.match(/[a-f0-9]{2}/gi).map((part) => parseInt(part, 16) / 255);
+  const linear = rgb.map((channel) => channel <= 0.04045
+    ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+}
+function contrast(a, b) {
+  const high = Math.max(luminance(a), luminance(b));
+  const low = Math.min(luminance(a), luminance(b));
+  return (high + 0.05) / (low + 0.05);
+}
+test("critical preview action and disabled-state colors meet WCAG AA text contrast", () => {
+  const css = read("preview-theme.css");
+  const cases = [
+    ["primary button", /main button\s*\{[^}]*background:\s*#1769e0;[^}]*color:\s*#fff;/s, "ffffff", "1769e0"],
+    ["secondary button", /main #run\s*\{[^}]*background:\s*#e9f1fc;[^}]*color:\s*#142746;/s, "142746", "e9f1fc"],
+    ["disabled action", /main #run:disabled\s*\{[^}]*background:\s*#e4eaf1;[^}]*color:\s*#405572;/s, "405572", "e4eaf1"],
+    ["skip link", /\.skip-link\s*\{[^}]*background:\s*#142746;[^}]*color:\s*#ffffff;/s, "ffffff", "142746"],
+  ];
+  for (const [name, rule, foreground, background] of cases) {
+    assert.match(css, rule, name + " palette changed: review contrast values");
+    assert.ok(contrast(foreground, background) >= 4.5, name + " must meet 4.5:1");
+  }
+});
