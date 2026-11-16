@@ -124,3 +124,24 @@ body.csv-preview main #run:disabled {
     color: GrayText;
   }
 }
+
+/* Keyboard skip navigation: the inherited pale link blends into the light
+   canvas. Give the focused shortcut a dark, high-contrast surface and a
+   distinct focus ring, without changing the shared audit stylesheet. */
+body.csv-preview .skip-link {
+  background: #142746;
+  color: #ffffff;
+  border: 2px solid #142746;
+}
+body.csv-preview .skip-link:focus-visible {
+  outline: 3px solid #1769e0;
+  outline-offset: 3px;
+}
+@media (forced-colors: active) {
+  body.csv-preview .skip-link {
+    background: Canvas;
+    color: LinkText;
+    border-color: LinkText;
+  }
+  body.csv-preview .skip-link:focus-visible { outline-color: Highlight; }
+}
