@@ -75,3 +75,27 @@ test("pending clipboard permission cannot announce success after a new sample", 
   assert.doesNotMatch(el["copy-feedback"].textContent, /copied to clipboard/i);
   assert.equal(el["copy-clean"].disabled, false);
 });
+
+test("clipboard object without writeText: falls back without claiming success", async () => {
+  const el = harness({});
+  await el.sample.click();
+  await el["copy-clean"].click();
+  assert.match(el["copy-feedback"].textContent, /Clipboard access is unavailable/);
+  assert.doesNotMatch(el["copy-feedback"].textContent, /copied to clipboard/i);
+  assert.equal(el.clean.selectCount, 1);
+  assert.equal(el["copy-clean"].disabled, false);
+});
+
+test("late clipboard rejection cannot replace the status of a newer selection", async () => {
+  let rejectWrite;
+  const el = harness({ writeText: () => new Promise((_, reject) => { rejectWrite = reject; }) });
+  await el.sample.click();
+  const pending = el["copy-reject"].click();
+  assert.equal(el["copy-reject"].disabled, true);
+  await el.sample.click();
+  const latestStatus = el["copy-feedback"].textContent;
+  rejectWrite(new Error("permission denied"));
+  await pending;
+  assert.equal(el["copy-feedback"].textContent, latestStatus);
+  assert.equal(el["copy-reject"].disabled, false);
+});
