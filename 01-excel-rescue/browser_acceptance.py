@@ -74,9 +74,9 @@ def main():
             hostile = browser.new_page(viewport={"width": 375, "height": 800})
             hostile.goto(URL, wait_until="load")
             hostile_csv = (
-                "name,email,signup_date,city\\n"
-                "=2+2,fictional@example.test,2026-01-02,=HYPERLINK(1)\\n"
-                "Unsafe,=cmd@example.test,2026-01-02,Test\\n"
+                "name,email,signup_date,city\n"
+                "=2+2,fictional@example.test,2026-01-02,=HYPERLINK(1)\n"
+                "Unsafe,=cmd@example.test,2026-01-02,Test\n"
             )
             hostile.locator("#source").set_input_files({
                 "name": "synthetic-hostile.csv",
