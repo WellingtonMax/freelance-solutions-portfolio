@@ -12,13 +12,13 @@ const path = require("node:path");
 const handlers = {};
 function element(id) {
   return {
-    id, hidden: id === "result", value: "", textContent: "", disabled: false, files: [], attributes: {},
+    id, hidden: id === "result" || id === "result-nav", value: "", textContent: "", disabled: false, files: [], attributes: {},
     setAttribute(name, value) { this.attributes[name] = value; },
     addEventListener(type, callback) { handlers[id + ":" + type] = callback; },
     focus() { this.focused = true; }
   };
 }
-const nodes = Object.fromEntries(["source", "feedback", "result", "run", "clean", "reject", "totals", "sample", "result-heading", "copy-clean", "copy-reject", "copy-feedback"].map(id => [id, element(id)]));
+const nodes = Object.fromEntries(["source", "feedback", "result", "result-nav", "run", "clean", "reject", "totals", "sample", "result-heading", "copy-clean", "copy-reject", "copy-feedback"].map(id => [id, element(id)]));
 const sandbox = {
   document: { getElementById(id) { return nodes[id]; } },
   ExcelRescueSample: require("./sample-data.js"),
