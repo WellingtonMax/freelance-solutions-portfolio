@@ -59,3 +59,39 @@ test("results navigation follows processing success and selection reset", async 
   assert.equal(element("result").hidden, true);
   assert.equal(element("result-nav").hidden, true);
 });
+
+test("stale file reads never reveal results navigation", async () => {
+  const elements = new Map();
+  function element(id) {
+    if (!elements.has(id)) elements.set(id, {
+      hidden: id === "result" || id === "result-nav",
+      disabled: false, value: "", textContent: "", files: [], listeners: {},
+      addEventListener(event, handler) { this.listeners[event] = handler; },
+      setAttribute() {}, focus() {}, select() {},
+    });
+    return elements.get(id);
+  }
+  let finishRead;
+  const delayedRead = new Promise(resolve => { finishRead = resolve; });
+  const file = { name: "old.csv", size: 20, text: () => delayedRead };
+  const context = {
+    document: { getElementById: element },
+    ExcelRescueSample: "name,email,signup_date,city",
+    CsvRescuePreview: {
+      MAX_BYTES: 1048576,
+      process() { throw new Error("Stale data must never be processed"); },
+    },
+    navigator: {},
+  };
+  vm.runInNewContext(js, context, { filename: "try-ui.js" });
+  element("source").files = [file];
+  element("source").listeners.change();
+  const pending = element("run").listeners.click();
+  element("source").files = [];
+  element("source").listeners.change();
+  finishRead("name,email,signup_date,city\\nOld,old@example.com,2026-01-01,Old City");
+  await pending;
+  assert.equal(element("result").hidden, true);
+  assert.equal(element("result-nav").hidden, true);
+  assert.equal(element("run").disabled, false);
+});
