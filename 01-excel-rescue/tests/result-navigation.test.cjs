@@ -95,3 +95,42 @@ test("stale file reads never reveal results navigation", async () => {
   assert.equal(element("result-nav").hidden, true);
   assert.equal(element("run").disabled, false);
 });
+
+test("reset moves keyboard focus away from disappearing results navigation", async () => {
+  const elements = new Map();
+  const document = {
+    activeElement: null,
+    getElementById(id) {
+      if (!elements.has(id)) elements.set(id, {
+        hidden: id === "result" || id === "result-nav",
+        disabled: false, value: "", textContent: "", files: [], listeners: {},
+        addEventListener(event, handler) { this.listeners[event] = handler; },
+        setAttribute() {},
+        focus() { document.activeElement = this; },
+        select() {},
+      });
+      return elements.get(id);
+    },
+  };
+  const node = id => document.getElementById(id);
+  vm.runInNewContext(js, {
+    document,
+    ExcelRescueSample: "name,email,signup_date,city\\nTest,test@example.com,2026-01-01,City",
+    CsvRescuePreview: {
+      MAX_BYTES: 1048576,
+      process(text) {
+        return { sourceRows: 1, accepted: [{}], rejected: [],
+          cleanCsv: text, rejectCsv: "line,reason" };
+      },
+    },
+    navigator: {},
+  }, { filename: "try-ui.js" });
+  node("sample").listeners.click();
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(node("result-nav").hidden, false);
+  node("result-nav").focus();
+  node("source").files = [{ name: "next.csv", size: 10 }];
+  node("source").listeners.change();
+  assert.equal(node("result-nav").hidden, true);
+  assert.equal(document.activeElement, node("source"));
+});
