@@ -91,7 +91,12 @@ def main():
             assert "unsafe email prefix" in rejected
             assert "1 accepted" in hostile.locator("#totals").inner_text()
             assert "1 rejected" in hostile.locator("#totals").inner_text()
-            assert hostile.locator("#result script").count() == 0
+            # Assert hostile markup is displayed as inert CSV text, not inserted into DOM.
+            # A script-only selector is insufficient: event-handler HTML is also dangerous.
+            assert hostile.locator("#result img, #result iframe, #result svg, #result script").count() == 0
+            assert hostile.locator("#clean").evaluate(
+                "el => el.tagName === 'TEXTAREA' && !el.isContentEditable"
+            )
             print("PASS: hostile synthetic CSV is escaped/rejected in browser output")
 
             # 320px viewport approximates reflow at 400% of 1280px, not actual browser zoom.
