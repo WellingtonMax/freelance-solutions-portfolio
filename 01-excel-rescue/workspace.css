@@ -32,3 +32,23 @@
 @media(max-width:1050px){.csv-preview .columns{grid-template-columns:1fr}.csv-preview .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.csv-preview .app{display:block}.csv-preview .sidebar{padding:12px;gap:8px}.csv-preview .brand{padding:4px 6px}.csv-preview .side-label,.csv-preview .sidebar .foot{display:none}.csv-preview .sidebar nav{display:flex;overflow-x:auto;gap:4px}.csv-preview .sidebar a{white-space:nowrap;padding:10px;font-size:.82rem}.csv-preview .topbar{padding:18px}.csv-preview .content{padding:16px}.csv-preview .card{padding:16px}.csv-preview .kpis{gap:8px}.csv-preview .kpi{padding:12px}.csv-preview .outputs{grid-template-columns:1fr}}
 @media print{.csv-preview .sidebar,.csv-preview button,.csv-preview input{display:none}.csv-preview .app{display:block}.csv-preview .card{box-shadow:none}}
+
+/* Container reflow follows the actual available layout width, including
+   browser zoom where viewport media queries can still report desktop width. */
+body.csv-preview{container-type:inline-size}
+@container (max-width:640px){
+  .csv-preview .app{display:block}
+  .csv-preview .sidebar{padding:12px;gap:8px}
+  .csv-preview .side-label,.csv-preview .sidebar .foot{display:none}
+  .csv-preview .sidebar nav{display:flex;overflow-x:auto;max-width:100%;gap:4px}
+  .csv-preview .sidebar a{white-space:nowrap;padding:10px;font-size:.82rem}
+  .csv-preview .workspace{min-width:0}
+  .csv-preview .topbar{padding:18px}
+  .csv-preview .content{padding:16px;min-width:0}
+  .csv-preview .columns{grid-template-columns:minmax(0,1fr)}
+  .csv-preview .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .csv-preview .kpi{padding:12px;min-width:0}
+  .csv-preview .card{padding:16px;min-width:0}
+  .csv-preview .outputs{grid-template-columns:minmax(0,1fr)}
+  .csv-preview .output{min-width:0}
+}
