@@ -6,7 +6,6 @@
 .csv-preview .brand{font-size:1.32rem;font-weight:800;letter-spacing:-.04em;color:white;padding:7px 12px}.csv-preview .brand span{color:#13b8d5}
 .csv-preview .side-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#a9bbd2;padding:0 12px}
 .csv-preview .sidebar nav{display:grid;gap:7px}.csv-preview .sidebar a{color:#dbe8f5;text-decoration:none;display:block;padding:13px 15px;border-radius:12px}
-.csv-preview .sidebar .nav-pending{display:block;padding:13px 15px;color:#b7c9de;font-size:.9rem;cursor:default}
 .csv-preview .sidebar a:hover,.csv-preview .sidebar a:focus-visible,.csv-preview .sidebar a[aria-current]{background:#08aeca;color:white}
 .csv-preview .sidebar .foot{margin-top:auto;font-size:.78rem;color:#b7c9de;padding:12px}
 .csv-preview .workspace{min-width:0}.csv-preview .topbar{background:#fff;border-bottom:1px solid #dbe5ee;padding:22px clamp(16px,3vw,42px);display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
