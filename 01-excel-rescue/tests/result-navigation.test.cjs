@@ -133,4 +133,15 @@ test("reset moves keyboard focus away from disappearing results navigation", asy
   node("source").listeners.change();
   assert.equal(node("result-nav").hidden, true);
   assert.equal(document.activeElement, node("source"));
+
+  // The heading, output textareas and copy controls are also hidden on reset.
+  for (const id of ["result-heading", "clean", "reject", "copy-clean", "copy-reject"]) {
+    node("sample").listeners.click();
+    await new Promise(resolve => setImmediate(resolve));
+    node(id).focus();
+    node("source").files = [{ name: "next.csv", size: 10 }];
+    node("source").listeners.change();
+    assert.equal(node("result").hidden, true);
+    assert.equal(document.activeElement, node("source"), `${id} must not retain hidden focus`);
+  }
 });
