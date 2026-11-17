@@ -59,3 +59,21 @@ Reference direction: user-approved Meridian ERP density and hierarchy; no brand 
 **Desktop wireframe (semantic order):** title / fictional-local-data badge → sample/import actions → validation status → three totals from the processor → “Rejected records” heading + reason filter + “Showing N of M” → horizontally bounded table (CSV record #, reason) → copyable CSV outputs. **Mobile (320 px):** same DOM order, single-column totals and filter, table in a labeled horizontal-scroll region with no viewport-wide overflow; the existing output copy controls remain reachable without hover.
 
 **Observable acceptance cases (pending execution):** (1) CSV with a quoted newline and a later invalid email displays the processor's record index, not a claimed physical line; (2) sorted rejection records retain the original record indices; (3) changing the file clears stale diagnostics; (4) focus remains visible and the table has a caption and header associations; (5) no user-controlled field is inserted via HTML parsing. Frontend owns implementation/testing once its existing-flow changes are coordinated. The wider dashboard remains **NOT UX_READY** pending verified BACKEND_READY.
+
+## Focused UX refinement · failure recovery and stale-results prevention (2026-11-17)
+
+**Observed in main:** `try-ui.js` resets the results region on a new file selection and displays a generic validation failure message in `#feedback`; `#result` is initially hidden. The independent frontend PR #91 owns contextual result navigation. This design change does not edit that PR's UI files or change processing rules.
+
+**Decision:** when validation fails, keep the last attempted file selection available for correction/retry, but **never** show results, KPIs, rejected-row filters or export/copy actions from an earlier file. The error must identify a recoverable next action without echoing untrusted CSV contents. On a fresh selection, clear prior diagnostic filters and totals before asynchronous reading begins. An earlier file read finishing late must not repopulate the view or move focus away from the newer task.
+
+**Testable state matrix:**
+
+| Trigger | Visible content | Navigation and keyboard | Status copy |
+| --- | --- | --- | --- |
+| Initial / selection cleared | No results or stale KPIs | Import available; results link absent from Tab order | “Choose a fictional CSV or try the sample.” |
+| Valid sample completes | Counts and diagnostics from this run only | Results destination available; focus on results heading | “Preview complete: A accepted, B rejected.” |
+| Invalid header or malformed CSV | No old results, copy/export unavailable | Import remains reachable; results destination unavailable | “Unable to validate. Check headers and CSV formatting, then retry.” |
+| Oversized file | No old results, copy/export unavailable | File chooser remains reachable | “File exceeds the 1 MB local preview limit.” |
+| Selection changes during pending read | New selection owns loading/empty state | No stale result focus or results destination | New selection feedback, not prior file's outcome |
+
+**Accessibility acceptance:** expose status through the existing polite live region; avoid placing the entire page in `aria-busy`, blocking keyboard access or automatically focusing the file input on ordinary validation errors. Preserve a visible focus indicator and non-color error wording at 320 px and 200% zoom. Distinguish processing errors from a successful analysis containing zero accepted rows: the latter is a completed result, not a failed upload. Browser/keyboard/E2E verification is still required; these are acceptance criteria, not observed passes.
