@@ -77,6 +77,7 @@ def main():
                 "name,email,signup_date,city\n"
                 "=2+2,fictional@example.test,2026-01-02,=HYPERLINK(1)\n"
                 "Unsafe,=cmd@example.test,2026-01-02,Test\n"
+                "<img src=x onerror=alert(1)>,html@example.test,2026-01-03,Test\n"
             )
             hostile.locator("#source").set_input_files({
                 "name": "synthetic-hostile.csv",
@@ -89,7 +90,8 @@ def main():
             rejected = hostile.locator("#reject").input_value()
             assert "'=2+2" in accepted and "'=HYPERLINK(1)" in accepted
             assert "unsafe email prefix" in rejected
-            assert "1 accepted" in hostile.locator("#totals").inner_text()
+            assert "<img src=x onerror=alert(1)>" in accepted
+            assert "2 accepted" in hostile.locator("#totals").inner_text()
             assert "1 rejected" in hostile.locator("#totals").inner_text()
             # Assert hostile markup is displayed as inert CSV text, not inserted into DOM.
             # A script-only selector is insufficient: event-handler HTML is also dangerous.
