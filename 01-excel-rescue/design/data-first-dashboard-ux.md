@@ -77,3 +77,16 @@ Reference direction: user-approved Meridian ERP density and hierarchy; no brand 
 | Selection changes during pending read | New selection owns loading/empty state | No stale result focus or results destination | New selection feedback, not prior file's outcome |
 
 **Accessibility acceptance:** expose status through the existing polite live region; avoid placing the entire page in `aria-busy`, blocking keyboard access or automatically focusing the file input on ordinary validation errors. Preserve a visible focus indicator and non-color error wording at 320 px and 200% zoom. Distinguish processing errors from a successful analysis containing zero accepted rows: the latter is a completed result, not a failed upload. Browser/keyboard/E2E verification is still required; these are acceptance criteria, not observed passes.
+
+## Focused UX refinement · focus safety when conditional navigation disappears (2026-11-17)
+
+**Code-review finding:** frontend PR #91 correctly hides `#result-nav` when a new CSV is selected, but its tests only assert the `hidden` property. They do not exercise the browser's keyboard focus when that same link was focused before the selection reset. The UX risk is a temporarily lost/indeterminate focus target, especially for keyboard and assistive-technology users. This is a **pending browser verification**, not a proven regression.
+
+**Acceptance contract for the existing navigation fix (no new feature or backend dependency):**
+1. On first load, “Review results” is absent from the visual layout, accessibility tree and Tab sequence; “Import & validate” remains reachable. CSS must honor the `hidden` attribute.
+2. After successful processing, “Review results” becomes a real destination, and following it moves the user to the visible results heading. The processing status remains a polite announcement, not a duplicate forced focus.
+3. If the user has keyboard focus on “Review results” and the result is subsequently invalidated by choosing another CSV, focus must end on a visible, relevant control or heading (prefer the file chooser / import section); never leave focus on a hidden link. Do not steal focus during an ordinary background state update when the focused element remains visible.
+4. On an invalid CSV, an oversized file or a stale asynchronous read, the link remains unavailable and cannot navigate to a previous analysis. On successful analysis with **zero accepted rows**, the results destination remains available because rejection reasons still matter.
+5. Verify at 320 px, 200% zoom, keyboard-only and a browser accessibility-tree inspection. A DOM stub asserting `element.hidden` is insufficient evidence for focus behavior; add a real-browser regression before claiming complete accessibility.
+
+**Ownership:** frontend PR #91 owns code and browser tests; UX only supplies this acceptance review. Backend remains the sole merge executor. This note neither marks #90 `UX_READY` nor blocks the narrow navigation regression fix solely for lack of a broader redesign, but the focus scenario must be explicitly tracked if not yet tested.
