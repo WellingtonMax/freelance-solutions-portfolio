@@ -39,6 +39,13 @@ body.csv-preview main #run {
   color: #142746;
 }
 body.csv-preview main #run:hover:not(:disabled) { background: #d9e9fc; }
+/* File-picker intrinsic width and CSV output must not expand the mobile panel. */
+body.csv-preview main input[type="file"],
+body.csv-preview main textarea {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
 body.csv-preview main textarea {
   background: #f8fbff;
   border-color: #b7c8dc;
