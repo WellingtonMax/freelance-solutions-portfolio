@@ -13,7 +13,16 @@ test("CSV preview loads the scoped light theme after the shared stylesheet", () 
   assert.match(html, /<body\s+class="csv-preview"/);
   const shared = html.indexOf('href="demo.css"');
   const scoped = html.indexOf('href="preview-theme.css"');
-  assert.ok(shared >= 0 && scoped > shared, "scoped CSS must override shared CSS");
+  const workspace = html.indexOf('href="workspace.css"');
+  assert.ok((shared >= 0 && scoped > shared) || (workspace >= 0 && shared < 0 && scoped < 0),
+    "preview must load either the legacy scoped theme or the isolated RescueDesk workspace");
+  if (workspace >= 0) {
+    const css = read("workspace.css");
+    assert.match(css, /container-type:\s*inline-size/);
+    assert.match(css, /@container\s*\(max-width:\s*640px\)/);
+    assert.match(css, /:focus-visible/);
+    assert.doesNotMatch(css, /@import\b|url\s*\(/i);
+  }
   assert.match(html, /href="#preview-heading"/);
   assert.match(html, /id="preview-heading"\s+tabindex="-1"/);
 });
@@ -50,11 +59,11 @@ test("keyboard skip link has an explicit visible surface and focus ring", () => 
 test("CSV preview clearly labels fictional offline processing and blocks network connections", () => {
   const html = read("try.html");
   assert.match(html, /Fictional demonstration/);
-  assert.match(html, /No uploads or external connections/);
+  assert.match(html, /No uploads or external connections|No network requests/);
   assert.match(html, /Use fictional records only/);
   assert.match(html, /connect-src 'none'/);
   assert.match(html, /form-action 'none'/);
-  assert.match(html, /Maximum 1 MB, 2,000 rows/);
+  assert.match(html, /Maximum 1 MB(?:,| and) 2,000 rows/);
 });
 
 function luminance(hex) {
