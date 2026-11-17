@@ -6,6 +6,7 @@ let sampleSelected = false;
 let selectionVersion = 0;
 const feedback = document.getElementById("feedback");
 const result = document.getElementById("result");
+const resultNav = document.getElementById("result-nav");
 const run = document.getElementById("run");
 const clean = document.getElementById("clean");
 const reject = document.getElementById("reject");
@@ -23,7 +24,13 @@ function resetPreview() {
   copyReject.disabled = true;
   copyFeedback.textContent = "Copy an output to use it locally. If copying is unavailable, select the CSV text manually.";
   feedback.setAttribute("aria-busy", "false");
+  // Reset may hide the navigation link or any focused result control.
+  // Restore a visible keyboard target before hiding the result panel.
+  if ([resultNav, resultHeading, clean, reject, copyClean, copyReject].includes(document.activeElement)) {
+    source.focus();
+  }
   result.hidden = true;
+  resultNav.hidden = true;
   clean.value = "";
   reject.value = "";
   totals.textContent = "";
@@ -78,6 +85,7 @@ async function processSelection() {
     reject.value = output.rejectCsv;
     totals.textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
     result.hidden = false;
+    resultNav.hidden = false;
     copyClean.disabled = output.accepted.length === 0;
     copyReject.disabled = output.rejected.length === 0;
     copyFeedback.textContent = output.accepted.length === 0 && output.rejected.length === 0

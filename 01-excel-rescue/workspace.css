@@ -52,3 +52,6 @@ body.csv-preview{container-type:inline-size}
   .csv-preview .outputs{grid-template-columns:minmax(0,1fr)}
   .csv-preview .output{min-width:0}
 }
+
+/* Keep conditional navigation out of layout and keyboard focus until results exist. */
+.csv-preview .sidebar a[hidden]{display:none}

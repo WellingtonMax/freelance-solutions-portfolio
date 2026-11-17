@@ -8,10 +8,10 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 function harness(clipboard) {
-  const ids = ["source", "sample", "result-heading", "feedback", "result", "run",
+  const ids = ["source", "sample", "result-heading", "feedback", "result", "result-nav", "run",
     "clean", "reject", "totals", "copy-clean", "copy-reject", "copy-feedback"];
   const elements = Object.fromEntries(ids.map(id => [id, {
-    value: "", textContent: "", hidden: id === "result", disabled: false,
+    value: "", textContent: "", hidden: id === "result" || id === "result-nav", disabled: false,
     files: [], listeners: {}, attributes: {}, focusCount: 0, selectCount: 0,
     addEventListener(type, handler) { this.listeners[type] = handler; },
     setAttribute(name, value) { this.attributes[name] = value; },
