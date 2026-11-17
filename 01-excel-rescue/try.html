@@ -21,7 +21,7 @@
 <input id="source" aria-describedby="source-help feedback" type="file" accept=".csv,text/csv">
 <p><button id="run" type="button" aria-controls="result" aria-describedby="feedback">Validate CSV locally</button></p>
 <p id="feedback" role="status" aria-live="polite" aria-atomic="true">No file selected.</p></section>
-<div class="card" id="result" hidden><p class="eyebrow">02 / Review results</p><h2 id="result-heading" tabindex="-1">Review records before export</h2><p id="totals"></p>
+<div class="card" id="result" hidden><p class="eyebrow">02 / Review results</p><h3 id="result-heading" tabindex="-1">Review records before export</h3><p id="totals"></p>
 <div class="outputs"><div class="output"><label for="clean">Accepted records — copyable CSV</label><button type="button" id="copy-clean" aria-describedby="copy-feedback" disabled>Copy accepted CSV</button><textarea id="clean" aria-describedby="copy-feedback" readonly rows="7"></textarea></div>
 <div class="output"><label for="reject">Rejected records — investigate first</label><button type="button" id="copy-reject" aria-describedby="copy-feedback" disabled>Copy rejected CSV</button><textarea id="reject" aria-describedby="copy-feedback" readonly rows="7"></textarea></div></div>
 <p id="copy-feedback" role="status" aria-live="polite">Copy an output to use it locally. If copying is unavailable, select the CSV text manually.</p></div>
