@@ -24,6 +24,8 @@ function resetPreview() {
   copyReject.disabled = true;
   copyFeedback.textContent = "Copy an output to use it locally. If copying is unavailable, select the CSV text manually.";
   feedback.setAttribute("aria-busy", "false");
+  // Never strand keyboard focus on a navigation link that is about to disappear.
+  if (document.activeElement === resultNav) source.focus();
   result.hidden = true;
   resultNav.hidden = true;
   clean.value = "";
