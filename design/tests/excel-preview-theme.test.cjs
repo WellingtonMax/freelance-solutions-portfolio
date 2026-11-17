@@ -81,3 +81,12 @@ test("critical preview action and disabled-state colors meet WCAG AA text contra
     assert.ok(contrast(foreground, background) >= 4.5, name + " must meet 4.5:1");
   }
 });
+
+test("programmatic heading focus survives Windows high contrast", () => {
+  const css = read("preview-theme.css");
+  const forced = css.match(/@media \\(forced-colors:\\s*active\\)\\s*\\{([\\s\\S]*?)\\n\\}/);
+  assert.ok(forced, "forced-colors rules required");
+  assert.match(forced[1], /#preview-heading:focus/);
+  assert.match(forced[1], /#result-heading:focus/);
+  assert.match(forced[1], /outline-color:\\s*Highlight/);
+});
