@@ -1,0 +1,54 @@
+/* RescueDesk: scoped visual shell. Existing CSV processing and safety remain unchanged. */
+:root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#182b4b;background:#eaf6f8}
+*{box-sizing:border-box}body.csv-preview{margin:0;max-width:none;padding:0;background:#eff8fa;color:#182b4b}
+.csv-preview .app{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:100vh}
+.csv-preview .sidebar{background:#172d50;color:#eaf4ff;padding:22px 14px;display:flex;flex-direction:column;gap:22px}
+.csv-preview .brand{font-size:1.32rem;font-weight:800;letter-spacing:-.04em;color:white;padding:7px 12px}.csv-preview .brand span{color:#13b8d5}
+.csv-preview .side-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:#a9bbd2;padding:0 12px}
+.csv-preview .sidebar nav{display:grid;gap:7px}.csv-preview .sidebar a{color:#dbe8f5;text-decoration:none;display:block;padding:13px 15px;border-radius:12px}
+.csv-preview .sidebar a:hover,.csv-preview .sidebar a:focus-visible,.csv-preview .sidebar a[aria-current]{background:#08aeca;color:white}
+.csv-preview .sidebar .foot{margin-top:auto;font-size:.78rem;color:#b7c9de;padding:12px}
+.csv-preview .workspace{min-width:0}.csv-preview .topbar{background:#fff;border-bottom:1px solid #dbe5ee;padding:22px clamp(16px,3vw,42px);display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}
+.csv-preview .topbar h1{font-size:clamp(1.5rem,2.6vw,2.2rem);margin:0;color:#172d50}.csv-preview .topbar p{margin:6px 0 0;color:#566780}
+.csv-preview .pill{background:#e5f8fc;color:#075e7d;padding:8px 12px;border-radius:100px;font-size:.78rem;font-weight:700}
+.csv-preview .content{padding:24px clamp(16px,3vw,42px) 48px;max-width:1600px;margin:auto}
+.csv-preview .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.csv-preview .kpi,.csv-preview .card{background:white;border:1px solid #d9e4ec;border-radius:14px;box-shadow:0 3px 16px #18335c0a}
+.csv-preview .kpi{padding:18px}.csv-preview .kpi strong{display:block;font-size:clamp(1.35rem,2.3vw,2rem);color:#153458;margin-top:8px}.csv-preview .kpi small{color:#65778d}
+.csv-preview .columns{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(280px,.6fr);gap:18px;align-items:start}
+.csv-preview .card{padding:22px;margin-bottom:18px}.csv-preview .card h2{margin:0 0 12px;color:#173252;font-size:1.2rem}.csv-preview .card p{line-height:1.6}
+.csv-preview .eyebrow{font-size:.74rem;text-transform:uppercase;letter-spacing:.12em;color:#087c9a;font-weight:800}
+.csv-preview button{background:#0754bf;color:white;border:0;border-radius:9px;padding:12px 16px;font:inherit;font-weight:650;cursor:pointer}
+.csv-preview button:hover{background:#063f93}.csv-preview button:disabled{opacity:.48;cursor:not-allowed}
+.csv-preview #sample{background:#0bafc8}.csv-preview input[type=file]{width:100%;max-width:100%;padding:12px;background:#f6f9fc;border:1px dashed #a4b9ce;border-radius:10px}
+.csv-preview textarea{width:100%;max-width:100%;min-height:145px;font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;border:1px solid #cddce8;border-radius:10px;background:#f8fbfd;color:#20354c;padding:12px}
+.csv-preview label{display:block;font-weight:650;margin:12px 0 6px}.csv-preview .small,.csv-preview .hint{font-size:.85rem;color:#66768a}
+.csv-preview #feedback,.csv-preview #copy-feedback{padding:12px;border-radius:9px;background:#eaf6fb;color:#145171}
+.csv-preview .steps{padding-left:24px;line-height:2}.csv-preview .steps li::marker{color:#0a9bb9;font-weight:800}
+.csv-preview .outputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.csv-preview .output{min-width:0;background:#f9fcfe;border:1px solid #e1ebf1;padding:14px;border-radius:12px}
+.csv-preview .output button{margin-bottom:10px}.csv-preview a{color:#0754bf}
+.csv-preview :focus-visible{outline:3px solid #f7a928;outline-offset:3px}
+.csv-preview .skip-link{position:absolute;left:-9999px;top:10px;z-index:99;background:#fff;padding:10px}.csv-preview .skip-link:focus{left:10px}
+@media(max-width:1050px){.csv-preview .columns{grid-template-columns:1fr}.csv-preview .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){.csv-preview .app{display:block}.csv-preview .sidebar{padding:12px;gap:8px}.csv-preview .brand{padding:4px 6px}.csv-preview .side-label,.csv-preview .sidebar .foot{display:none}.csv-preview .sidebar nav{display:flex;overflow-x:auto;gap:4px}.csv-preview .sidebar a{white-space:nowrap;padding:10px;font-size:.82rem}.csv-preview .topbar{padding:18px}.csv-preview .content{padding:16px}.csv-preview .card{padding:16px}.csv-preview .kpis{gap:8px}.csv-preview .kpi{padding:12px}.csv-preview .outputs{grid-template-columns:1fr}}
+@media print{.csv-preview .sidebar,.csv-preview button,.csv-preview input{display:none}.csv-preview .app{display:block}.csv-preview .card{box-shadow:none}}
+
+/* Container reflow follows the actual available layout width, including
+   browser zoom where viewport media queries can still report desktop width. */
+body.csv-preview{container-type:inline-size}
+@container (max-width:640px){
+  .csv-preview .app{display:block}
+  .csv-preview .sidebar{padding:12px;gap:8px}
+  .csv-preview .side-label,.csv-preview .sidebar .foot{display:none}
+  .csv-preview .sidebar nav{display:flex;overflow-x:auto;max-width:100%;gap:4px}
+  .csv-preview .sidebar a{white-space:nowrap;padding:10px;font-size:.82rem}
+  .csv-preview .workspace{min-width:0}
+  .csv-preview .topbar{padding:18px}
+  .csv-preview .content{padding:16px;min-width:0}
+  .csv-preview .columns{grid-template-columns:minmax(0,1fr)}
+  .csv-preview .kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .csv-preview .kpi{padding:12px;min-width:0}
+  .csv-preview .card{padding:16px;min-width:0}
+  .csv-preview .outputs{grid-template-columns:minmax(0,1fr)}
+  .csv-preview .output{min-width:0}
+}

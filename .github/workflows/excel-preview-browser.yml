@@ -9,6 +9,7 @@ on:
       - '01-excel-rescue/sample-data.js'
       - '01-excel-rescue/demo.css'
       - '01-excel-rescue/preview-theme.css'
+      - '01-excel-rescue/workspace.css'
       - '01-excel-rescue/check_try_browser.py'
       - '.github/workflows/excel-preview-browser.yml'
   workflow_dispatch:
