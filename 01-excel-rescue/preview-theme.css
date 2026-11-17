@@ -67,7 +67,9 @@ body.csv-preview #result-heading:focus {
   body.csv-preview a:focus-visible,
   body.csv-preview button:focus-visible,
   body.csv-preview input[type="file"]:focus-visible,
-  body.csv-preview textarea:focus-visible { outline-color: Highlight; }
+  body.csv-preview textarea:focus-visible,
+  body.csv-preview #preview-heading:focus,
+  body.csv-preview #result-heading:focus { outline-color: Highlight; }
 }
 
 /* P01-F01 mobile task flow: keep each action reachable at 320 CSS px and
