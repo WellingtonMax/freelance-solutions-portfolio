@@ -90,3 +90,8 @@ test("programmatic heading focus survives Windows high contrast", () => {
   assert.match(forced[1], /#result-heading:focus/);
   assert.match(forced[1], /outline-color:\s*Highlight/);
 });
+
+test("file picker and CSV outputs stay within the mobile panel box", () => {
+  const css = read("preview-theme.css");
+  assert.match(css, /main input\[type="file"\],\s*body\.csv-preview main textarea\s*\{[^}]*box-sizing:\s*border-box;[^}]*min-width:\s*0;[^}]*max-width:\s*100%;/s);
+});
