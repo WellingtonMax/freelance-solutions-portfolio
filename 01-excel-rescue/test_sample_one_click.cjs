@@ -8,10 +8,10 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 test("fictional sample processes on one click and announces the result", async () => {
-  const ids = ["source", "sample", "result-heading", "feedback", "result", "run",
+  const ids = ["source", "sample", "result-heading", "feedback", "result", "result-nav", "run",
     "clean", "reject", "totals", "copy-clean", "copy-reject", "copy-feedback"];
   const elements = Object.fromEntries(ids.map(id => [id, {
-    value: "", textContent: "", hidden: id === "result", disabled: false,
+    value: "", textContent: "", hidden: id === "result" || id === "result-nav", disabled: false,
     files: [], size: 0, listeners: {}, attributes: {}, focusCount: 0,
     addEventListener(event, handler) { this.listeners[event] = handler; },
     setAttribute(name, value) { this.attributes[name] = value; },
@@ -48,10 +48,10 @@ test("fictional sample processes on one click and announces the result", async (
 });
 
 test("changing from a pending local read to the fictional sample cannot show stale results", async () => {
-  const ids = ["source", "sample", "result-heading", "feedback", "result", "run",
+  const ids = ["source", "sample", "result-heading", "feedback", "result", "result-nav", "run",
     "clean", "reject", "totals", "copy-clean", "copy-reject", "copy-feedback"];
   const elements = Object.fromEntries(ids.map(id => [id, {
-    value: "", textContent: "", hidden: id === "result", disabled: false,
+    value: "", textContent: "", hidden: id === "result" || id === "result-nav", disabled: false,
     files: [], listeners: {}, attributes: {},
     addEventListener(event, handler) { this.listeners[event] = handler; },
     setAttribute(name, value) { this.attributes[name] = value; },
@@ -89,10 +89,10 @@ test("changing from a pending local read to the fictional sample cannot show sta
 });
 
 test("an obsolete rejected file read cannot replace a newer successful preview", async () => {
-  const ids = ["source", "sample", "result-heading", "feedback", "result", "run",
+  const ids = ["source", "sample", "result-heading", "feedback", "result", "result-nav", "run",
     "clean", "reject", "totals", "copy-clean", "copy-reject", "copy-feedback"];
   const elements = Object.fromEntries(ids.map(id => [id, {
-    value: "", textContent: "", hidden: id === "result", disabled: false,
+    value: "", textContent: "", hidden: id === "result" || id === "result-nav", disabled: false,
     files: [], attributes: {}, listeners: {},
     addEventListener(event, handler) { this.listeners[event] = handler; },
     setAttribute(name, value) { this.attributes[name] = value; },
