@@ -2,16 +2,16 @@
 
 **Eight practical software demonstrations for small-business workflows** — spreadsheets, analytics, API exports, lead review, landing pages, document generation, data auditing and offline change detection.
 
-[Browser showcase (after Pages activation)](https://wellingtonmax.github.io/freelance-solutions-portfolio/) · [Showcase HTML source](index.html) · [How to evaluate the work](CLIENT_START_HERE.md) · [Automated test workflow](.github/workflows/portfolio-ci.yml) · [Security policy](SECURITY.md)
+[Live browser showcase](https://wellingtonmax.github.io/freelance-solutions-portfolio/) · [Showcase HTML source](index.html) · [How to evaluate the work](CLIENT_START_HERE.md) · [Automated test workflow](.github/workflows/portfolio-ci.yml) · [Security policy](SECURITY.md)
 
 > **Portfolio in progress.** These are original **fictional demonstrations**, not completed paid engagements or customer testimonials. Development is **AI-assisted**; human review is required before commercial use. The presence of code in `main` does **not** mean a project is production-ready, hosted or independently security-certified.
 
 ## The eight core projects
 
-**Try the eight browser demos (GitHub Pages publication gate):**
+**Try the eight browser demos:**
 
 1. [Excel Rescue — CSV cleaner](https://wellingtonmax.github.io/freelance-solutions-portfolio/01-excel-rescue/try.html) · [HTML source](01-excel-rescue/try.html)
-2. [Sales Intelligence dashboard](https://wellingtonmax.github.io/freelance-solutions-portfolio/02-sales-intelligence/demo-ui.html) · [HTML source](02-sales-intelligence/demo-ui.html)
+2. [Sales Intelligence dashboard](https://wellingtonmax.github.io/freelance-solutions-portfolio/02-sales-intelligence/sample-explorer.html) · [HTML source](02-sales-intelligence/sample-explorer.html)
 3. [API Bridge JSON-to-CSV](https://wellingtonmax.github.io/freelance-solutions-portfolio/03-api-bridge/demo-ui.html) · [HTML source](03-api-bridge/demo-ui.html)
 4. [CRM Lead Intelligence review](https://wellingtonmax.github.io/freelance-solutions-portfolio/04-crm-lead-intelligence/demo-ui.html) · [HTML source](04-crm-lead-intelligence/demo-ui.html)
 5. [Landing Page Studio](https://wellingtonmax.github.io/freelance-solutions-portfolio/05-landing-page-studio/index.html) · [HTML source](05-landing-page-studio/index.html)
@@ -19,7 +19,7 @@
 7. [Data Quality Auditor](https://wellingtonmax.github.io/freelance-solutions-portfolio/07-data-quality-auditor/demo-ui.html) · [HTML source](07-data-quality-auditor/demo-ui.html)
 8. [Site Change Monitor](https://wellingtonmax.github.io/freelance-solutions-portfolio/08-site-change-monitor/demo-ui.html) · [HTML source](08-site-change-monitor/demo-ui.html)
 
-> **Publication not yet confirmed:** these are the intended GitHub Pages destinations, not verified working live links. The repository owner must enable **Settings → Pages → Deploy from a branch → main → /(root)**, and the links must be smoke-tested before sharing them on Upwork. Until then, opening HTML paths inside the GitHub repository shows source code. These pages are browser-only fictional demonstrations; they are **not** the Python services, and no server, authentication or live customer data is provided.
+> **Live on GitHub Pages.** The links above open interactive demonstrations, not production services. Browser previews use sample or local data; they are separate from the Python tools and do not provide a live backend, accounts or customer data.
 
 **Run the existing browser previews locally (no hosting account):** clone or download this repository, open a terminal in its root, then start a loopback-only static server:
 
@@ -29,12 +29,12 @@ python -m http.server 8000 --bind 127.0.0.1
 
 Open [http://127.0.0.1:8000/index.html](http://127.0.0.1:8000/index.html) **on the same computer** and choose one of the eight entries. To open Excel Rescue directly, visit [http://127.0.0.1:8000/01-excel-rescue/try.html](http://127.0.0.1:8000/01-excel-rescue/try.html). Stop the server with `Ctrl+C`. These addresses work only while the local server is running; they are **not public demo links**. Use fictional input only; this simple static server is for local inspection, not production or network exposure. Browser-based preview behavior must still be tested independently.
 
-All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. Some offer browser previews; others are **local command-line tools**, not live web applications. Open each README for exact commands and limitations.
+All eight numbered projects have source files, synthetic samples and tests integrated into the `main` branch. All eight have browser previews; several also include **local command-line tools** with a different scope. Open each README for exact commands and limitations.
 
 | Project | The problem it demonstrates | What you can inspect | Delivery status |
 |---|---|---|---|
 | **01 · [Excel Rescue](01-excel-rescue/README.md)** | Clean inconsistent CRM CSV exports and explain rejected or duplicate records | [Try browser CSV cleaner](https://wellingtonmax.github.io/freelance-solutions-portfolio/01-excel-rescue/try.html) · [HTML source](01-excel-rescue/try.html) · [Synthetic audit walkthrough](01-excel-rescue/demo.html) · [Case study](01-excel-rescue/CASE_STUDY.md) | Local Python tool and optional localhost web app; **prototype**, not public-hosting ready |
-| **02 · [Sales Intelligence](02-sales-intelligence/README.md)** | Turn transaction CSV files into actionable revenue metrics | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/02-sales-intelligence/demo-ui.html) · [HTML source](02-sales-intelligence/demo-ui.html) · JSON KPIs, offline HTML report · [Case study](02-sales-intelligence/CASE_STUDY.md) | Offline reporting demonstration; no live business dashboard |
+| **02 · [Sales Intelligence](02-sales-intelligence/README.md)** | Turn transaction CSV files into actionable revenue metrics | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/02-sales-intelligence/sample-explorer.html) · [HTML source](02-sales-intelligence/sample-explorer.html) · JSON KPIs, offline HTML report · [Case study](02-sales-intelligence/CASE_STUDY.md) | Offline reporting demonstration; no live business dashboard |
 | **03 · [API Bridge](03-api-bridge/README.md)** | Export data from an approved JSON API into CSV | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/03-api-bridge/demo-ui.html) · [HTML source](03-api-bridge/demo-ui.html) · Python exporter, mocked-network tests · [Case study](03-api-bridge/CASE_STUDY.md) | Local integration prototype; optional public test API, no enterprise auth |
 | **04 · [CRM Lead Intelligence](04-crm-lead-intelligence/README.md)** | Review and prioritize a fictional B2B lead list without contacting anyone | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/04-crm-lead-intelligence/demo-ui.html) · [HTML source](04-crm-lead-intelligence/demo-ui.html) · [Synthetic CSV](04-crm-lead-intelligence/sample.csv), suppression rules, JSON review output and tests | Offline, **review-only** prototype; no outreach, CRM login or contact verification |
 | **05 · [Landing Page Studio](05-landing-page-studio/README.md)** | Demonstrate a responsive small-business landing page and enquiry validation | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/05-landing-page-studio/index.html) · [HTML source](05-landing-page-studio/index.html), CSS/JavaScript and tests | Browser prototype; form validates **locally** and never submits data |
@@ -46,7 +46,7 @@ All eight numbered projects have source files, synthetic samples and tests integ
 
 ## Evaluate a demonstration in a few minutes
 
-1. Start with the [visual showcase](index.html). Its eight numbered entries link to real files in `main`; some links lead to source/instructions instead of a running application.
+1. Start with the [visual showcase](index.html). Excel Rescue, Landing Page Studio and Sales Intelligence are featured first. Use each **Try demo** link for the interactive preview.
 2. Choose a project and open its **README**. Check the fictional business brief, sample input, expected output and stated exclusions.
 3. Run its documented example locally and compare the outcome with its tests. For a concrete command-line example:
 

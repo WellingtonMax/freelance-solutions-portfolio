@@ -8,6 +8,7 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
+SHOWCASE_ROUTE_OVERRIDES = {"02": "02-sales-intelligence/sample-explorer.html"}
 PREVIEWS = {
     "02": "02-sales-intelligence/demo-ui.html",
     "03": "03-api-bridge/demo-ui.html",
@@ -29,13 +30,14 @@ class LinkParser(HTMLParser):
 
 
 class ShowcasePreviewTests(unittest.TestCase):
-    def test_six_preview_links_exist_and_resolve(self):
+    def test_six_project_demo_links_exist_and_resolve(self):
         page = LinkParser()
         page.feed((ROOT / "index.html").read_text(encoding="utf-8"))
         for number, target in PREVIEWS.items():
             with self.subTest(project=number):
-                self.assertEqual(page.links.count(target), 1)
-                self.assertTrue((ROOT / target).is_file(), target)
+                route = SHOWCASE_ROUTE_OVERRIDES.get(number, target)
+                self.assertEqual(page.links.count(route), 1)
+                self.assertTrue((ROOT / route).is_file(), route)
 
     def test_previews_disclose_synthetic_scope_and_link_back(self):
         for number, target in PREVIEWS.items():
