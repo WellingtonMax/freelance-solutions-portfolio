@@ -77,6 +77,8 @@ async function processSelection() {
     clean.value = output.cleanCsv;
     reject.value = output.rejectCsv;
     totals.textContent = output.sourceRows + " input rows · " + output.accepted.length + " accepted · " + output.rejected.length + " rejected";
+    totals.setAttribute("data-accepted", output.accepted.length);
+    totals.setAttribute("data-rejected", output.rejected.length);
     result.hidden = false;
     copyClean.disabled = output.accepted.length === 0;
     copyReject.disabled = output.rejected.length === 0;

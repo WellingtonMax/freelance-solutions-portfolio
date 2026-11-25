@@ -12,6 +12,12 @@ on:
       - '07-data-quality-auditor/**'
       - '08-site-change-monitor/**'
       - '.github/workflows/portfolio-ci.yml'
+      - 'assets/**'
+      - 'demos/**'
+      - 'workspace/**'
+      - 'scripts/check-workbench.cjs'
+      - 'tests/workbench.test.mjs'
+      - 'tests/test_showcase_preview_links.py'
       - 'index.html'
       - 'README.md'
       - 'tests/test_eight_main_showcase.py'
@@ -73,3 +79,23 @@ jobs:
       - name: Site Change Monitor
         working-directory: 08-site-change-monitor
         run: python -m unittest discover -v
+
+      - name: Workbench algorithms and data boundaries
+        run: node --test tests/workbench.test.mjs
+
+  workbench-browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22.15.0'
+      - name: Install pinned browser tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/workbench-qa" --no-audit --no-fund playwright@1.56.0
+          "$RUNNER_TEMP/workbench-qa/node_modules/.bin/playwright" install --with-deps chromium
+      - name: Verify browser workflows, local SQLite, and mobile layouts
+        run: PLAYWRIGHT_MODULE="$RUNNER_TEMP/workbench-qa/node_modules/playwright" node scripts/check-workbench.cjs

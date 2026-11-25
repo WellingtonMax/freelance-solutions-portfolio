@@ -1,3 +1,4 @@
+import { mountHistory } from "../../assets/workbench/history-card.mjs";
 import {
   createDemoState, memberBalance, recordPurchase, redeemPoints,
   redeemFreeVisit, addMember, setMembership, setRewardsRule, clinicMetrics
@@ -7,7 +8,6 @@ let state = createDemoState();
 let clinicId = "north";
 let view = "overview";
 let search = "";
-let sequence = 0;
 const page = document.querySelector("#page");
 const modal = document.querySelector("#modal");
 const modalTitle = document.querySelector("#modal-title");
@@ -18,7 +18,7 @@ const money = (cents) => cash.format(cents / 100);
 const html = (value) => String(value ?? "").replace(/[&<>"']/g, (c) => ({
   "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
 })[c]);
-const nowId = (prefix) => prefix + "-" + Date.now() + "-" + (++sequence);
+const nowId = (prefix) => prefix + "-" + crypto.randomUUID();
 const clinic = () => state.clinics.find((c) => c.id === clinicId);
 const members = () => state.members.filter((m) => m.clinicId === clinicId);
 const transactions = () => state.transactions.filter((t) => t.clinicId === clinicId).slice().reverse();
@@ -77,7 +77,7 @@ function overviewPage() {
   ).join("");
   return title("Business overview", "Good morning, team.", "A clear view of your membership program across " + html(clinic().name) + ".", button("+ New member", "add") + button("Record purchase", "purchase", "dark")) +
     '<div class="stats">' + statCards + '</div><div class="dashboard-grid">' +
-    '<section class="panel">' + panelHeader("Recent activity", "Purchases and redemptions from fictional records", '<button class="linkish" data-action="go-transactions">View all →</button>') +
+    '<section class="panel">' + panelHeader("Recent activity", "Purchases and redemptions from fictional records", '<button class="linkish" data-action="go-transactions">View all</button>') +
     '<div class="table-wrap"><table><thead><tr><th>Transaction</th><th>Member</th><th>Activity</th><th>Amount</th><th>Status</th></tr></thead><tbody>' +
     transactionRows(transactions().slice(0, 5)) + "</tbody></table></div></section>" +
     '<section class="panel">' + panelHeader("Loyalty progress", "Buy " + clinic().buyX + " eligible visits, earn one free") +
@@ -105,7 +105,7 @@ function rewardsPage() {
     '%"></span></div><p>Free visit vouchers: ' + m.freeCredits + '</p></div>'
   ).join("");
   return title("Member benefits", "Rewards & loyalty", "Transparent earning and redemption rules.", button("Redeem rewards", "redeem") + button("Use free visit", "free", "dark")) +
-    '<div class="stats" style="grid-template-columns:repeat(3,minmax(0,1fr))">' +
+    '<div class="stats rewards-stats">' +
     '<section class="stat"><div class="stat-head">Rewards earn rate<span class="stat-icon">%</span></div><span class="stat-value">' + clinic().rewardPct +
     '%</span><div class="stat-foot">of eligible purchase subtotal</div></section>' +
     '<section class="stat"><div class="stat-head">Buy-X promotion<span class="stat-icon">✧</span></div><span class="stat-value">' + clinic().buyX +
@@ -118,14 +118,14 @@ function rewardsPage() {
 
 function transactionsPage() {
   return title("Financial activity", "Transaction ledger", "Illustrative sales, reward redemptions and audit events.", button("Record purchase", "purchase") + button("Export CSV", "export", "dark")) +
-    '<section class="panel">' + panelHeader("All clinic transactions", "This is an in-memory transaction record, not a persistent audit ledger") +
+    '<section class="panel">' + panelHeader("All clinic transactions", "Simulated transactions for the selected hospital") +
     '<div class="table-wrap"><table><thead><tr><th>Event ID</th><th>Member</th><th>Transaction type</th><th>Amount</th><th>Status</th></tr></thead><tbody>' +
     transactionRows(transactions()) + "</tbody></table></div></section>";
 }
 
 function settingsPage() {
   return title("Program controls", "Rewards configuration", "Set demonstration rules for the selected hospital. Other hospitals remain unaffected.", button("Reset demo", "reset", "dark")) +
-    '<div class="dashboard-grid"><section class="panel">' + panelHeader("Program settings", "Simulated settings, with no backend persistence") +
+    '<div class="dashboard-grid"><section class="panel">' + panelHeader("Program settings", "Fictional rewards settings for this hospital") +
     '<div class="rule-card"><form data-form="settings"><label for="rate">Reward percentage per purchase (0–20%)</label><input id="rate" name="rate" type="number" min="0" max="20" step="1" required value="' + clinic().rewardPct +
     '"><label for="threshold">Purchases needed for one free visit (2–20)</label><input id="threshold" name="threshold" type="number" min="2" max="20" step="1" required value="' + clinic().buyX +
     '"><p>Changing a rule affects subsequent simulated purchases. Historical ledger credits are not recalculated.</p><button type="submit" class="btn primary">Save demo settings</button></form></div></section>' +
@@ -139,8 +139,17 @@ function render() {
   const select = document.querySelector("#clinic");
   select.innerHTML = state.clinics.map((c) => '<option value="' + html(c.id) + '">' + html(c.name) + "</option>").join("");
   select.value = clinicId;
-  document.querySelectorAll("[data-view]").forEach((b) => b.classList.toggle("active", b.dataset.view === view));
+  document.querySelectorAll("[data-view]").forEach((b) => {
+    const active = b.dataset.view === view;
+    b.classList.toggle("active", active);
+    b.setAttribute("aria-pressed", String(active));
+  });
   page.innerHTML = ({ overview: overviewPage, members: membersPage, rewards: rewardsPage, transactions: transactionsPage, settings: settingsPage })[view]();
+  page.querySelectorAll(".table-wrap").forEach(table => {
+    table.tabIndex = 0;
+    table.setAttribute("role", "region");
+    table.setAttribute("aria-label", "Scrollable table");
+  });
 }
 
 function notify(message, isError = false) {
@@ -150,13 +159,20 @@ function notify(message, isError = false) {
   clearTimeout(notify.timer);
   notify.timer = setTimeout(() => toastEl.classList.remove("show"), 3600);
 }
-function closeModal() { modal.classList.remove("open"); modalContent.textContent = ""; }
+let modalTrigger;
+function closeModal() {
+  if (!modal.classList.contains("open")) return;
+  modal.classList.remove("open"); modalContent.textContent = "";
+  document.querySelector(".app").inert = false;
+  modalTrigger?.focus();
+}
 function modalForm(titleText, contents, submitLabel) {
   modalTitle.textContent = titleText;
   modalContent.innerHTML = contents + '<div class="dialog-actions"><button type="button" class="btn" data-action="close">Cancel</button><button class="btn primary" type="submit">' + submitLabel + "</button></div>";
+  modalTrigger = document.activeElement;
   modal.classList.add("open");
-  const input = modalContent.querySelector("input,select");
-  if (input) input.focus();
+  document.querySelector(".app").inert = true;
+  (modalContent.querySelector('input:not([type="hidden"]),select') || modal.querySelector("button")).focus();
 }
 function openDialog(action, selectedId) {
   const active = members().filter((m) => m.status === "active");
@@ -190,7 +206,7 @@ function centsFrom(value) {
 function csvCell(value) {
   let s = String(value ?? "");
   // Prevent formula execution when users open CSV in Excel or similar spreadsheet apps.
-  if (/^[\s]*[=+\-@]/.test(s)) s = "'" + s;
+  if (/^[\s\u0000-\u001f\u007f\u200b-\u200f\u202a-\u202e\u2060\ufeff]*[=+\-@]/u.test(s)) s = "'" + s;
   return '"' + s.replace(/"/g, '""') + '"';
 }
 function exportTransactions() {
@@ -219,7 +235,7 @@ document.addEventListener("click", (event) => {
   if (action === "close") return closeModal();
   if (action === "go-transactions") { view = "transactions"; render(); return; }
   if (action === "export") return exportTransactions();
-  if (action === "reset") { state = createDemoState(); clinicId = "north"; view = "overview"; search = ""; render(); notify("Demo reset"); return; }
+  if (action === "reset") { state = createDemoState(); clinicId = "north"; view = "overview"; search = ""; render(); notify("Demo reset for this tab; saved simulation unchanged"); return; }
   if (["add", "purchase", "redeem", "free", "manage"].includes(action)) openDialog(action, actionBtn.dataset.member);
 });
 document.querySelector("#clinic").addEventListener("change", (event) => {
@@ -250,9 +266,57 @@ document.addEventListener("submit", (event) => {
     if (type === "free") redeemFreeVisit(state, { clinicId, memberId: args.memberId, eventId: nowId("voucher") });
     if (type === "manage") setMembership(state, { clinicId, memberId: args.memberId, status: args.status });
     if (type === "settings") setRewardsRule(state, { clinicId, rewardPct: Number(args.rate), buyX: Number(args.threshold) });
+    const action = modalTrigger?.dataset.action;
     closeModal(); render(); notify("Demo updated successfully");
+    if (action) (page.querySelector(`[data-action="${action}"]`) || document.querySelector('#clinic')).focus();
   } catch (err) { notify(err.message || "Invalid operation", true); }
 });
 modal.addEventListener("click", (event) => { if (event.target === modal) closeModal(); });
-document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeModal(); });
+modal.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") { closeModal(); return; }
+  if (event.key !== "Tab") return;
+  const focusable = [...modal.querySelectorAll('button:not([disabled]),select:not([disabled]),input:not([type="hidden"]):not([disabled])')];
+  const index = focusable.indexOf(document.activeElement);
+  if (event.shiftKey && index <= 0) { event.preventDefault(); focusable.at(-1)?.focus(); }
+  if (!event.shiftKey && index === focusable.length - 1) { event.preventDefault(); focusable[0]?.focus(); }
+});
+const checkpoint = document.querySelector(".checkpoint");
+const checkpointStatus = document.querySelector("#checkpoint-status");
+const seed = new Map(createDemoState().members.map(member => [member.id, member]));
+function checkpointState() {
+  // Only original fixture identities and generated aliases may reach storage.
+  const copy = structuredClone(state);
+  copy.members = copy.members.map((member, index) => {
+    const known = seed.get(member.id);
+    return {...member, name:known?.name || `Demo member ${index+1}`,
+      pet:known?.pet || `Demo pet ${index+1}`, email:known?.email || `member${index+1}@example.test`};
+  });
+  return copy;
+}
+async function updateCheckpoint(action) {
+  const buttons = [...checkpoint.querySelectorAll("button")];
+  buttons.forEach(button => { button.disabled = true; });
+  try {
+    const db = await import("../../assets/workbench/db.mjs");
+    if (action === "save") {
+      await db.savePawCheckpoint(checkpointState());
+      checkpointStatus.textContent = "Simulation saved in this browser.";
+    } else if (action === "load") {
+      const snapshot = await db.getPawCheckpoint();
+      if (snapshot) { state = snapshot; search = ""; render(); }
+      checkpointStatus.textContent = snapshot ? "Saved simulation restored." : "No saved simulation yet.";
+    } else {
+      await db.clearPawCheckpoint();
+      checkpointStatus.textContent = "Saved simulation deleted. The current tab is unchanged.";
+    }
+  } catch (error) {
+    console.error(error);
+    checkpointStatus.textContent = "Could not access the simulation database. Check browser storage or try a smaller simulation.";
+  } finally {
+    buttons.forEach(button => { button.disabled = false; });
+  }
+}
+for (const action of ["save", "load", "clear"])
+  document.querySelector("#checkpoint-" + action).addEventListener("click", () => updateCheckpoint(action));
+mountHistory(document.querySelector("#run-history"), "paw", () => ({members:members().length, transactions:transactions().length}));
 render();

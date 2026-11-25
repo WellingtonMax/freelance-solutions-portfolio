@@ -62,3 +62,17 @@ footer{border-top:1px solid var(--line);padding:18px 0 27px}
 @media(max-width:520px){.container{padding-inline:16px}.masthead{justify-content:space-between;gap:0 9px}.nav{gap:8px}.nav a{font-size:12px}.brand{font-size:14px}.featured,.grid{grid-template-columns:1fr}.card-body,.grid .card{padding:14px}.section-head{margin-top:19px}.section-head p:not(.eyebrow){font-size:13px}}
 @media(max-width:355px){.brand-mark{display:none}.nav{gap:7px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Catalogue cards share the featured layout; the images are real demo views. */
+.grid .card{padding:0;gap:0}
+.grid .card a{width:auto;margin-top:0}
+.grid .card a.btn{padding-block:9px}
+.grid .card[hidden],.catalog-filter[hidden]{display:none}
+.catalog-filter{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;margin:0 0 14px;font-size:14px}
+.catalog-filter label{font-weight:720}
+.catalog-filter select{min-height:44px;border:1px solid #637958;border-radius:8px;background:#202d24;color:var(--text);padding:8px 10px;font:inherit}
+.catalog-filter p{margin:0;color:var(--quiet)}
+.workspace-callout,.lab{margin-top:20px;padding:20px;background:var(--pane);border:1px solid var(--line);border-radius:13px}
+.workspace-callout{display:flex;align-items:center;justify-content:space-between;gap:12px 22px;flex-wrap:wrap;background:#1e2b24}
+.workspace-callout h3,.lab h3{margin:6px 0;font-size:23px;line-height:1.15;letter-spacing:-.035em}
+.workspace-callout p:not(.eyebrow),.lab p:not(.eyebrow){margin:5px 0;color:var(--quiet);font-size:14px;max-width:65ch}

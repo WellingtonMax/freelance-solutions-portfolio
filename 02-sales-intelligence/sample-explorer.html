@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Interactive, offline exploration of six fictional sales transactions.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
 <title>Sales Intelligence | Fictional sales explorer</title>
 <style>
 :root{color-scheme:light;--ink:#15253b;--muted:#4e6078;--blue:#2056b4;--line:#c9d6e6;--bg:#f2f6fc}
@@ -28,12 +28,12 @@ caption{text-align:left;font-weight:600;padding:0 0 12px;color:var(--muted)}.sma
 @media(max-width:360px){main{padding:18px 12px}.cards{grid-template-columns:1fr}}
 @media print{body{background:white}main{padding:0}.panel,.card{break-inside:avoid;box-shadow:none}select{border:0}.scroll{overflow:visible}table{min-width:0}}
 </style>
-</head>
+<link rel="stylesheet" href="../assets/workbench/history-card.css"><script type="module" src="../assets/workbench/adapters.mjs"></script><script src="sample-explorer.js" defer></script></head>
 <body><main>
-<a href="README.md">← Sales Intelligence source and CLI</a>
+<a href="../index.html">Portfolio</a> · <a href="README.md">Sales Intelligence source and CLI</a>
 <header class="intro"><p class="eyebrow">02 / Offline analytics · fictional demonstration</p>
 <h1>Explore six synthetic sales</h1>
-<p>This working browser explorer uses the six fictional transactions in <a href="sample_sales.csv">sample_sales.csv</a>. Filter by category to inspect exact revenue, orders, units and average order value. No uploads, network requests or customer data. This is a fixed sample, not the Python-generated report or a live dashboard.</p></header>
+<p>This working browser explorer uses the six fictional transactions in <a href="sample_sales.csv">sample_sales.csv</a>. Filter by category to inspect exact revenue, orders, units and average order value. No data uploads or customer data. This is a fixed sample, not the Python-generated report or a live dashboard.</p></header>
 <section aria-labelledby="summary"><h2 id="summary">Filtered sales summary</h2>
 <div class="cards">
 <div class="card"><span>Revenue (USD)</span><strong id="revenue">$209.50</strong></div>
@@ -61,44 +61,6 @@ caption{text-align:left;font-weight:600;padding:0 0 12px;color:var(--muted)}.sma
 <tr data-category="Travel" data-cents="9000" data-units="2"><td>1006</td><td>2026-11-05</td><td>Backpack</td><td>Travel</td><td>2</td><td>$90.00</td></tr>
 </tbody></table></div></section>
 <p class="small">Scope: unique completed orders only; no returns, taxes, shipping, discounts or currency conversion. Fictional data, AI-assisted development and human review. For independently generated HTML/JSON reports, use <a href="report.py">the Python reference implementation</a>.</p>
-</main>
-<script>
-"use strict";
-(function(){
- const category=document.getElementById("category");
- const rows=Array.from(document.querySelectorAll("#rows tr"));
- const money=cents=>"$"+(cents/100).toFixed(2);
- const bars=document.getElementById("bars");
- function render(){
-  const selected=category.value;
-  let revenue=0,units=0,orders=0;
-  const categories=new Map();
-  for(const row of rows){
-   const visible=selected==="All"||row.dataset.category===selected;
-   row.hidden=!visible;
-   if(!visible)continue;
-   const cents=Number(row.dataset.cents);
-   revenue+=cents;units+=Number(row.dataset.units);orders++;
-   categories.set(row.dataset.category,(categories.get(row.dataset.category)||0)+cents);
-  }
-  document.getElementById("revenue").textContent=money(revenue);
-  document.getElementById("orders").textContent=String(orders);
-  document.getElementById("units").textContent=String(units);
-  document.getElementById("average").textContent=money(orders?Math.round(revenue/orders):0);
-  document.getElementById("status").textContent="Showing "+orders+" fictional "+(orders===1?"order":"orders")+" in "+(selected==="All"?"all categories":selected)+".";
-  bars.replaceChildren();
-  const max=Math.max(1,...categories.values());
-  for(const [name,cents] of categories){
-   const row=document.createElement("div");row.className="bar-row";
-   const label=document.createElement("strong");label.textContent=name;
-   const track=document.createElement("div");track.className="track";
-   const fill=document.createElement("div");fill.className="fill";fill.style.width=(cents/max*100).toFixed(1)+"%";
-   const value=document.createElement("span");value.className="amount";value.textContent=money(cents);
-   track.append(fill);row.append(label,track,value);bars.append(row);
-  }
- }
- category.addEventListener("change",render);
- render();
-})();
-</script>
+<section data-run-project="sales" aria-label="Local run history"></section></main>
+
 </body></html>

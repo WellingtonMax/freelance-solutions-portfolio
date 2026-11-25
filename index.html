@@ -6,12 +6,13 @@
 <meta name="description" content="Wellington Souza's freelance portfolio. Try original demos for responsive landing pages, sales dashboards and CSV cleanup.">
 <title>Wellington Souza | Freelance Portfolio</title>
 <link rel="stylesheet" href="assets/showcase/showcase.css">
+<script type="module" src="assets/showcase/catalog.mjs"></script>
 </head>
 <body>
 <a class="skip" href="#top">Skip to content</a>
 <header><div class="container masthead">
 <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true">W</span> Wellington Souza</a>
-<nav class="nav" aria-label="Main navigation"><a href="#work">Featured</a><a href="#projects">More projects</a><a href="https://github.com/WellingtonMax">GitHub</a></nav>
+<nav class="nav" aria-label="Main navigation"><a href="#work">Featured</a><a href="#projects">All work</a><a href="workspace/">Run history</a><a href="https://github.com/WellingtonMax">GitHub</a></nav>
 </div></header>
 <main id="top" class="container">
 <section class="hero" aria-labelledby="hero-title">
@@ -25,7 +26,7 @@
 </div>
 </section>
 <section id="work" aria-labelledby="work-title">
-<div class="section-head"><h2 id="work-title">Featured projects</h2><p>Three interactive demos. No account required.</p></div>
+<div class="section-head"><h2 id="work-title">Featured projects</h2><p>Start here: three hands-on demos, no sign-in.</p></div>
 <div class="featured">
 <article class="card">
 <div class="card-media"><img src="assets/showcase/excel-rescue.webp" width="1280" height="800" alt="Excel Rescue audit showing four input rows split into accepted and rejected records" decoding="async"></div>
@@ -59,17 +60,46 @@
 </article>
 </div></section>
 <section id="projects" class="collection" aria-labelledby="projects-title">
-<div class="section-head"><h2 id="projects-title">More projects</h2><p>Additional prototypes, automation tools and product experiments.</p></div>
+<div class="section-head"><h2 id="projects-title">More ways to work</h2><p>From API mapping and document automation to a two-clinic dashboard.</p></div>
+<div class="catalog-filter" hidden><label for="catalog-theme">Filter by area</label><select id="catalog-theme"><option value="">All areas</option><option>Data</option><option>Documents</option><option>Operations</option></select><p id="catalog-status" role="status"></p></div>
 <div class="grid">
-<article class="card"><div class="kicker"><span>03 / Integration</span><span>Implemented</span></div><h3>API Bridge</h3><p>Export authorized JSON API data to clean CSV using controlled requests and safe defaults.</p><a href="03-api-bridge/demo-ui.html">Try offline JSON-to-CSV preview</a><a href="03-api-bridge/CASE_STUDY.md">Read case study</a></article>
-<article class="card"><div class="kicker"><span>04 / Sales operations</span><span>Prototype</span></div><h3>CRM Lead Intelligence</h3><p>Prioritize fictional company leads with explicit opt-out and agency suppression, deduplication, and human-review-only output.</p><a href="04-crm-lead-intelligence/demo-ui.html">Try synthetic lead review</a><a href="04-crm-lead-intelligence/README.md">Read safeguards</a></article>
-<article class="card"><div class="kicker"><span>06 / Documents</span><span>Prototype</span></div><h3>Document Factory</h3><p>Generate escaped HTML quotations from bounded fictional JSON inputs; no external signing or client data.</p><a href="06-document-factory/demo-ui.html">Try printable quotation preview</a><a href="06-document-factory/README.md">Read generator guide</a></article>
-<article class="card"><div class="kicker"><span>07 / Data quality</span><span>Prototype</span></div><h3>Data Quality Auditor</h3><p>Check fictional CSV schemas, duplicates and anomalous values with explainable, traceable findings.</p><a href="07-data-quality-auditor/demo-ui.html">Try synthetic data audit</a><a href="07-data-quality-auditor/README.md">Read audit rules</a></article>
-<article class="card"><div class="kicker"><span>08 / Monitoring</span><span>Prototype</span></div><h3>Site Change Monitor</h3><p>Compare two authorized local HTML snapshots; no live crawling, tracking or third-party requests.</p><a href="08-site-change-monitor/demo-ui.html">Try local text comparison</a><a href="08-site-change-monitor/README.md">Read comparison limits</a></article>
-<article class="card"><div class="kicker"><span>Product lab / Critical minerals</span><span>Local MVP</span></div><h3>StrataSignal</h3><p>Private procurement intelligence: sourcing concentration, stock scenarios, metadata triage and experimental delivery-delay estimates. Synthetic demo; commercial validation pending.</p><a href="https://github.com/WellingtonMax/stratasignal/blob/main/demo/monthly/report.html">Explore synthetic decision report</a><a href="https://github.com/WellingtonMax/stratasignal/blob/main/README.md">Read product scope and market research</a></article>
-<article class="card"><div class="kicker"><span>Document automation</span><span>Offline demo</span></div><h3>Document Flow</h3><p>Simulated Word revisions, 12 mapped PandaDoc-style variables, safe local preview, testable API request shape and reproducible DOCX samples. No live PandaDoc integration claimed.</p><a href="demos/document-flow/index.html">Try synthetic document demo</a><a href="demos/document-flow/README.md">Read limitations and run tests</a></article>
-<article class="card"><div class="kicker"><span>Veterinary SaaS / Loyalty</span><span>Interactive demo</span></div><h3>PawLedger</h3><p>Fictional two-hospital membership dashboard with simulated purchases, rewards ledger, redemptions, promotions and client-safe export. No live Stripe, login or customer data.</p><a href="demos/vet-loyalty/index.html">Try interactive veterinary dashboard</a><a href="demos/vet-loyalty/README.md">Scope, tests &amp; architecture</a></article>
-</div></section>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/api-bridge.webp" width="960" height="540" alt="JSON editor beside field checkboxes and a CSV preview" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Data"><div class="kicker"><span>03 / Integration</span><span>Implemented</span></div>
+<h3>API Bridge</h3><p>Turn JSON into a CSV by selecting fields, previewing the rows and exporting the final file.</p>
+<div class="card-actions"><a class="btn demo" href="03-api-bridge/mapper.html" aria-label="Try demo: API Bridge">Try demo</a><a class="text-link" href="03-api-bridge/CASE_STUDY.md">Project notes</a></div></div></article>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/crm-lead-intelligence.webp" width="960" height="540" alt="Lead queue showing review and suppression decisions" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Operations"><div class="kicker"><span>04 / Sales operations</span><span>Prototype</span></div>
+<h3>CRM Lead Intelligence</h3><p>Filter fictional leads and see why each company goes to human review or is suppressed. Nothing is sent.</p>
+<div class="card-actions"><a class="btn demo" href="04-crm-lead-intelligence/demo-ui.html" aria-label="Try demo: CRM Lead Intelligence">Try demo</a><a class="text-link" href="04-crm-lead-intelligence/README.md">Project notes</a></div></div></article>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/document-factory.webp" width="960" height="540" alt="Quotation editor next to an itemized preview" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Documents"><div class="kicker"><span>06 / Quotations</span><span>Prototype</span></div>
+<h3>Document Factory</h3><p>Configure a service, price and discount. Review the line item and print a clean sample quotation.</p>
+<div class="card-actions"><a class="btn demo" href="06-document-factory/demo-ui.html" aria-label="Try demo: Document Factory">Try demo</a><a class="text-link" href="06-document-factory/README.md">Project notes</a></div></div></article>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/data-quality-auditor.webp" width="960" height="540" alt="Example catalog and its data quality findings" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Data"><div class="kicker"><span>07 / Data quality</span><span>Prototype</span></div>
+<h3>Data Quality Auditor</h3><p>Find duplicates, missing categories and invalid amounts in a catalog CSV. Filter and export the findings.</p>
+<div class="card-actions"><a class="btn demo" href="07-data-quality-auditor/demo-ui.html" aria-label="Try demo: Data Quality Auditor">Try demo</a><a class="text-link" href="07-data-quality-auditor/README.md">Project notes</a></div></div></article>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/site-change-monitor.webp" width="960" height="540" alt="Text comparison showing additions and removals" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Data"><div class="kicker"><span>08 / Change detection</span><span>Prototype</span></div>
+<h3>Site Change Monitor</h3><p>Compare two text snapshots. Review additions and deletions by line, without connecting to any website.</p>
+<div class="card-actions"><a class="btn demo" href="08-site-change-monitor/demo-ui.html" aria-label="Try demo: Site Change Monitor">Try demo</a><a class="text-link" href="08-site-change-monitor/README.md">Project notes</a></div></div></article>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/document-flow.webp" width="960" height="540" alt="Document Flow header with four document revision stages" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Documents"><div class="kicker"><span>Document automation</span><span>Interactive demo</span></div>
+<h3>Document Flow</h3><p>Review Word-style edits, fill 12 variables and download a sample PandaDoc-style request. No live integration.</p>
+<div class="card-actions"><a class="btn demo" href="demos/document-flow/index.html" aria-label="Try demo: Document Flow">Try demo</a><a class="text-link" href="demos/document-flow/README.md">Project notes</a></div></div></article>
+<article class="card">
+<div class="card-media"><img src="assets/showcase/pawledger.webp" width="960" height="540" alt="PawLedger showing a veterinary clinic dashboard" loading="lazy" decoding="async"></div>
+<div class="card-body" data-category="Operations"><div class="kicker"><span>Veterinary SaaS / Loyalty</span><span>Interactive demo</span></div>
+<h3>PawLedger</h3><p>Run a fictional rewards program across two hospitals, including simulated purchases, redemptions and a local checkpoint.</p>
+<div class="card-actions"><a class="btn demo" href="demos/vet-loyalty/index.html" aria-label="Try demo: PawLedger">Try demo</a><a class="text-link" href="demos/vet-loyalty/README.md">Project notes</a></div></div></article></div>
+<aside class="workspace-callout"><div><p class="eyebrow">Local SQLite workspace</p><h3>Take your results with you.</h3><p>Save numeric summaries from the interactive demos and download the database. Nothing syncs or leaves this browser unless you export it.</p></div><a class="btn demo" href="workspace/">Open run history</a></aside>
+<aside class="lab"><p class="eyebrow">Product lab · Research prototype on hold</p><h3>StrataSignal</h3><p>Critical minerals procurement research, from sourcing concentration to stock scenarios. The report uses synthetic data.</p><div class="card-actions"><a class="text-link" href="products/stratasignal/demo/report.html">View sample decision report</a><a class="text-link" href="https://github.com/WellingtonMax/stratasignal">View separate repository</a></div></aside></section>
 <section class="approach" id="approach" aria-labelledby="approach-title">
 <div class="section-head"><div><p class="eyebrow">Process</p><h2 id="approach-title">How I work</h2></div><a class="text-link" href="CLIENT_START_HERE.md">Read the delivery guide</a></div>
 <div class="steps"><div><strong>01 / Scope</strong><p>Define the outcome and how we’ll verify it.</p></div><div><strong>02 / Build</strong><p>Build the smallest version that solves the problem.</p></div><div><strong>03 / Verify</strong><p>Test the main flow, edge cases and limits.</p></div><div><strong>04 / Handover</strong><p>Deliver maintainable files and clear instructions.</p></div></div>
