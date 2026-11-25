@@ -84,11 +84,16 @@ function overviewPage() {
     (promoRows || '<div class="empty">No active members</div>') + "</section></div>";
 }
 
+const memberMatches = () => {
+  const query = search.trim().toLowerCase();
+  return members().filter(m => [m.name, m.pet, m.email].some(value => value.toLowerCase().includes(query)));
+};
+const memberCount = n => n + (n === 1 ? " member shown" : " members shown");
 function membersPage() {
-  const visible = members().filter((m) => [m.name, m.pet, m.email].some((s) => s.toLowerCase().includes(search.toLowerCase())));
+  const visible = memberMatches();
   return title("Customer management", "Members & pets", "Manage fictional enrollments and rewards balances.", button("+ New member", "add") + button("Record purchase", "purchase", "dark")) +
     '<div class="toolbar"><input id="search" class="input" type="search" placeholder="Search member, pet or email..." maxlength="100" aria-label="Search members" value="' + html(search) +
-    '"><span class="chip">' + visible.length + " members shown</span></div>" +
+    '"><span class="chip" id="member-count" role="status">' + memberCount(visible.length) + "</span></div>" +
     '<section class="panel">' + panelHeader("Member directory", "Account access is simulated; never enter real client data") +
     '<div class="table-wrap"><table><thead><tr><th>Customer</th><th>Pet</th><th>Membership</th><th>Balance</th><th>Promotion</th><th></th></tr></thead><tbody>' +
     memberRows(visible) + "</tbody></table></div></section>";
@@ -247,7 +252,11 @@ document.addEventListener("input", (event) => {
     search = event.target.value;
     // Update table without replacing the focused search box.
     const tbody = page.querySelector("tbody");
-    if (tbody) tbody.innerHTML = memberRows(members().filter((m) => [m.name, m.pet, m.email].some((s) => s.toLowerCase().includes(search.toLowerCase()))));
+    if (tbody) {
+      const visible = memberMatches();
+      tbody.innerHTML = memberRows(visible);
+      document.querySelector("#member-count").textContent = memberCount(visible.length);
+    }
   }
 });
 document.addEventListener("submit", (event) => {

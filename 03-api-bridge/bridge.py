@@ -239,8 +239,12 @@ def main() -> None:
     parser.add_argument("--field", required=True, action="append", help="Column name")
     parser.add_argument("--output", type=Path, default=Path("api-export.csv"))
     args = parser.parse_args()
-    records = fetch_json(args.url, set(args.host))
-    print(f"Exported {export_rows(records, args.field, args.output)} records")
+    try:
+        records = fetch_json(args.url, set(args.host))
+        count = export_rows(records, args.field, args.output)
+    except (ValueError, RuntimeError, OSError) as exc:
+        parser.exit(1, f"API Bridge: {exc}\n")
+    print(f"Exported {count} records")
 
 
 if __name__ == "__main__":

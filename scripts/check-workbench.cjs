@@ -77,6 +77,10 @@ async function main() {
     await open('api');
     await click('#preview'); await check('#summary','3 records'); await save();
     assert.match((await download('#download','api-bridge-fictional-export.csv')).toString(), /River Demo/);
+    await page.getByRole('checkbox',{name:'amount',exact:true}).uncheck();
+    assert(await page.locator('#download').isDisabled());
+    assert.equal(await page.locator('#summary').textContent(), '');
+    await click('#preview'); await check('#summary','3 columns');
     await open('crm');
     await page.selectOption('#filter','Suppressed');
     await check('#result','Showing 2 fictional companies'); await check('#details','Opted out'); await save();
@@ -106,6 +110,13 @@ async function main() {
     for (const nav of ['members','rewards','transactions','settings','overview']) {
       await click(`[data-view="${nav}"]`); await noOverflow(`PawLedger ${nav}`);
     }
+    await click('[data-view=members]');
+    await page.locator('#search').fill(' OLIVIA ');
+    await check('#member-count','1 member shown');
+    await page.locator('#search').fill('missing synthetic member');
+    await check('#member-count','0 members shown');
+    await check('.table-wrap','No matching fictional members.');
+    await click('[data-view=overview]');
     await page.getByRole('button',{name:'New member'}).click();
     assert(await page.locator('#name').evaluate(el => document.activeElement === el));
     await page.keyboard.press('Escape');
