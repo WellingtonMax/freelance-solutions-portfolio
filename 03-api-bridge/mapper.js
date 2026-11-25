@@ -58,7 +58,11 @@
       previewButton.disabled = false; feedback.textContent = snapshot.records.length + " fictional records ready. Choose columns.";
     } catch (error) { feedback.textContent = error.message; }
   });
-  fieldsEl.addEventListener("change", () => {csv = ""; downloadButton.disabled = true; output.textContent = "Columns changed. Preview again.";});
+  fieldsEl.addEventListener("change", () => {
+    csv = ""; downloadButton.disabled = true;
+    output.textContent = "Columns changed. Preview again."; summary.textContent = "";
+    feedback.textContent = "Review the selected columns, then preview again.";
+  });
   previewButton.addEventListener("click", () => {
     if (!snapshot) return;
     const selected = Array.from(fieldsEl.querySelectorAll('input[type="checkbox"]:checked'), el => el.value);

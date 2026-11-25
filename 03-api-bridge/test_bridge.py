@@ -1,12 +1,13 @@
 import csv
-from io import BytesIO
+from contextlib import redirect_stderr, redirect_stdout
+from io import BytesIO, StringIO
 import os
 from pathlib import Path
 import tempfile
 import unittest
 from unittest.mock import patch
 
-from bridge import (MAX_BYTES, export_rows, fetch_json, resolve_public_addresses,
+from bridge import (MAX_BYTES, export_rows, fetch_json, main, resolve_public_addresses,
                     safe_csv, validate_url)
 
 
@@ -186,6 +187,30 @@ class BridgeTests(unittest.TestCase):
                 self.assertEqual(list(csv.DictReader(stream))[0],
                                  {"id": "1", "name": "Alice"})
 
+
+
+class CommandLineTests(unittest.TestCase):
+    def test_documented_export_command_and_network_error(self):
+        url = "https://jsonplaceholder.typicode.com/users"
+        host = "jsonplaceholder.typicode.com"
+        with tempfile.TemporaryDirectory() as tmp:
+            output = Path(tmp) / "users.csv"
+            argv = ["bridge.py", "--url", url, "--host", host,
+                    "--field", "id", "--field", "name", "--field", "email", "--output", str(output)]
+            with patch("sys.argv", argv), patch("bridge.fetch_json", side_effect=ValueError("DNS lookup failed")):
+                err = StringIO()
+                with redirect_stderr(err), self.assertRaises(SystemExit) as exit_info:
+                    main()
+                self.assertEqual(exit_info.exception.code, 1)
+                self.assertEqual(err.getvalue(), "API Bridge: DNS lookup failed\n")
+                self.assertFalse(output.exists())
+            with patch("sys.argv", argv), patch("bridge.fetch_json", return_value=[
+                {"id": 1, "name": "Fictional", "email": "qa@example.test"}
+            ]) as fetch, redirect_stdout(StringIO()) as stdout:
+                main()
+            fetch.assert_called_once_with(url, {host})
+            self.assertIn("Exported 1 records", stdout.getvalue())
+            self.assertEqual(output.read_text(), "id,name,email\n1,Fictional,qa@example.test\n")
 
 if __name__ == "__main__":
     unittest.main()

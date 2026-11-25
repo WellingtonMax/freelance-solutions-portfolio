@@ -76,7 +76,7 @@ python -m unittest discover -v
 
 These are separate portfolio examples, **not** projects 09 or 10 and not substitutes for completing the eight core projects.
 
-- **[PawLedger — veterinary membership and rewards](demos/vet-loyalty/README.md):** [interactive fictional browser concept](demos/vet-loyalty/index.html) with simulated member/rewards operations. No live Stripe, authentication, persistent database or real clinic/customer association.
+- **[PawLedger — veterinary membership and rewards](demos/vet-loyalty/README.md):** [interactive fictional browser concept](demos/vet-loyalty/index.html) with simulated member/rewards operations. Includes an optional browser-local SQLite checkpoint. No live Stripe, authentication, shared database or real clinic/customer association.
 - **[Document Flow — Word / PandaDoc-style variables](demos/document-flow/README.md):** [offline interactive preview](demos/document-flow/index.html) of a fictional variable-mapping workflow. No live PandaDoc connection or electronic signing. Its optional Word sample generator uses a separate `python-docx` dependency.
 - **[StrataSignal](https://github.com/WellingtonMax/stratasignal):** an independent critical-minerals intelligence concept maintained in **another repository**. Its development and product claims are not part of the eight-project acceptance checklist here.
 
