@@ -31,7 +31,7 @@ class MainShowcaseTests(unittest.TestCase):
 
     def test_exactly_eight_numbered_cards_and_no_unapproved_projects(self):
         numbers = re.findall(r"<span>(0[1-9]|10) /", self.page)
-        self.assertEqual(numbers, list(EXPECTED))
+        self.assertEqual(numbers, ["01", "05", "02", "03", "04", "06", "07", "08"])
         self.assertNotIn("Bug Fix Laboratory", self.page)
         self.assertNotIn("Business Operations API", self.page)
 
@@ -52,14 +52,14 @@ class MainShowcaseTests(unittest.TestCase):
             ) if f"<span>{number} /" in card)
             self.assertIn("Prototype", card)
             self.assertNotIn("Production-ready", card)
-        self.assertIn("not production-ready", self.page)
+        self.assertIn("not production-ready", self.page.lower())
         self.assertIn("human review", self.page.lower())
 
     def test_public_demo_routes_are_explicit_and_source_remains_available(self):
         base = "https://wellingtonmax.github.io/freelance-solutions-portfolio/"
         routes = {
             "01": "01-excel-rescue/try.html",
-            "02": "02-sales-intelligence/demo-ui.html",
+            "02": "02-sales-intelligence/sample-explorer.html",
             "03": "03-api-bridge/demo-ui.html",
             "04": "04-crm-lead-intelligence/demo-ui.html",
             "05": "05-landing-page-studio/index.html",
@@ -72,8 +72,27 @@ class MainShowcaseTests(unittest.TestCase):
                 self.assertIn(f"]({base}{target})", self.readme)
                 self.assertIn(f"]({target})", self.readme)
                 self.assertTrue((ROOT / target).is_file(), target)
-        self.assertIn("Publication not yet confirmed", self.readme)
+        self.assertIn("Live on GitHub Pages", self.readme)
+        self.assertNotIn("Publication not yet confirmed", self.readme)
         self.assertIn('href="01-excel-rescue/try.html"', self.page)
+
+    def test_featured_project_cards_have_real_preview_assets_and_demo_links(self):
+        featured = self.page.split('<div class="featured">', 1)[1].split("</section>", 1)[0]
+        targets = {
+            "excel-rescue": "01-excel-rescue/try.html",
+            "landing-page-studio": "05-landing-page-studio/index.html",
+            "sales-intelligence": "02-sales-intelligence/sample-explorer.html",
+        }
+        cards = re.findall(r'<article class="card">.*?</article>', featured, flags=re.DOTALL)
+        self.assertEqual(len(cards), len(targets))
+        for card, (slug, target) in zip(cards, targets.items()):
+            with self.subTest(target=target):
+                asset = f"assets/showcase/{slug}.webp"
+                self.assertIn(f'src="{asset}"', card)
+                self.assertIn('alt="', card)
+                self.assertEqual((ROOT / asset).read_bytes()[8:12], b"WEBP")
+                self.assertIn(f'class="btn demo" href="{target}"', card)
+                self.assertTrue((ROOT / target).is_file())
 
     def test_readme_matches_integrated_tree(self):
         self.assertIn("## The eight core projects", self.readme)
