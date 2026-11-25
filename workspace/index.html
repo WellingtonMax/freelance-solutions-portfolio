@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="View and export your locally saved portfolio demo runs.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+<title>Run history | Wellington Souza</title>
+<link rel="stylesheet" href="../assets/workbench/workbench.css">
+<script type="module" src="workspace.mjs"></script>
+</head>
+<body><a class="skip" href="#main">Skip to content</a>
+<header class="top"><div class="shell"><a href="../index.html">Wellington Souza / Portfolio</a><span>Local workspace</span></div></header>
+<main class="shell" id="main">
+<div class="hero"><p class="eyebrow">Portfolio workspace</p><h1>Saved demo runs</h1><p>Compare your results across the portfolio or download an actual SQLite database. No account required.</p></div>
+<section class="panel" aria-labelledby="records"><div class="panel-head"><h2 id="records">Run history</h2><p>Up to 250 summaries in this browser. Runs do not sync to other devices and can be lost if you clear site data.</p></div>
+<div class="box"><div class="actions"><label for="project">Project</label><select id="project"><option value="">All projects</option></select><button type="button" class="secondary" id="export" disabled>Download SQLite</button><button type="button" class="quiet" id="clear" disabled>Clear history</button></div>
+<div id="confirm" class="notice" hidden><p>Delete every saved run from this browser? This cannot be undone.</p><div class="actions"><button type="button" id="confirm-clear">Delete all runs</button><button type="button" class="quiet" id="cancel-clear">Cancel</button></div></div>
+<p id="status" role="status">Opening local database…</p><ul class="records" id="runs"></ul>
+<p id="empty" hidden>No saved runs here yet. <a href="../index.html#work">Open a demo</a> and select <strong>Save run</strong> after trying it.</p>
+</div></section></main></body></html>

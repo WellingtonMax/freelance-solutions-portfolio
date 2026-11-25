@@ -6,20 +6,28 @@
 
 > **Portfolio in progress.** These are original **fictional demonstrations**, not completed paid engagements or customer testimonials. Development is **AI-assisted**; human review is required before commercial use. The presence of code in `main` does **not** mean a project is production-ready, hosted or independently security-certified.
 
+## Save and inspect demo results
+
+Open the [run history](https://wellingtonmax.github.io/freelance-solutions-portfolio/workspace/) or select **Save run** after working in a demo. The browser saves only numeric summaries to real SQLite (sql.js), persisted in IndexedDB. Filter or delete entries, clear the history, or download the `.sqlite3` file. The database is browser-specific, limited to 250 runs, and can be lost when site data is cleared. There is no account, server database, telemetry or cross-device sync.
+
+PawLedger separately supports an opt-in simulation checkpoint. It keeps simulated transactions, rewards and settings, replacing newly entered identities with generated aliases before storage. The shared run history export never includes this checkpoint.
+
+Serve the checkout from its root with `python -m http.server 8000 --bind 127.0.0.1`; opening files via `file://` does not support the workspace. See [workbench notes](workspace/README.md) for the schema and verification commands.
+
 ## The eight core projects
 
 **Try the eight browser demos:**
 
 1. [Excel Rescue — CSV cleaner](https://wellingtonmax.github.io/freelance-solutions-portfolio/01-excel-rescue/try.html) · [HTML source](01-excel-rescue/try.html)
 2. [Sales Intelligence dashboard](https://wellingtonmax.github.io/freelance-solutions-portfolio/02-sales-intelligence/sample-explorer.html) · [HTML source](02-sales-intelligence/sample-explorer.html)
-3. [API Bridge JSON-to-CSV](https://wellingtonmax.github.io/freelance-solutions-portfolio/03-api-bridge/demo-ui.html) · [HTML source](03-api-bridge/demo-ui.html)
+3. [API Bridge JSON-to-CSV](https://wellingtonmax.github.io/freelance-solutions-portfolio/03-api-bridge/mapper.html) · [HTML source](03-api-bridge/mapper.html)
 4. [CRM Lead Intelligence review](https://wellingtonmax.github.io/freelance-solutions-portfolio/04-crm-lead-intelligence/demo-ui.html) · [HTML source](04-crm-lead-intelligence/demo-ui.html)
 5. [Landing Page Studio](https://wellingtonmax.github.io/freelance-solutions-portfolio/05-landing-page-studio/index.html) · [HTML source](05-landing-page-studio/index.html)
 6. [Document Factory quotation](https://wellingtonmax.github.io/freelance-solutions-portfolio/06-document-factory/demo-ui.html) · [HTML source](06-document-factory/demo-ui.html)
 7. [Data Quality Auditor](https://wellingtonmax.github.io/freelance-solutions-portfolio/07-data-quality-auditor/demo-ui.html) · [HTML source](07-data-quality-auditor/demo-ui.html)
 8. [Site Change Monitor](https://wellingtonmax.github.io/freelance-solutions-portfolio/08-site-change-monitor/demo-ui.html) · [HTML source](08-site-change-monitor/demo-ui.html)
 
-> **Live on GitHub Pages.** The links above open interactive demonstrations, not production services. Browser previews use sample or local data; they are separate from the Python tools and do not provide a live backend, accounts or customer data.
+> **Live on GitHub Pages.** The links above open interactive demonstrations, not production services. Browser previews use sample or local data; they are separate from the Python tools and do not provide a shared backend, accounts or customer data.
 
 **Run the existing browser previews locally (no hosting account):** clone or download this repository, open a terminal in its root, then start a loopback-only static server:
 
@@ -35,7 +43,7 @@ All eight numbered projects have source files, synthetic samples and tests integ
 |---|---|---|---|
 | **01 · [Excel Rescue](01-excel-rescue/README.md)** | Clean inconsistent CRM CSV exports and explain rejected or duplicate records | [Try browser CSV cleaner](https://wellingtonmax.github.io/freelance-solutions-portfolio/01-excel-rescue/try.html) · [HTML source](01-excel-rescue/try.html) · [Synthetic audit walkthrough](01-excel-rescue/demo.html) · [Case study](01-excel-rescue/CASE_STUDY.md) | Local Python tool and optional localhost web app; **prototype**, not public-hosting ready |
 | **02 · [Sales Intelligence](02-sales-intelligence/README.md)** | Turn transaction CSV files into actionable revenue metrics | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/02-sales-intelligence/sample-explorer.html) · [HTML source](02-sales-intelligence/sample-explorer.html) · JSON KPIs, offline HTML report · [Case study](02-sales-intelligence/CASE_STUDY.md) | Offline reporting demonstration; no live business dashboard |
-| **03 · [API Bridge](03-api-bridge/README.md)** | Export data from an approved JSON API into CSV | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/03-api-bridge/demo-ui.html) · [HTML source](03-api-bridge/demo-ui.html) · Python exporter, mocked-network tests · [Case study](03-api-bridge/CASE_STUDY.md) | Local integration prototype; optional public test API, no enterprise auth |
+| **03 · [API Bridge](03-api-bridge/README.md)** | Export data from an approved JSON API into CSV | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/03-api-bridge/mapper.html) · [HTML source](03-api-bridge/mapper.html) · Python exporter, mocked-network tests · [Case study](03-api-bridge/CASE_STUDY.md) | Local integration prototype; optional public test API, no enterprise auth |
 | **04 · [CRM Lead Intelligence](04-crm-lead-intelligence/README.md)** | Review and prioritize a fictional B2B lead list without contacting anyone | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/04-crm-lead-intelligence/demo-ui.html) · [HTML source](04-crm-lead-intelligence/demo-ui.html) · [Synthetic CSV](04-crm-lead-intelligence/sample.csv), suppression rules, JSON review output and tests | Offline, **review-only** prototype; no outreach, CRM login or contact verification |
 | **05 · [Landing Page Studio](05-landing-page-studio/README.md)** | Demonstrate a responsive small-business landing page and enquiry validation | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/05-landing-page-studio/index.html) · [HTML source](05-landing-page-studio/index.html), CSS/JavaScript and tests | Browser prototype; form validates **locally** and never submits data |
 | **06 · [Document Factory](06-document-factory/README.md)** | Generate consistent sample quotations from structured information | [Try interactive browser demo](https://wellingtonmax.github.io/freelance-solutions-portfolio/06-document-factory/demo-ui.html) · [HTML source](06-document-factory/demo-ui.html) · [Synthetic JSON](06-document-factory/sample.json), Python generator, escaped/printable HTML and tests | Offline prototype; does **not** create PDF files automatically |

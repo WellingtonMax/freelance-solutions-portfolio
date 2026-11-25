@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Independent fictional veterinary membership and rewards dashboard demo. No real customer data or billing.">
   <meta name="color-scheme" content="light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <link rel="stylesheet" href="../../assets/workbench/history-card.css">
   <title>PawLedger — Veterinary Rewards Demo</title>
   <style>
     :root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#1c3047;background:#f5f8fc;font-synthesis:none}
@@ -72,15 +74,20 @@
     .toast{position:fixed;right:22px;bottom:22px;padding:14px 18px;background:#153d51;color:white;border-radius:11px;box-shadow:0 12px 35px #14394b44;font-size:12px;display:none;z-index:30;max-width:340px}
     .toast.show{display:block}.toast.error{background:#923e42}
     @media(max-width:1120px){.stats{grid-template-columns:repeat(2,1fr)}.dashboard-grid{grid-template-columns:1fr}}
-    @media(max-width:740px){.app{grid-template-columns:1fr}aside{padding:14px;gap:9px}.brand{border:0;padding:0}.side-bottom,.nav-label{display:none}nav{display:flex;gap:5px;overflow-x:auto}nav .nav-btn{white-space:nowrap;padding:10px}header{padding:14px 18px;flex-wrap:wrap}.content{padding:25px 18px}.stats{gap:10px}.stat{padding:15px}.stat-value{font-size:23px}th,td{padding:13px 12px}}
-    @media(max-width:450px){.stats{grid-template-columns:1fr 1fr}.stat-head{font-size:10px}.nav-ico{display:none}}
+    @media(max-width:740px){.app{grid-template-columns:minmax(0,1fr)}aside{min-width:0;padding:14px;gap:9px}.brand{border:0;padding:0}.side-bottom,.nav-label{display:none}nav{display:flex;gap:5px;overflow-x:auto}nav .nav-btn{flex:0 0 auto;width:auto;min-height:44px;white-space:nowrap;padding:10px}header{padding:14px 18px;flex-wrap:wrap}.content{padding:25px 18px}.stats{gap:10px}.stat{padding:15px}.stat-value{font-size:23px}th,td{padding:13px 12px}}
+    .stats,.dashboard-grid,.panel,.table-wrap,.toolbar>*{min-width:0}
+    .dashboard-grid{overflow-wrap:anywhere}.select{max-width:min(220px,100%)}.dialog{max-width:100%}
+    .table-wrap:focus-visible{outline:3px solid #177466;outline-offset:-3px}.table-wrap{scrollbar-color:#9bb8bb #eef4f6}
+    .rewards-stats{grid-template-columns:repeat(3,minmax(0,1fr))}
+    .checkpoint{margin-block:20px;color:#244a58}.checkpoint button{min-height:44px}.checkpoint p{font-size:14px;margin:8px 0}
+    @media(max-width:450px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat-head{font-size:10px}.nav-ico{display:none}}
   </style>
 </head>
 <body>
 <div class="app">
   <aside>
     <div class="brand"><div class="brand-mark" aria-hidden="true">✚</div><div><strong>PawLedger</strong><small>Rewards platform / demo</small></div></div>
-    <div><div class="nav-label">Workspace</div><nav aria-label="Main navigation" id="nav">
+    <div><a class="nav-btn" href="../../index.html">Portfolio</a><div class="nav-label">Workspace</div><nav aria-label="Main navigation" id="nav">
       <button class="nav-btn active" data-view="overview"><span class="nav-ico">◫</span>Overview</button>
       <button class="nav-btn" data-view="members"><span class="nav-ico">♙</span>Members</button>
       <button class="nav-btn" data-view="rewards"><span class="nav-ico">✧</span>Rewards & loyalty</button>
@@ -98,8 +105,14 @@
       </div>
     </header>
     <div class="content">
-      <div class="notice"><strong>Portfolio demonstration, not customer software.</strong> Business operations are simulated using fictional sample data, stored only in this browser tab until refresh. No live payments, real users or sensitive records. Do not enter real customer information.</div>
+      <div class="notice"><strong>Portfolio demonstration, not customer software.</strong> Business operations are simulated using fictional sample data, kept in this tab unless you explicitly save a local SQLite checkpoint. No live payments, real users or sensitive records. Do not enter real customer information.</div>
       <div id="page" aria-live="polite"></div>
+      <details class="notice checkpoint"><summary>Save or resume this simulation</summary>
+        <p>Keep one SQLite checkpoint in this browser. Added members are replaced with fictional aliases before saving to remove names, emails and pet names. Saving replaces the previous checkpoint.</p>
+        <div class="actions"><button type="button" class="btn primary" id="checkpoint-save">Save simulation</button><button type="button" class="btn" id="checkpoint-load">Restore simulation</button><button type="button" class="btn" id="checkpoint-clear">Delete saved simulation</button></div>
+        <p id="checkpoint-status" role="status"></p>
+      </details>
+      <section id="run-history" aria-label="Local run history"></section>
       <p class="footnote">PawLedger is an independent concept for a veterinary membership and loyalty application. No affiliation with My Vet Perks. Prototype is not production-ready; all financial values and customer identities are synthetic. <a href="README.md">Implementation notes &amp; limitations</a>.</p>
     </div>
   </main>

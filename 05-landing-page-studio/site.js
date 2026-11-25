@@ -74,6 +74,7 @@ if (typeof document !== "undefined") {
   let hasAttemptedValidation = false;
   let lastSubmitHadErrors = false;
   for (const [key, input] of Object.entries(inputs)) input.addEventListener("input", () => {
+    feedback.removeAttribute("data-valid");
     // Any edit invalidates a previously successful validation result.
     // After a failed submit, retain an error until this field actually validates.
     // Before submit, avoid showing errors while the visitor is still typing.
@@ -99,6 +100,7 @@ if (typeof document !== "undefined") {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     hasAttemptedValidation = true;
+    feedback.removeAttribute("data-valid");
     clearErrors();
     try {
     const fieldErrors = validateEnquiryAllFields({
@@ -116,7 +118,8 @@ if (typeof document !== "undefined") {
       feedback.textContent = errorSummary(invalidFields.length);
       inputs[invalidFields[0]].focus();
     } else {
-      feedback.textContent = "Fields look valid. Demo only — nothing was sent or saved.";
+      feedback.setAttribute("data-valid", "yes");
+      feedback.textContent = "Fields look valid. No form contents were sent or saved.";
     }
     } catch (_) {
       feedback.textContent = "Validation could not complete. Try again; nothing was sent.";

@@ -38,6 +38,8 @@
     fieldsEl = doc.getElementById("field-group"), feedback = doc.getElementById("feedback"),
     summary = doc.getElementById("summary"), output = doc.getElementById("csv-output");
   let snapshot = null, csv = "";
+  const example = input.value;
+  doc.getElementById("load-example").addEventListener("click", () => { input.value = example; inspectButton.click(); });
   function reset() {
     snapshot = null; csv = ""; previewButton.disabled = true; downloadButton.disabled = true;
     fieldsEl.replaceChildren(); output.textContent = "No preview yet."; summary.textContent = "";
@@ -62,6 +64,8 @@
     const selected = Array.from(fieldsEl.querySelectorAll('input[type="checkbox"]:checked'), el => el.value);
     if (!selected.length) { feedback.textContent = "Choose at least one column."; downloadButton.disabled = true; return; }
     csv = toCsv(snapshot.records, selected);
+    summary.setAttribute("data-records", snapshot.records.length);
+    summary.setAttribute("data-columns", selected.length);
     output.textContent = csv; summary.textContent = snapshot.records.length + " records · " + selected.length + " columns · offline CSV preview.";
     feedback.textContent = "CSV ready. Review before downloading."; downloadButton.disabled = false;
   });
@@ -72,4 +76,5 @@
     anchor.href = url; anchor.download = "api-bridge-fictional-export.csv"; anchor.click();
     URL.revokeObjectURL(url);
   });
+  inspectButton.click();
 })(typeof globalThis === "undefined" ? this : globalThis);

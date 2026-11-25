@@ -14,7 +14,7 @@
 - Export of synthetic transaction rows to CSV, with spreadsheet-formula protection.
 - Node's built-in test runner covers rewards arithmetic, multi-clinic isolation, idempotency, invalid input and promotions.
 
-**Demo scope:** state lives only in the browser memory and resets on reload. There is no login, database, billing, webhooks, persistent audit storage or real Stripe API connection. Buttons labeled "Demo" simulate business operations; do not enter real personal data. This page is not suitable for real veterinary operations or cardholders.
+**Demo scope:** the active simulation runs in memory. In **Save or resume this simulation**, you can explicitly save one local SQLite checkpoint, restore it after reloading, or delete it. Added members are anonymized to generated demo aliases before writing. Use fictional records only. There is no login, shared backend, billing, webhooks or real Stripe API connection. The local checkpoint is not a production audit trail and this page is not suitable for veterinary operations or cardholders.
 
 ## Run locally
 

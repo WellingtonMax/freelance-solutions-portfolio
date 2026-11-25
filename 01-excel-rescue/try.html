@@ -1,15 +1,15 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
-<title>RescueDesk | Excel Rescue CSV Workspace</title><link rel="stylesheet" href="workspace.css"></head>
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>RescueDesk | Excel Rescue CSV Workspace</title><link rel="stylesheet" href="workspace.css"><link rel="stylesheet" href="../assets/workbench/history-card.css"><script type="module" src="../assets/workbench/adapters.mjs"></script></head>
 <body class="csv-preview"><a class="skip-link" href="#preview-heading">Skip to CSV preview</a>
 <div class="app"><aside class="sidebar" aria-label="Workspace navigation">
 <div class="brand">Rescue<span>Desk</span></div><div class="side-label">Workspace</div>
-<nav aria-label="Project navigation"><a href="try.html" aria-current="page">◫ Dashboard</a><a href="#preview-heading">↑ Import &amp; validate</a><a href="#result-heading">✓ Review results</a><a href="demo.html">▤ Sample audit</a></nav>
+<nav aria-label="Project navigation"><a href="../index.html">Portfolio</a><a href="try.html" aria-current="page">◫ Dashboard</a><a href="#preview-heading">↑ Import &amp; validate</a><a href="#result-heading">✓ Review results</a><a href="demo.html">▤ Sample audit</a></nav>
 <div class="foot">01 · Excel Rescue<br>Local-only synthetic demonstration<br>No server connection</div></aside>
 <div class="workspace"><header class="topbar"><div><p class="eyebrow">Excel Rescue / CSV quality workspace</p><h1>Data operations overview</h1><p>Inspect, validate and review CSV records in your browser.</p></div><span class="pill">● Local demo · No upload</span></header>
 <main class="content"><section class="kpis" aria-label="Workspace capabilities">
-<div class="kpi"><small>Processing</small><strong>Local</strong><small>No network requests</small></div>
+<div class="kpi"><small>Processing</small><strong>Local</strong><small>No data uploads</small></div>
 <div class="kpi"><small>Maximum file size</small><strong>1 MB</strong><small>UTF-8 CSV</small></div>
 <div class="kpi"><small>Maximum rows</small><strong>2,000</strong><small>Per preview</small></div>
 <div class="kpi"><small>Outputs</small><strong>2 CSVs</strong><small>Accepted and rejected</small></div>
@@ -24,7 +24,7 @@
 <div class="card" id="result" hidden><p class="eyebrow">02 / Review results</p><h3 id="result-heading" tabindex="-1">Review records before export</h3><p id="totals"></p>
 <div class="outputs"><div class="output"><label for="clean">Accepted records — copyable CSV</label><button type="button" id="copy-clean" aria-describedby="copy-feedback" disabled>Copy accepted CSV</button><textarea id="clean" aria-describedby="copy-feedback" readonly rows="7"></textarea></div>
 <div class="output"><label for="reject">Rejected records — investigate first</label><button type="button" id="copy-reject" aria-describedby="copy-feedback" disabled>Copy rejected CSV</button><textarea id="reject" aria-describedby="copy-feedback" readonly rows="7"></textarea></div></div>
-<p id="copy-feedback" role="status" aria-live="polite">Copy an output to use it locally. If copying is unavailable, select the CSV text manually.</p></div>
+<p id="copy-feedback" role="status" aria-live="polite">Copy an output to use it locally. If copying is unavailable, select the CSV text manually.</p><section data-run-project="excel" aria-label="Local run history"></section></div>
 </div><div><section class="card"><p class="eyebrow">Quick guide</p><h2>From raw CSV to review</h2><ol class="steps"><li>Load the fictional sample or select a CSV.</li><li>Run local validation.</li><li>Inspect accepted and rejected records.</li><li>Copy the output after human review.</li></ol><p class="hint">The workspace does not claim to repair every error, process XLSX or save files automatically.</p></section>
 <section class="card"><p class="eyebrow">Security &amp; trust</p><h2>Designed for transparent review</h2><p>Ambiguous duplicates are rejected together. Formula-like text is escaped and suspicious email prefixes are rejected. Spreadsheet behavior may differ between applications.</p><p class="hint">Fictional demonstration · AI-assisted · Human review required before commercial use. Never use real customer data in this demo.</p><p><a href="../SECURITY.md">Security policy</a> · <a href="README.md">Reference implementation</a></p></section></div></div></main></div></div>
 <script src="try.js" defer></script><script src="sample-data.js" defer></script><script src="try-ui.js" defer></script></body></html>

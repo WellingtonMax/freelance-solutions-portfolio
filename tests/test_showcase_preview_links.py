@@ -8,7 +8,7 @@ from pathlib import Path
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
-SHOWCASE_ROUTE_OVERRIDES = {"02": "02-sales-intelligence/sample-explorer.html"}
+SHOWCASE_ROUTE_OVERRIDES = {"02": "02-sales-intelligence/sample-explorer.html", "03": "03-api-bridge/mapper.html"}
 PREVIEWS = {
     "02": "02-sales-intelligence/demo-ui.html",
     "03": "03-api-bridge/demo-ui.html",
@@ -48,7 +48,12 @@ class ShowcasePreviewTests(unittest.TestCase):
                 self.assertIn("../index.html", parser.links)
                 self.assertIn("README.md", parser.links)
                 self.assertIn("Synthetic data only", source)
-                self.assertIn("No data is sent or saved", source)
+                if number in {"02", "03"}:  # Legacy links remain standalone, unsaved previews.
+                    self.assertIn("No data is sent or saved", source)
+                else:
+                    self.assertIn("Only numerical summaries are saved locally", source)
+                    self.assertIn("form-action 'none'", source)
+                    self.assertIn("connect-src 'self'", source)
                 self.assertNotIn("fetch(", source)
                 self.assertNotIn("XMLHttpRequest", source)
                 self.assertNotIn("innerHTML", source)

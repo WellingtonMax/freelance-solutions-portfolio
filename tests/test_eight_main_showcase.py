@@ -60,7 +60,7 @@ class MainShowcaseTests(unittest.TestCase):
         routes = {
             "01": "01-excel-rescue/try.html",
             "02": "02-sales-intelligence/sample-explorer.html",
-            "03": "03-api-bridge/demo-ui.html",
+            "03": "03-api-bridge/mapper.html",
             "04": "04-crm-lead-intelligence/demo-ui.html",
             "05": "05-landing-page-studio/index.html",
             "06": "06-document-factory/demo-ui.html",

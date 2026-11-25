@@ -1,5 +1,6 @@
 import {templateText, sampleValues, mergeTemplate, validateValues, apiDraft, mappingCsv, variablesIn} from './merge.mjs';
-// Browser-only demonstration. Never upload, persist or fetch user data.
+import { mountHistory } from '../../assets/workbench/history-card.mjs';
+// Browser-only demonstration. Never upload or persist document fields.
 const fields = document.querySelector('#fields');
 const preview = document.querySelector('#preview');
 const status = document.querySelector('#status');
@@ -43,4 +44,5 @@ document.querySelector('#btn-json').addEventListener('click',()=>saveFile('panda
 document.querySelector('#btn-csv').addEventListener('click',()=>saveFile('variable_mapping_SAMPLE.csv',mappingCsv(values),'text/csv;charset=utf-8'));
 document.querySelector('#btn-print').addEventListener('click',()=>window.print());
 document.querySelector('#btn-reset').addEventListener('click',()=>{for(const [key,value] of entries){values[key]=value;document.getElementById('fld_'+key).value=value;}update();});
+mountHistory(document.querySelector("#run-history"), "docflow", () => validateValues(templateText, values).valid ? {fields:entries.length} : null);
 update();

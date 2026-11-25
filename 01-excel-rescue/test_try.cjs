@@ -48,7 +48,7 @@ test("do not interpret untrusted content as HTML",()=>{
  assert.match(x.cleanCsv,/<img/);
  const html=fs.readFileSync(path.join(__dirname,"try.html"),"utf8");
  const ui=fs.readFileSync(path.join(__dirname,"try-ui.js"),"utf8");
- assert.match(html,/connect-src 'none'/);assert.doesNotMatch(ui,/innerHTML|eval\(|fetch\(|document\.write/);
+ assert.match(html,/connect-src 'self'/);assert.doesNotMatch(ui,/innerHTML|eval\(|fetch\(|document\.write/);
  assert.match(ui,/\.value = output\.cleanCsv/);
 });
 
